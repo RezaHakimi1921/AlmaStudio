@@ -4,11 +4,10 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LinkPageContent } from "@/lib/types";
 import { publicPathForSlug } from "@/lib/routes";
-import { AdminRichToolbar } from "@/components/AdminRichToolbar";
+import { AdminRichEditor } from "@/components/AdminRichEditor";
 
 export function AdminEditForm({ page }: { page: LinkPageContent }) {
   const router = useRouter();
-  const bodyRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState<LinkPageContent>({ ...page });
   const [message, setMessage] = useState("");
@@ -186,23 +185,11 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         </label>
       </div>
 
-      <div className="rich-field">
-        <div className="rich-field__head">
-          <span className="rich-field__label">متن اصلی صفحه</span>
-          <AdminRichToolbar
-            textareaRef={bodyRef}
-            value={draft.bodyHtml}
-            onChange={(next) => updateField("bodyHtml", next)}
-          />
-        </div>
-        <textarea
-          ref={bodyRef}
-          value={draft.bodyHtml}
-          onChange={(e) => updateField("bodyHtml", e.target.value)}
-          style={{ minHeight: 180 }}
-          placeholder="متن را بنویسید؛ برای پررنگ یا کج کردن، انتخاب کنید و B یا I را بزنید."
-        />
-      </div>
+      <AdminRichEditor
+        resetKey={page.slug}
+        value={draft.bodyHtml}
+        onChange={(next) => updateField("bodyHtml", next)}
+      />
 
       <label>
         پکیج‌ها و قیمت (هر خط یک مورد — اختیاری)

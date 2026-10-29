@@ -403,11 +403,16 @@ nextjs-portal,
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .mood-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   margin: 0 0 0.55rem;
   padding: 0.28rem 0.7rem;
   border-radius: 999px;
@@ -420,6 +425,7 @@ nextjs-portal,
 .hero-brand-row {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.65rem;
   margin-bottom: 0.45rem;
 }
@@ -1112,6 +1118,53 @@ nextjs-portal,
 .rich-toolbar__hint {
   font-size: 0.75rem;
   color: var(--alma-muted);
+}
+
+.rich-editor {
+  min-height: 180px;
+  width: 100%;
+  border: 1px solid rgba(168, 50, 50, 0.2);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  background: #fffdf9;
+  color: var(--alma-ink);
+  line-height: 1.85;
+  outline: none;
+  overflow-wrap: anywhere;
+  direction: rtl;
+  text-align: right;
+}
+
+.rich-editor:focus {
+  border-color: rgba(168, 50, 50, 0.45);
+  box-shadow: 0 0 0 3px rgba(168, 50, 50, 0.12);
+}
+
+.rich-editor:empty::before,
+.rich-editor[data-placeholder]:not(:focus):has(> :only-child:empty)::before {
+  content: attr(data-placeholder);
+  color: var(--alma-muted);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.rich-editor b,
+.rich-editor strong {
+  font-weight: 700;
+  color: var(--alma-red-deep);
+}
+
+.rich-editor i,
+.rich-editor em {
+  font-style: italic;
+}
+
+.rich-editor p {
+  margin: 0 0 0.65rem;
+}
+
+.rich-editor p:last-child {
+  margin-bottom: 0;
 }
 
 .admin-login__lead {
