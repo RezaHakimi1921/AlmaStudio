@@ -1,9 +1,5 @@
-import { notFound } from "next/navigation";
-import { getPage } from "@/lib/content";
-import { LinkPageView } from "@/components/LinkPageView";
+import { redirect } from "next/navigation";
 
-export default async function StudioPrepPage() {
-  const page = await getPage("studio-prep");
-  if (!page) notFound();
-  return <LinkPageView page={page} />;
+export default function StudioPrepLegacyRedirect() {
+  redirect("/amadegi-atelier");
 }

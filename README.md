@@ -1,6 +1,6 @@
 # AlmaStudio — client links
 
-آتلیه آلما — لینک‌های اختصاصی مشتریان با سیستم طراحی یکپارچه (liquid glass + Alma red).
+آتلیه آلما — لینک‌های اختصاصی مشتریان.
 
 ## Start (localhost)
 
@@ -10,39 +10,34 @@ npm install
 npx next dev -p 3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+## Public URL map
 
-### Public links
+| Path | Page |
+|------|------|
+| `/` | Home |
+| `/fazabaz` | شرایط فضای باز |
+| `/amadegi-fazabaz` | آمادگی فضای باز |
+| `/amadegi-atelier` | آمادگی جهت عکاسی |
+| `/sharaet-alma` | شرایط آتلیه آلما |
+| `/admin` | Admin (`admin` / env password) |
 
-- `/links/studio-conditions` — شرایط آتلیه آلما (شفافیت و اعتبار)
-- `/links/studio-prep` — آمادگی جهت عکاسی (حرفه‌ای و صمیمی)
-- `/links/outdoor-conditions` — شرایط فضای باز (طبیعت و اعتماد)
-- `/links/outdoor-prep` — آمادگی فضای باز (آرامش و راهنمایی)
+Legacy `/links/outdoor-conditions` (etc.) → redirects to short paths.  
+`?shot=1` skips intro animation.
 
-Append `?shot=1` to skip intro animation.
+## Admin
 
-### Admin
-
-- URL: `/admin`
-- Login: `admin` / `alma123`
-- Visual blocks: text / note / price / image / contact (reorder, bold, draft/publish)
-- Per-page phone for `tel:` Call button (empty = disabled structure)
+- Login: `ADMIN_USERNAME` / `ADMIN_PASSWORD` (defaults `admin` / `alma123` locally)
+- Simple fields + hero **file upload** → `public/uploads/`
 - Persistence: `data/content.json`
 
-### Design
+## Docker + nginx (production)
 
-- Tokens: Alma red `#A83232`, cream `#F8F3ED`, garden `#58745A`
-- Skill: `.cursor/skills/alma-design/SKILL.md`
-
-### Hero upload (admin)
-
-In `/admin/[slug]`, use **آپلود از دستگاه** to save into `public/uploads/` (path written into `heroImageUrl`). URL/path field remains as fallback. Requires login.
-
-### Docker (ready — do not deploy until SSH keys set)
+See [deploy/DEPLOY.md](deploy/DEPLOY.md).
 
 ```bash
-docker compose build
-docker compose up -d
+cp .env.example .env   # set ADMIN_PASSWORD, ADMIN_SESSION_SECRET
+docker compose build && docker compose up -d
+# nginx: deploy/nginx-alma.artepersia.com.conf → alma.artepersia.com → 127.0.0.1:3000
 ```
 
-Later host: `alma.artepersia.com` → `78.39.51.105`. Volumes persist `data/` and `public/uploads/`.
+Host: `alma.artepersia.com` → `78.39.51.105`.

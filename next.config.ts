@@ -1,10 +1,32 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Hide Next.js black "N" floating badge in screenshots / local review
   devIndicators: false,
-  // Smaller production image for Docker
   output: "standalone",
+  async redirects() {
+    return [
+      {
+        source: "/links/outdoor-conditions",
+        destination: "/fazabaz",
+        permanent: true,
+      },
+      {
+        source: "/links/outdoor-prep",
+        destination: "/amadegi-fazabaz",
+        permanent: true,
+      },
+      {
+        source: "/links/studio-prep",
+        destination: "/amadegi-atelier",
+        permanent: true,
+      },
+      {
+        source: "/links/studio-conditions",
+        destination: "/sharaet-alma",
+        permanent: true,
+      },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {

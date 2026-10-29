@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { readContent } from "@/lib/content";
+import { publicPathForSlug } from "@/lib/routes";
 import { AlmaAppleLogo } from "@/components/AlmaAppleLogo";
 
 export const dynamic = "force-dynamic";
@@ -18,16 +19,19 @@ export default async function HomePage() {
         جدا برای هر موضوع.
       </p>
       <ul className="home-list">
-        {content.pages.map((page) => (
-          <li key={page.slug}>
-            <Link href={`/links/${page.slug}`} className="glass">
-              <strong>{page.title}</strong>
-              <span>
-                {page.moodTag} · /links/{page.slug}
-              </span>
-            </Link>
-          </li>
-        ))}
+        {content.pages.map((page) => {
+          const href = publicPathForSlug(page.slug);
+          return (
+            <li key={page.slug}>
+              <Link href={href} className="glass">
+                <strong>{page.title}</strong>
+                <span>
+                  {page.moodTag} · {href}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
       <p style={{ marginTop: "1.75rem" }}>
         <Link

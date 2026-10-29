@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LinkPageContent } from "@/lib/types";
+import { publicPathForSlug } from "@/lib/routes";
 
 export function AdminEditForm({ page }: { page: LinkPageContent }) {
   const router = useRouter();
@@ -263,7 +264,12 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         <button className="admin-btn" type="submit" disabled={saving}>
           {saving ? "در حال ذخیره..." : "ذخیره"}
         </button>
-        <a className="admin-btn admin-btn--ghost" href={`/links/${page.slug}`} target="_blank" rel="noreferrer">
+        <a
+          className="admin-btn admin-btn--ghost"
+          href={publicPathForSlug(page.slug)}
+          target="_blank"
+          rel="noreferrer"
+        >
           مشاهده
         </a>
         <a className="admin-btn admin-btn--ghost" href="/admin">

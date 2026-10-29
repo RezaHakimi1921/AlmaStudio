@@ -1,6 +1,5 @@
-# Production-ready compose for AlmaStudio
-# Domain (later): alma.artepersia.com → 78.39.51.105
-# Do not deploy until SSH keys are ready on the server.
+# Production compose — alma.artepersia.com → 78.39.51.105
+# Put secrets in `.env` next to this file (see .env.example).
 
 services:
   alma:
@@ -9,16 +8,29 @@ services:
     container_name: alma-studio
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      # Bound to localhost so nginx (host) proxies publicly
+      - "127.0.0.1:3000:3000"
     environment:
       NODE_ENV: production
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-alma123}
       ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-change-me-in-production}
     volumes:
-      # Persist admin content + uploaded heroes
       - alma_data:/app/data
       - alma_uploads:/app/public/uploads
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
 
 volumes:
   alma_data:
