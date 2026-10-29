@@ -34,17 +34,21 @@ export function ContactBar({ phone, maps, garden = false, brand, visible = true 
     return () => window.removeEventListener("keydown", onKey);
   }, [sheet]);
 
+  const hasPhone = phone.trim().length > 0;
   const hasMaps = maps.length > 0;
+  if (!hasPhone && !hasMaps) return null;
 
   return (
     <>
       <nav
         aria-label="تماس و مسیریابی"
-        className={`float-cta glass-strong${garden ? " float-cta--garden" : ""}${hasMaps ? " float-cta--split" : ""}${shot ? " float-cta--static" : ""}${visible ? "" : " is-waiting"}`}
+        className={`float-cta glass-strong${garden ? " float-cta--garden" : ""}${hasPhone && hasMaps ? " float-cta--split" : ""}${shot ? " float-cta--static" : ""}${visible ? "" : " is-waiting"}`}
       >
-        <CallButton phone={phone} garden={garden} brand={brand} className="call-btn--primary">
-          <span>تماس با آتلیه</span>
-        </CallButton>
+        {hasPhone ? (
+          <CallButton phone={phone} garden={garden} brand={brand} className="call-btn--primary">
+            <span>تماس با آتلیه</span>
+          </CallButton>
+        ) : null}
 
         {maps.length === 1 ? (
           <a

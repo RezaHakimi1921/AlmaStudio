@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { isAuthenticated } from "@/lib/auth";
 import { readContent } from "@/lib/content";
+import { publicPathForSlug } from "@/lib/routes";
 import { AdminLoginForm } from "@/components/AdminLoginForm";
 import { AdminLogoutButton } from "@/components/AdminLogoutButton";
 import { AlmaAppleLogo } from "@/components/AlmaAppleLogo";
@@ -48,7 +49,8 @@ export default async function AdminPage() {
                 {!page.published ? <span className="draft-badge">پیش‌نویس</span> : null}
               </strong>
               <span>
-                {page.moodTag} · ویرایش · /links/{page.slug}
+                {page.moodTag} · {publicPathForSlug(page.slug)} ·{" "}
+                {page.phone.trim() ? `تماس: ${page.phone.trim()}` : "بدون شماره تماس"}
               </span>
             </Link>
           </li>

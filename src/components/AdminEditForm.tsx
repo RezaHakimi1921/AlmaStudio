@@ -153,15 +153,25 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         ) : null}
       </fieldset>
 
-      <label>
-        تلفن تماس (خالی = دکمه غیرفعال)
-        <input
-          value={draft.phone}
-          onChange={(e) => updateField("phone", e.target.value)}
-          placeholder="مثلاً 02112345678"
-          inputMode="tel"
-        />
-      </label>
+      <fieldset className="hero-upload">
+        <legend>شماره تماس این لینک</legend>
+        <label>
+          شماره برای دکمه «تماس با آتلیه» (هر لینک جدا)
+          <input
+            value={draft.phone}
+            onChange={(e) => updateField("phone", e.target.value)}
+            placeholder="مثلاً 02155123456 یا 09121234567"
+            inputMode="tel"
+            dir="ltr"
+            autoComplete="tel"
+          />
+        </label>
+        <p className="hero-upload__hint">
+          {draft.phone.trim()
+            ? "روی صفحهٔ عمومی دکمه تماس با همین شماره (tel:) نمایش داده می‌شود."
+            : "خالی بگذارید تا دکمه تماس روی این لینک نشان داده نشود."}
+        </p>
+      </fieldset>
       <label>
         اینستاگرام
         <input value={draft.instagramUrl} onChange={(e) => updateField("instagramUrl", e.target.value)} />
