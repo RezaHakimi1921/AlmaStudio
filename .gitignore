@@ -21,9 +21,9 @@
 # misc
 .DS_Store
 *.pem
-demo-screenshots/
 
 # debug
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
