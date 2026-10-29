@@ -18,8 +18,12 @@
       "address": "تهران، شهرری، میدان شاه‌عبدالعظیم، خیابان زکریای رازی، پاساژ مروارید طبقه ۵ واحد ۵۰۳",
       "instagramUrl": "https://www.instagram.com/",
       "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
+      "neshanUrl": "",
+      "baleUrl": "",
       "showInstagram": true,
       "showMaps": true,
+      "showNeshan": false,
+      "showBale": false,
       "published": true
     },
     {
@@ -40,8 +44,12 @@
       "address": "تهران، شهرری، ابتدای خیابان ۲۴ متری، پاساژ مروارید طبقه ۵ واحد ۵۰۳",
       "instagramUrl": "https://www.instagram.com/",
       "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
+      "neshanUrl": "",
+      "baleUrl": "",
       "showInstagram": true,
       "showMaps": true,
+      "showNeshan": false,
+      "showBale": false,
       "published": true
     },
     {
@@ -62,8 +70,12 @@
       "address": "",
       "instagramUrl": "https://www.instagram.com/",
       "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
+      "neshanUrl": "",
+      "baleUrl": "",
       "showInstagram": true,
       "showMaps": false,
+      "showNeshan": false,
+      "showBale": false,
       "published": true
     },
     {
@@ -84,9 +96,99 @@
       "address": "تهران، شهرری، میدان بسیج، پمپ بنزین، باغ قصر سفید (هماهنگی دقیق مسیر از طریق استودیو)",
       "instagramUrl": "https://www.instagram.com/",
       "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
+      "neshanUrl": "",
+      "baleUrl": "",
       "showInstagram": true,
       "showMaps": true,
+      "showNeshan": false,
+      "showBale": false,
       "published": true
     }
-  ]
+  ],
+  "settings": {
+    "announcement": {
+      "enabled": false,
+      "tone": "festival",
+      "text": "جشنواره پاییزی آلما — ۱۵٪ تخفیف عکاسی بارداری و نوزاد",
+      "linkLabel": "رزرو",
+      "linkUrl": "",
+      "startDate": "",
+      "endDate": ""
+    },
+    "hours": {
+      "enabled": false,
+      "note": "پذیرش با هماهنگی و رزرو قبلی",
+      "days": [
+        {
+          "day": 0,
+          "open": true,
+          "from": "10:00",
+          "to": "20:00"
+        },
+        {
+          "day": 1,
+          "open": true,
+          "from": "10:00",
+          "to": "20:00"
+        },
+        {
+          "day": 2,
+          "open": true,
+          "from": "10:00",
+          "to": "20:00"
+        },
+        {
+          "day": 3,
+          "open": true,
+          "from": "10:00",
+          "to": "20:00"
+        },
+        {
+          "day": 4,
+          "open": true,
+          "from": "10:00",
+          "to": "20:00"
+        },
+        {
+          "day": 5,
+          "open": true,
+          "from": "10:00",
+          "to": "14:00"
+        },
+        {
+          "day": 6,
+          "open": false,
+          "from": "10:00",
+          "to": "20:00"
+        }
+      ]
+    },
+    "faq": {
+      "enabled": false,
+      "items": [
+        {
+          "id": "faq-age",
+          "question": "بهترین زمان برای عکاسی نوزاد چه روزهایی است؟",
+          "answer": "معمولاً روزهای ۵ تا ۱۴ پس از تولد، زمانی که نوزاد بیشتر می‌خوابد و ژست‌های نوزادی راحت‌تر انجام می‌شود.",
+          "visible": true
+        },
+        {
+          "id": "faq-pregnancy",
+          "question": "عکاسی بارداری در چه ماهی انجام شود؟",
+          "answer": "بهترین زمان معمولاً هفته‌های ۲۸ تا ۳۴ بارداری است؛ فرم شکم زیباست و مادر هنوز احساس راحتی دارد.",
+          "visible": true
+        },
+        {
+          "id": "faq-delivery",
+          "question": "فایل‌های نهایی چه زمانی تحویل داده می‌شود؟",
+          "answer": "زمان تحویل در فاکتور شما درج می‌شود. در صورت نیاز می‌توانید با آتلیه تماس بگیرید.",
+          "visible": true
+        }
+      ]
+    },
+    "gallery": {
+      "enabled": true,
+      "images": []
+    }
+  }
 }

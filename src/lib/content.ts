@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { defaultContent, defaultSettings } from "./default-content";
+import { normalizeMediaUrl } from "./media";
 import type {
   DayHours,
   FaqItem,
@@ -36,7 +37,7 @@ function migratePage(raw: Record<string, unknown>, fallback: LinkPageContent): L
     subtitle: String(raw.subtitle ?? fallback.subtitle ?? ""),
     moodTag: String(raw.moodTag ?? fallback.moodTag),
     brandLabel: String(raw.brandLabel ?? fallback.brandLabel),
-    heroImageUrl: String(raw.heroImageUrl ?? fallback.heroImageUrl),
+    heroImageUrl: normalizeMediaUrl(String(raw.heroImageUrl ?? fallback.heroImageUrl)),
     introTheme: (raw.introTheme as LinkPageContent["introTheme"]) || fallback.introTheme,
     introLabel: String(raw.introLabel ?? fallback.introLabel),
     phone: raw.phone != null ? String(raw.phone) : fallback.phone || "",
@@ -125,7 +126,7 @@ export function migrateSettings(raw: unknown): SiteSettings {
         .map(obj)
         .map((x, i) => ({
           id: str(x.id) || `img-${Date.now()}-${i}`,
-          url: str(x.url).trim(),
+          url: normalizeMediaUrl(str(x.url).trim()),
           caption: str(x.caption).trim().slice(0, 120),
           category: (GALLERY_CATEGORIES as readonly string[]).includes(str(x.category))
             ? (str(x.category) as GalleryImage["category"])
@@ -135,7 +136,15 @@ export function migrateSettings(raw: unknown): SiteSettings {
     : [];
   const gallery = { enabled: bool(g.enabled, d.gallery.enabled), images };
 
-  return { announcement, hours, faq, gallery };
+  const hubRaw = obj(r.hub);
+  const hub = {
+    title: str(hubRaw.title, d.hub.title).slice(0, 80) || d.hub.title,
+    subtitle: str(hubRaw.subtitle, d.hub.subtitle).slice(0, 200),
+    heroImageUrl:
+      normalizeMediaUrl(str(hubRaw.heroImageUrl, d.hub.heroImageUrl)) || d.hub.heroImageUrl,
+  };
+
+  return { hub, announcement, hours, faq, gallery };
 }
 
 function migrateContent(parsed: unknown): SiteContent {

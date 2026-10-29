@@ -97,7 +97,15 @@ export type GalleryImage = {
   category: GalleryCategory;
 };
 
+/** Home hub (`/`) hero — admin-editable banner */
+export type HubSettings = {
+  title: string;
+  subtitle: string;
+  heroImageUrl: string;
+};
+
 export type SiteSettings = {
+  hub: HubSettings;
   announcement: Announcement;
   hours: WorkingHours;
   faq: { enabled: boolean; items: FaqItem[] };

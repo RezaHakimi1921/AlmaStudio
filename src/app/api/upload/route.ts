@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
+import { normalizeMediaUrl } from "@/lib/media";
 
 export const runtime = "nodejs";
 
@@ -61,6 +62,6 @@ export async function POST(request: Request) {
   const buffer = Buffer.from(await file.arrayBuffer());
   await fs.writeFile(path.join(uploadDir, name), buffer);
 
-  const url = `/uploads/${name}`;
+  const url = normalizeMediaUrl(`/uploads/${name}`);
   return NextResponse.json({ ok: true, url, path: url });
 }

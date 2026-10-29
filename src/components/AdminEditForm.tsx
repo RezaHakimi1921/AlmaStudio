@@ -1,20 +1,27 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { LinkPageContent } from "@/lib/types";
 import { publicPathForSlug } from "@/lib/routes";
+import { normalizeMediaUrl } from "@/lib/media";
+import { HeroImageField } from "@/components/HeroImageField";
 
 export function AdminEditForm({ page }: { page: LinkPageContent }) {
   const router = useRouter();
   const bodyRef = useRef<HTMLTextAreaElement>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [draft, setDraft] = useState<LinkPageContent>({ ...page });
+  const [draft, setDraft] = useState<LinkPageContent>({
+    ...page,
+    heroImageUrl: normalizeMediaUrl(page.heroImageUrl),
+  });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    setDraft({ ...page, heroImageUrl: normalizeMediaUrl(page.heroImageUrl) });
+  }, [page]);
 
   function updateField<K extends keyof LinkPageContent>(
     key: K,
@@ -41,40 +48,21 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
     });
   }
 
-  async function onHeroUpload(file: File | null) {
-    if (!file) return;
-    setUploading(true);
-    setError("");
-    setMessage("");
-    try {
-      const body = new FormData();
-      body.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body });
-      const data = (await res.json()) as { ok?: boolean; url?: string; error?: string };
-      if (!res.ok || !data.ok || !data.url) {
-        setError(data.error || "آپلود ناموفق بود");
-        return;
-      }
-      updateField("heroImageUrl", data.url);
-      setMessage("تصویر هیرو آپلود شد — برای اعمال ذخیره کنید");
-    } catch {
-      setError("خطا در آپلود");
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
-  }
-
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError("");
     setMessage("");
     try {
+      const payload = {
+        ...draft,
+        heroImageUrl: normalizeMediaUrl(draft.heroImageUrl),
+      };
+      setDraft(payload);
       const res = await fetch("/api/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ page: draft }),
+        body: JSON.stringify({ page: payload }),
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) {
@@ -120,38 +108,13 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         برچسب اینترو
         <input value={draft.introLabel} onChange={(e) => updateField("introLabel", e.target.value)} />
       </label>
-      <fieldset className="hero-upload">
-        <legend>تصویر هیرو</legend>
-        <label>
-          آپلود از دستگاه
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            disabled={uploading}
-            onChange={(e) => onHeroUpload(e.target.files?.[0] || null)}
-          />
-        </label>
-        <p className="hero-upload__hint">
-          {uploading ? "در حال آپلود…" : "JPG / PNG / WebP / GIF تا ۸MB — در public/uploads ذخیره می‌شود"}
-        </p>
-        <label>
-          یا URL / مسیر (fallback)
-          <input
-            value={draft.heroImageUrl}
-            onChange={(e) => updateField("heroImageUrl", e.target.value)}
-            placeholder="/uploads/… یا https://…"
-          />
-        </label>
-        {draft.heroImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={draft.heroImageUrl}
-            alt=""
-            className="hero-upload__preview"
-          />
-        ) : null}
-      </fieldset>
+      <HeroImageField
+        label="تصویر هیرو این لینک"
+        value={draft.heroImageUrl}
+        onChange={(url) => updateField("heroImageUrl", url)}
+        onMessage={setMessage}
+        onError={setError}
+      />
 
       <fieldset className="hero-upload">
         <legend>شماره تماس این لینک</legend>

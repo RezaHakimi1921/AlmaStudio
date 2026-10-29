@@ -13,6 +13,11 @@ const HERO = {
 };
 
 export const defaultSettings: SiteSettings = {
+  hub: {
+    title: "آتلیه آلما",
+    subtitle: "عکاسی نوزاد، بارداری و فضای باز — لینک‌های اختصاصی مشتریان",
+    heroImageUrl: HERO.gardenMorning,
+  },
   announcement: {
     enabled: false,
     tone: "festival",

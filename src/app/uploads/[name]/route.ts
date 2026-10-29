@@ -21,7 +21,9 @@ const SAFE_NAME = /^[A-Za-z0-9._-]+$/;
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
 export async function GET(_req: Request, { params }: { params: Promise<{ name: string }> }) {
-  const { name } = await params;
+  // strip accidental trailing slash from /uploads/foo.jpg/
+  const { name: rawName } = await params;
+  const name = decodeURIComponent(rawName || "").replace(/\/+$/, "");
   const type = TYPES[path.extname(name).toLowerCase()];
   if (!SAFE_NAME.test(name) || name.startsWith(".") || !type) {
     return new Response("Not found", { status: 404 });

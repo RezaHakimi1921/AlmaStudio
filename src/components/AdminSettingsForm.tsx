@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FA_DAYS, faJalali } from "@/lib/tehran";
+import { normalizeMediaUrl } from "@/lib/media";
 import type { DayHours, FaqItem, SiteSettings } from "@/lib/types";
 import { AnnouncementBar } from "./AnnouncementBar";
+import { HeroImageField } from "./HeroImageField";
 
 export function Switch({
   checked,
@@ -42,7 +44,14 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    setS(initial);
+  }, [initial]);
+
   const a = s.announcement;
+  const hub = s.hub;
+  const setHub = (patch: Partial<SiteSettings["hub"]>) =>
+    setS((p) => ({ ...p, hub: { ...p.hub, ...patch } }));
   const setA = (patch: Partial<SiteSettings["announcement"]>) =>
     setS((p) => ({ ...p, announcement: { ...p.announcement, ...patch } }));
   const setHours = (patch: Partial<SiteSettings["hours"]>) =>
@@ -67,7 +76,14 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
     setError("");
     setMessage("");
     try {
-      setS(await saveSettings(s));
+      const payload: SiteSettings = {
+        ...s,
+        hub: {
+          ...s.hub,
+          heroImageUrl: normalizeMediaUrl(s.hub.heroImageUrl),
+        },
+      };
+      setS(await saveSettings(payload));
       setMessage("ذخیره شد ✓");
       router.refresh();
     } catch (err) {
@@ -79,6 +95,42 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
 
   return (
     <form className="admin-settings" onSubmit={onSave}>
+      {/* ---------------- Hub hero ---------------- */}
+      <section className="admin-card glass admin-section">
+        <div className="admin-section__head">
+          <div>
+            <h2>تصویر هاب اصلی (/)</h2>
+            <p>بنر صفحهٔ ورود alma — عنوان، زیرعنوان و تصویر هیرو.</p>
+          </div>
+        </div>
+        <div className="admin-grid">
+          <label>
+            عنوان
+            <input
+              value={hub.title}
+              maxLength={80}
+              onChange={(e) => setHub({ title: e.target.value })}
+              required
+            />
+          </label>
+          <label className="span-2">
+            زیرعنوان
+            <input
+              value={hub.subtitle}
+              maxLength={200}
+              onChange={(e) => setHub({ subtitle: e.target.value })}
+            />
+          </label>
+        </div>
+        <HeroImageField
+          label="تصویر بنر هاب"
+          value={hub.heroImageUrl}
+          onChange={(url) => setHub({ heroImageUrl: url })}
+          onMessage={setMessage}
+          onError={setError}
+        />
+      </section>
+
       {/* ---------------- Announcement ---------------- */}
       <section className="admin-card glass admin-section">
         <div className="admin-section__head">

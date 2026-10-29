@@ -11,7 +11,10 @@ export default async function AdminSettingsPage() {
   const settings = await getSettings();
   return (
     <main className="admin-shell">
-      <AdminHeader title="اطلاعیه، ساعات و سوالات" subtitle="روی همه لینک‌ها نمایش داده می‌شود" />
+      <AdminHeader
+        title="هاب، اطلاعیه، ساعات و سوالات"
+        subtitle="بنر صفحهٔ اصلی و تنظیمات مشترک همه لینک‌ها"
+      />
       <AdminSettingsForm initial={settings} />
     </main>
   );
