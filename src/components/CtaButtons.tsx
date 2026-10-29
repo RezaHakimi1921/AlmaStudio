@@ -1,27 +1,30 @@
-import { InstagramIcon, PinIcon } from "./Icons";
+import { ChatIcon, InstagramIcon } from "./Icons";
 
 type Props = {
   showInstagram: boolean;
-  showMaps: boolean;
   instagramUrl: string;
-  mapsUrl: string;
+  showBale: boolean;
+  baleUrl: string;
   garden?: boolean;
 };
 
+/** Social / messenger links at the end of the page (Instagram + optional Bale). */
 export function CtaButtons({
   showInstagram,
-  showMaps,
   instagramUrl,
-  mapsUrl,
+  showBale,
+  baleUrl,
   garden = false,
 }: Props) {
-  if (!showInstagram && !showMaps) return null;
+  const instagram = showInstagram && Boolean(instagramUrl);
+  const bale = showBale && Boolean(baleUrl);
+  if (!instagram && !bale) return null;
 
   return (
     <div className="cta-stack" data-reveal>
-      {showInstagram ? (
-        <div>
-          <p className="cta-heading">ما را در اینستاگرام دنبال کنید</p>
+      <p className="cta-heading">با ما در ارتباط باشید</p>
+      <div className={`social-row${instagram && bale ? " social-row--two" : ""}`}>
+        {instagram ? (
           <a
             className={`cta-btn cta-btn--shine${garden ? " cta-btn--garden" : ""}`}
             href={instagramUrl}
@@ -29,24 +32,21 @@ export function CtaButtons({
             rel="noopener noreferrer"
           >
             <InstagramIcon />
-            <span>اینستاگرام آلما</span>
+            <span>اینستاگرام</span>
           </a>
-        </div>
-      ) : null}
-      {showMaps ? (
-        <div>
-          <p className="cta-heading">آدرس و مسیریابی</p>
+        ) : null}
+        {bale ? (
           <a
             className="cta-btn cta-btn--ghost"
-            href={mapsUrl}
+            href={baleUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <PinIcon />
-            <span>مسیریاب گوگل</span>
+            <ChatIcon />
+            <span>پیام در بله</span>
           </a>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   );
 }

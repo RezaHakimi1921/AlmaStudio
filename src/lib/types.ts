@@ -26,8 +26,14 @@ export type LinkPageContent = {
   address: string;
   instagramUrl: string;
   mapsUrl: string;
+  /** Neshan map link (e.g. https://nshn.ir/…) — optional */
+  neshanUrl: string;
+  /** Bale messenger link (e.g. https://ble.ir/username) — optional */
+  baleUrl: string;
   showInstagram: boolean;
   showMaps: boolean;
+  showNeshan: boolean;
+  showBale: boolean;
   published: boolean;
 };
 

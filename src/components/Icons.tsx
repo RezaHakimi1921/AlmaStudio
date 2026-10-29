@@ -96,3 +96,29 @@ export function ChevronDownIcon({ size = 18, className }: IconProps) {
     </svg>
   );
 }
+
+/** Generic chat bubble — used for the Bale messenger link */
+export function ChatIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+      <path
+        d="M12 3.5c4.9 0 8.5 3.4 8.5 7.6s-3.6 7.6-8.5 7.6c-1 0-2-.1-2.9-.4L5 20l1-3.6c-1.6-1.4-2.5-3.2-2.5-5.3 0-4.2 3.6-7.6 8.5-7.6z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <circle cx="8.5" cy="11.2" r="1.1" fill="currentColor" />
+      <circle cx="12" cy="11.2" r="1.1" fill="currentColor" />
+      <circle cx="15.5" cy="11.2" r="1.1" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** Generic navigation arrow — used for the Neshan link */
+export function NavigateIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+      <path d="M20 4L4 10.5l7 2.5 2.5 7L20 4z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    </svg>
+  );
+}

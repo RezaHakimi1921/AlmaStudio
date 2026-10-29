@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { LinkPageContent } from "@/lib/types";
 import { publicPathForSlug } from "@/lib/routes";
@@ -96,7 +97,7 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         {!draft.published ? <span className="draft-badge">پیش‌نویس</span> : null}
       </div>
       <p style={{ margin: 0, color: "var(--alma-muted)" }}>
-        ویرایش ساده · /links/{page.slug}
+        ویرایش ساده · {publicPathForSlug(page.slug)}
       </p>
 
       <label>
@@ -166,8 +167,31 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         <input value={draft.instagramUrl} onChange={(e) => updateField("instagramUrl", e.target.value)} />
       </label>
       <label>
-        نقشه / مسیریاب
-        <input value={draft.mapsUrl} onChange={(e) => updateField("mapsUrl", e.target.value)} />
+        مسیریاب گوگل
+        <input
+          value={draft.mapsUrl}
+          onChange={(e) => updateField("mapsUrl", e.target.value)}
+          dir="ltr"
+          placeholder="https://maps.google.com/…"
+        />
+      </label>
+      <label>
+        مسیریاب نشان (اختیاری)
+        <input
+          value={draft.neshanUrl}
+          onChange={(e) => updateField("neshanUrl", e.target.value)}
+          dir="ltr"
+          placeholder="https://nshn.ir/…"
+        />
+      </label>
+      <label>
+        پیام‌رسان بله (اختیاری)
+        <input
+          value={draft.baleUrl}
+          onChange={(e) => updateField("baleUrl", e.target.value)}
+          dir="ltr"
+          placeholder="https://ble.ir/username"
+        />
       </label>
 
       <div className="admin-actions">
@@ -182,10 +206,30 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
           </select>
         </label>
         <label style={{ flex: 1 }}>
-          نمایش نقشه
+          نمایش گوگل‌مپ
           <select
             value={draft.showMaps ? "1" : "0"}
             onChange={(e) => updateField("showMaps", e.target.value === "1")}
+          >
+            <option value="1">بله</option>
+            <option value="0">خیر</option>
+          </select>
+        </label>
+        <label style={{ flex: 1 }}>
+          نمایش نشان
+          <select
+            value={draft.showNeshan ? "1" : "0"}
+            onChange={(e) => updateField("showNeshan", e.target.value === "1")}
+          >
+            <option value="1">بله</option>
+            <option value="0">خیر</option>
+          </select>
+        </label>
+        <label style={{ flex: 1 }}>
+          نمایش بله
+          <select
+            value={draft.showBale ? "1" : "0"}
+            onChange={(e) => updateField("showBale", e.target.value === "1")}
           >
             <option value="1">بله</option>
             <option value="0">خیر</option>
@@ -272,9 +316,9 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         >
           مشاهده
         </a>
-        <a className="admin-btn admin-btn--ghost" href="/admin">
+        <Link className="admin-btn admin-btn--ghost" href="/admin">
           بازگشت
-        </a>
+        </Link>
       </div>
     </form>
   );

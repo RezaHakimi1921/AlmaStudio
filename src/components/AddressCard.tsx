@@ -6,11 +6,9 @@ import { CheckIcon, CopyIcon, PinIcon } from "./Icons";
 type Props = {
   title?: string;
   address: string;
-  mapsUrl?: string;
-  showMaps?: boolean;
 };
 
-export function AddressCard({ title, address, mapsUrl = "", showMaps = false }: Props) {
+export function AddressCard({ title, address }: Props) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -35,12 +33,6 @@ export function AddressCard({ title, address, mapsUrl = "", showMaps = false }: 
           {copied ? <CheckIcon /> : <CopyIcon />}
           <span>{copied ? "کپی شد" : "کپی آدرس"}</span>
         </button>
-        {showMaps && mapsUrl ? (
-          <a className="chip-btn" href={mapsUrl} target="_blank" rel="noopener noreferrer">
-            <PinIcon size={16} />
-            <span>نمایش روی نقشه</span>
-          </a>
-        ) : null}
       </div>
     </section>
   );

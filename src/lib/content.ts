@@ -45,9 +45,13 @@ function migratePage(raw: Record<string, unknown>, fallback: LinkPageContent): L
     address: String(raw.address ?? fallback.address ?? ""),
     instagramUrl: String(raw.instagramUrl ?? fallback.instagramUrl),
     mapsUrl: String(raw.mapsUrl ?? fallback.mapsUrl),
+    neshanUrl: String(raw.neshanUrl ?? fallback.neshanUrl ?? ""),
+    baleUrl: String(raw.baleUrl ?? fallback.baleUrl ?? ""),
     showInstagram:
       raw.showInstagram != null ? Boolean(raw.showInstagram) : fallback.showInstagram,
     showMaps: raw.showMaps != null ? Boolean(raw.showMaps) : fallback.showMaps,
+    showNeshan: raw.showNeshan != null ? Boolean(raw.showNeshan) : false,
+    showBale: raw.showBale != null ? Boolean(raw.showBale) : false,
     published: raw.published != null ? Boolean(raw.published) : true,
   };
 }

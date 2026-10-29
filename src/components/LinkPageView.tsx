@@ -8,7 +8,6 @@ import { IntroAnimation } from "./IntroAnimation";
 import { HeroSection } from "./HeroSection";
 import { CtaButtons } from "./CtaButtons";
 import { ContactBar } from "./ContactBar";
-import { QuickActions } from "./QuickActions";
 import { AddressCard } from "./AddressCard";
 import { CheckIcon, InfoIcon, SparkIcon, TagIcon } from "./Icons";
 
@@ -63,6 +62,14 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
 
   const packages = linesToParagraphs(page.packagesText || "");
   const notes = linesToParagraphs(page.notesText || "");
+  const mapLinks = [
+    page.showNeshan && page.neshanUrl.trim()
+      ? { key: "neshan", label: "نشان", href: page.neshanUrl.trim() }
+      : null,
+    page.showMaps && page.mapsUrl.trim()
+      ? { key: "google", label: "گوگل‌مپ", href: page.mapsUrl.trim() }
+      : null,
+  ].filter((m): m is { key: string; label: string; href: string } => m !== null);
 
   return (
     <>
@@ -96,15 +103,6 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
         >
           <div className="link-body-photo" aria-hidden="true" />
 
-          <QuickActions
-            phone={page.phone}
-            garden={garden}
-            brand={page.brandLabel}
-            showInstagram={page.showInstagram}
-            instagramUrl={page.instagramUrl}
-            showMaps={page.showMaps}
-            mapsUrl={page.mapsUrl}
-          />
 
           {!page.published ? (
             <p className="draft-badge" style={{ marginBottom: "1rem" }}>
@@ -168,12 +166,7 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
           ) : null}
 
           {page.address ? (
-            <AddressCard
-              title={page.addressTitle}
-              address={page.address}
-              mapsUrl={page.mapsUrl}
-              showMaps={page.showMaps}
-            />
+            <AddressCard title={page.addressTitle} address={page.address} />
           ) : null}
 
           {page.closingMessage ? (
@@ -185,9 +178,9 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
 
           <CtaButtons
             showInstagram={page.showInstagram}
-            showMaps={false}
             instagramUrl={page.instagramUrl}
-            mapsUrl={page.mapsUrl}
+            showBale={page.showBale}
+            baleUrl={page.baleUrl}
             garden={garden}
           />
         </div>
@@ -195,8 +188,7 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
 
       <ContactBar
         phone={page.phone}
-        showMaps={page.showMaps}
-        mapsUrl={page.mapsUrl}
+        maps={mapLinks}
         garden={garden}
         brand={page.brandLabel}
         visible={entered}

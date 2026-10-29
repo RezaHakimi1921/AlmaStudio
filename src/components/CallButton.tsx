@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { MouseEvent, PointerEvent, ReactNode } from "react";
+import type { PointerEvent, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useIsClient } from "@/lib/client";
 import { CloseIcon, PhoneIcon } from "./Icons";
@@ -15,7 +15,6 @@ type Props = {
   ariaLabel?: string;
 };
 
-const DIAL_DELAY_MS = 750;
 const OVERLAY_MS = 3600;
 const SPARKS = 14;
 
@@ -36,8 +35,8 @@ function prefersReducedMotion() {
 
 /**
  * Call button with a tactile ripple + a full-screen "connecting" moment
- * (expanding rings, spark burst, ringing phone) before the dialer opens.
- * A real tel: link is always present in the overlay as a fallback.
+ * (expanding rings, spark burst, ringing phone) shown while the phone's
+ * native dialer opens via the tel: link.
  */
 export function CallButton({
   phone,
@@ -50,34 +49,34 @@ export function CallButton({
   const [calling, setCalling] = useState(false);
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const timers = useRef<number[]>([]);
-  const dialTimer = useRef<number | null>(null);
   const mounted = useIsClient();
   const ready = phone.trim().length > 0;
   const href = telHref(phone);
 
   useEffect(() => {
     const list = timers.current;
-    return () => {
-      list.forEach((t) => window.clearTimeout(t));
-      if (dialTimer.current != null) window.clearTimeout(dialTimer.current);
-    };
+    return () => list.forEach((t) => window.clearTimeout(t));
   }, []);
 
-  const close = useCallback(() => {
-    if (dialTimer.current != null) {
-      window.clearTimeout(dialTimer.current);
-      dialTimer.current = null;
-    }
-    setCalling(false);
-  }, []);
+  const close = useCallback(() => setCalling(false), []);
 
   useEffect(() => {
     if (!calling) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
+    // Dialer took over the screen → when the visitor comes back, clear the overlay
+    let wentAway = false;
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") wentAway = true;
+      else if (wentAway) close();
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [calling, close]);
 
   const addRipple = useCallback((e: PointerEvent<HTMLElement>) => {
@@ -88,20 +87,14 @@ export function CallButton({
     timers.current.push(t);
   }, []);
 
-  const onClick = useCallback(
-    (e: MouseEvent<HTMLAnchorElement>) => {
-      if (prefersReducedMotion()) return; // let the link dial immediately
-      e.preventDefault();
-      navigator.vibrate?.([14, 50, 14]);
-      setCalling(true);
-      dialTimer.current = window.setTimeout(() => {
-        dialTimer.current = null;
-        window.location.href = href;
-      }, DIAL_DELAY_MS);
-      timers.current.push(window.setTimeout(() => setCalling(false), OVERLAY_MS));
-    },
-    [href],
-  );
+  // The tel: link is never blocked or delayed: the phone's own dialer opens
+  // right away, and the visual effect plays at the same time.
+  const onClick = useCallback(() => {
+    if (prefersReducedMotion()) return;
+    navigator.vibrate?.([14, 50, 14]);
+    setCalling(true);
+    timers.current.push(window.setTimeout(() => setCalling(false), OVERLAY_MS));
+  }, []);
 
   if (!ready) {
     return (
@@ -181,7 +174,7 @@ export function CallButton({
                 </p>
 
                 <a className="call-overlay__fallback" href={href}>
-                  اگر شماره‌گیر باز نشد، اینجا بزنید
+                  شماره‌گیری دوباره
                 </a>
               </div>
             </div>,
