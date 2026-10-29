@@ -1,69 +1,81 @@
-import Image from "next/image";
+import Link from "next/link";
+import { readContent } from "@/lib/content";
+import { publicPathForSlug } from "@/lib/routes";
+import { AlmaAppleLogo } from "@/components/AlmaAppleLogo";
+import { HubLinkIcon } from "@/components/HubLinkIcon";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const content = await readContent();
+  const { hub, pages } = content;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="hub-page">
+      <section className="hub-hero" aria-label="معرفی آتلیه آلما">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="hub-hero__photo"
+          src={hub.heroImageUrl}
+          alt=""
+          decoding="async"
+          fetchPriority="high"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <div className="hub-hero__veil" />
+        <div className="hub-hero__copy glass-strong">
+          <AlmaAppleLogo size={48} className="alma-logo--on-dark" />
+          <h1 className="hub-hero__title">{hub.title}</h1>
+          <p className="hub-hero__subtitle">{hub.subtitle}</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+
+      <section className="hub-body">
+        <header className="hub-body__head">
+          <p className="hub-body__eyebrow">لینک‌های مشتریان</p>
+          <p className="hub-body__hint">یکی از موضوع‌ها را انتخاب کنید</p>
+        </header>
+
+        <ul className="hub-list">
+          {pages
+            .filter((page) => page.published)
+            .map((page) => {
+              const href = publicPathForSlug(page.slug);
+              return (
+                <li key={page.slug}>
+                  <Link href={href} className="hub-card glass">
+                    <span className="hub-card__icon" data-slug={page.slug}>
+                      <HubLinkIcon slug={page.slug} />
+                    </span>
+                    <span className="hub-card__text">
+                      <strong className="hub-card__title">{page.title}</strong>
+                      <span className="hub-card__mood">{page.moodTag}</span>
+                      <span className="hub-card__desc">{page.subtitle}</span>
+                    </span>
+                    <span className="hub-card__enter" aria-hidden="true">
+                      ورود
+                      <svg viewBox="0 0 20 20" width="16" height="16" fill="none">
+                        <path
+                          d="M12.5 4.5 7 10l5.5 5.5"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+        </ul>
+
+        <footer className="hub-admin">
+          <p className="hub-admin__note">ورود مدیریت فقط برای تیم آتلیه</p>
+          <Link href="/admin" className="hub-admin__link">
+            پنل مدیریت
+          </Link>
+        </footer>
+      </section>
+    </main>
   );
 }
