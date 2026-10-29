@@ -1025,10 +1025,19 @@ nextjs-portal,
   font-size: 0.88rem;
 }
 
+.admin-shell--login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: min(100dvh, 900px);
+  padding-block: 2rem;
+}
+
 .admin-login {
   width: min(100%, 420px);
-  margin: 1.25rem auto 0;
-  padding: 1.35rem 1.2rem 1.45rem;
+  margin: 0 auto;
+  padding: 1.45rem 1.25rem 1.5rem;
   border-radius: 20px;
   display: grid;
   gap: 0.85rem;
@@ -1037,11 +1046,72 @@ nextjs-portal,
     rgba(248, 243, 237, 0.7);
 }
 
+.admin-login__brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.15rem;
+}
+
+.admin-login__brand .alma-logo {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 .admin-login__title {
   margin: 0;
   color: var(--alma-red);
   font-size: 1.45rem;
   text-align: center;
+}
+
+.rich-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.rich-field__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.rich-field__label {
+  font-size: 0.9rem;
+  color: var(--alma-ink);
+}
+
+.rich-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.rich-toolbar__btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(168, 50, 50, 0.22);
+  background: #fffdf9;
+  color: var(--alma-red-deep);
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.rich-toolbar__btn:hover {
+  background: rgba(168, 50, 50, 0.08);
+  border-color: rgba(168, 50, 50, 0.35);
+}
+
+.rich-toolbar__hint {
+  font-size: 0.75rem;
+  color: var(--alma-muted);
 }
 
 .admin-login__lead {
@@ -1257,6 +1327,7 @@ nextjs-portal,
   .admin-form > fieldset,
   .admin-form > .admin-actions,
   .admin-form > div,
+  .admin-form > .rich-field,
   .admin-form > .admin-error,
   .admin-form > .admin-ok,
   .admin-form label:has(textarea) {

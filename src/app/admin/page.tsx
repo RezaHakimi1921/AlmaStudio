@@ -12,8 +12,7 @@ export default async function AdminPage() {
 
   if (!authed) {
     return (
-      <main className="admin-shell">
-        <AlmaAppleLogo size={44} variant="lockup" />
+      <main className="admin-shell admin-shell--login">
         <AdminLoginForm />
       </main>
     );

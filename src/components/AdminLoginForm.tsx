@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AlmaAppleLogo } from "@/components/AlmaAppleLogo";
 
 export function AdminLoginForm() {
   const router = useRouter();
@@ -35,6 +36,9 @@ export function AdminLoginForm() {
 
   return (
     <form className="admin-login glass" onSubmit={onSubmit}>
+      <div className="admin-login__brand">
+        <AlmaAppleLogo size={52} variant="lockup" />
+      </div>
       <h1 className="admin-login__title">ورود مدیریت</h1>
       <p className="admin-login__lead">
         برای ویرایش هاب و لینک‌های مشتریان وارد شوید.

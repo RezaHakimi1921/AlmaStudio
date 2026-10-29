@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { LinkPageContent } from "@/lib/types";
 import { publicPathForSlug } from "@/lib/routes";
+import { AdminRichToolbar } from "@/components/AdminRichToolbar";
 
 export function AdminEditForm({ page }: { page: LinkPageContent }) {
   const router = useRouter();
@@ -20,24 +21,6 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
     value: LinkPageContent[K],
   ) {
     setDraft((prev) => ({ ...prev, [key]: value }));
-  }
-
-  /** Wrap selected text in <b>…</b> inside the body textarea */
-  function wrapBold() {
-    const el = bodyRef.current;
-    if (!el) return;
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
-    const value = el.value;
-    const selected = value.slice(start, end) || "متن پررنگ";
-    const next =
-      value.slice(0, start) + `<b>${selected}</b>` + value.slice(end);
-    updateField("bodyHtml", next);
-    requestAnimationFrame(() => {
-      el.focus();
-      const pos = start + 3 + selected.length;
-      el.setSelectionRange(pos, pos);
-    });
   }
 
   async function onHeroUpload(file: File | null) {
@@ -203,19 +186,21 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         </label>
       </div>
 
-      <div>
-        <div className="admin-actions" style={{ marginBottom: "0.4rem" }}>
-          <span style={{ fontSize: "0.9rem", color: "var(--alma-ink)" }}>متن اصلی صفحه</span>
-          <button type="button" className="admin-btn admin-btn--ghost" onClick={wrapBold}>
-            پررنگ (Bold)
-          </button>
+      <div className="rich-field">
+        <div className="rich-field__head">
+          <span className="rich-field__label">متن اصلی صفحه</span>
+          <AdminRichToolbar
+            textareaRef={bodyRef}
+            value={draft.bodyHtml}
+            onChange={(next) => updateField("bodyHtml", next)}
+          />
         </div>
         <textarea
           ref={bodyRef}
           value={draft.bodyHtml}
           onChange={(e) => updateField("bodyHtml", e.target.value)}
           style={{ minHeight: 180 }}
-          placeholder="<p>متن…</p> — از دکمه پررنگ برای <b>متن</b> استفاده کنید"
+          placeholder="متن را بنویسید؛ برای پررنگ یا کج کردن، انتخاب کنید و B یا I را بزنید."
         />
       </div>
 
