@@ -3,6 +3,7 @@ import { isAuthenticated } from "@/lib/auth";
 import { readContent } from "@/lib/content";
 import { AdminLoginForm } from "@/components/AdminLoginForm";
 import { AdminLogoutButton } from "@/components/AdminLogoutButton";
+import { AlmaAppleLogo } from "@/components/AlmaAppleLogo";
 
 export default async function AdminPage() {
   const authed = await isAuthenticated();
@@ -10,9 +11,7 @@ export default async function AdminPage() {
   if (!authed) {
     return (
       <main className="admin-shell">
-        <p className="home-brand" style={{ fontSize: "2.4rem" }}>
-          آلما
-        </p>
+        <AlmaAppleLogo size={44} variant="lockup" />
         <AdminLoginForm />
       </main>
     );
@@ -22,13 +21,19 @@ export default async function AdminPage() {
 
   return (
     <main className="admin-shell">
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", alignItems: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "1rem",
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
         <div>
-          <p className="home-brand" style={{ fontSize: "2.2rem" }}>
-            آلما
-          </p>
+          <AlmaAppleLogo size={40} variant="lockup" />
           <p className="home-lead" style={{ marginBottom: "1rem" }}>
-            ویرایش چهار لینک مشتری
+            ویرایش بصری چهار لینک مشتری
           </p>
         </div>
         <AdminLogoutButton />
@@ -37,9 +42,14 @@ export default async function AdminPage() {
       <ul className="home-list">
         {content.pages.map((page) => (
           <li key={page.slug}>
-            <Link href={`/admin/${page.slug}`}>
-              <strong>{page.title}</strong>
-              <span>ویرایش · /links/{page.slug}</span>
+            <Link href={`/admin/${page.slug}`} className="glass">
+              <strong>
+                {page.title}{" "}
+                {!page.published ? <span className="draft-badge">پیش‌نویس</span> : null}
+              </strong>
+              <span>
+                {page.moodTag} · ویرایش · /links/{page.slug}
+              </span>
             </Link>
           </li>
         ))}

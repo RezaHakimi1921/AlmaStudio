@@ -1,25 +1,147 @@
 {
   "pages": [
     {
+      "slug": "studio-conditions",
+      "title": "شرایط آتلیه آلما",
+      "subtitle": "رزرو، پرداخت و تحویل",
+      "moodTag": "شفافیت و اعتبار",
+      "brandLabel": "آتلیه آلما",
+      "greeting": "سلام دوست عزیز، از اینکه آلما را برای ثبت لحظه‌های زیبایتان انتخاب کردید سپاسگزاریم",
+      "heroImageUrl": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80",
+      "introTheme": "studio-conditions",
+      "introLabel": "سیب آلما",
+      "phone": "",
+      "blocks": [
+        {
+          "id": "sc-img-1",
+          "type": "image",
+          "imageUrl": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80",
+          "imageAlt": "ست بارداری آتلیه آلما",
+          "title": "ست‌های بارداری و نوزاد"
+        },
+        {
+          "id": "sc-1",
+          "type": "note",
+          "title": "مالیات بر ارزش افزوده",
+          "body": "طبق مرحله دهم قانون مالیات از دی ۱۴۰۲، آتلیه موظف است ۱۰٪ مالیات بر ارزش افزوده را به فاکتور نهایی اضافه کند."
+        },
+        {
+          "id": "sc-2",
+          "type": "text",
+          "title": "پارکینگ",
+          "body": "از نبود پارکینگ اختصاصی و سختی یافتن جای پارک در محدوده آتلیه پوزش می‌طلبیم."
+        },
+        {
+          "id": "sc-3",
+          "type": "note",
+          "title": "بیعانه و رزرو",
+          "body": "شماره کارت را از آتلیه دریافت کنید. پس از واریز، رسید را در پیام‌رسان ارسال نمایید. عدم ارسال رسید تا ۴ ساعت موجب لغو رزرو می‌شود.",
+          "bold": true
+        },
+        {
+          "id": "sc-4",
+          "type": "text",
+          "title": "تغییر زمان و تحویل",
+          "body": "هماهنگی تغییر نوبت حداقل ۴۸ ساعت قبل؛ تحویل فایل‌های نهایی طبق زمان اعلام‌شده در فاکتور انجام می‌شود."
+        },
+        {
+          "id": "sc-contact",
+          "type": "contact",
+          "title": "تماس با آتلیه",
+          "body": "برای هماهنگی رزرو و سوالات، از دکمه تماس استفاده کنید."
+        }
+      ],
+      "closingMessage": "با مهر، آتلیه آلما",
+      "addressTitle": "آدرس آتلیه آلما",
+      "address": "تهران، شهرری، میدان شاه‌عبدالعظیم، خیابان زکریای رازی، پاساژ مروارید طبقه ۵ واحد ۵۰۳",
+      "instagramUrl": "https://www.instagram.com/",
+      "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
+      "showInstagram": true,
+      "showMaps": true,
+      "published": true
+    },
+    {
+      "slug": "studio-prep",
+      "title": "آمادگی جهت عکاسی",
+      "subtitle": "آمادگی جهت عکاسی در آتلیه آلما",
+      "moodTag": "حرفه‌ای و صمیمی",
+      "brandLabel": "آتلیه آلما",
+      "greeting": "پدر و مادر نازنین، با تشکر از حسن انتخاب شما، ورودتان را به آتلیه آلما خیرمقدم عرض می‌نماییم",
+      "heroImageUrl": "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=1200&q=80",
+      "introTheme": "studio-prep",
+      "introLabel": "نور آتلیه",
+      "phone": "",
+      "blocks": [
+        {
+          "id": "sp-1",
+          "type": "text",
+          "title": "آدرس آتلیه شعبه شهرری",
+          "body": "تهران، شهرری، ابتدای خیابان ۲۴ متری، پاساژ مروارید طبقه ۵ واحد ۵۰۳، آتلیه آلما"
+        },
+        {
+          "id": "sp-2",
+          "type": "note",
+          "title": "پارکینگ",
+          "body": "پارکینگ عمومی دور میدان شاه‌عبدالعظیم می‌باشد؛ محدوده آتلیه جای پارک نیست."
+        },
+        {
+          "id": "sp-3",
+          "type": "note",
+          "title": "حضور به‌موقع",
+          "body": "لطفاً سر ساعت در مرکز حضور یابید تا بتوانیم تمامی دکورهای مدنظرتان را عکاسی کنیم. ترافیک مسیر را در نظر داشته باشید.",
+          "bold": true
+        },
+        {
+          "id": "sp-4",
+          "type": "text",
+          "title": "آمادگی کودک و لباس",
+          "body": "لباس راحت و هماهنگ با تم جلسه همراه داشته باشید. برای نوزاد، پتو و وسایل تعویض ضروری است."
+        },
+        {
+          "id": "sp-5",
+          "type": "note",
+          "title": "پیگیری",
+          "body": "اگر بعد از یک ماه با شما تماس گرفته نشد، خودتان با آتلیه تماس بگیرید."
+        },
+        {
+          "id": "sp-contact",
+          "type": "contact",
+          "title": "تماس",
+          "body": "شماره تماس از پنل ادمین قابل تنظیم است."
+        }
+      ],
+      "closingMessage": "منتظر حضور گرمتان هستیم",
+      "addressTitle": "آدرس و مسیریابی",
+      "address": "تهران، شهرری، ابتدای خیابان ۲۴ متری، پاساژ مروارید طبقه ۵ واحد ۵۰۳",
+      "instagramUrl": "https://www.instagram.com/",
+      "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
+      "showInstagram": true,
+      "showMaps": true,
+      "published": true
+    },
+    {
       "slug": "outdoor-conditions",
       "title": "شرایط فضای باز",
       "subtitle": "فیلمبرداری و عکاسی در باغ",
+      "moodTag": "طبیعت و اعتماد",
       "brandLabel": "آتلیه آلما",
       "greeting": "سلام دوست عزیز",
-      "heroImageUrl": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&q=80",
+      "heroImageUrl": "https://images.unsplash.com/photo-1609220136736-4259432112bd?w=1200&q=80",
       "introTheme": "outdoor-conditions",
       "introLabel": "فضای باز آلما",
+      "phone": "",
       "blocks": [
         {
           "id": "oc-1",
-          "type": "paragraph",
+          "type": "text",
           "body": "فیلمبرداری و عکاسی در باغ (۳ عنوان: کودک، بارداری، تعیین جنسیت)"
         },
         {
           "id": "oc-2",
-          "type": "heading",
+          "type": "text",
           "title": "شرایط کودک",
-          "body": ""
+          "body": "",
+          "bold": true
         },
         {
           "id": "oc-3",
@@ -43,40 +165,47 @@
         },
         {
           "id": "oc-6",
-          "type": "paragraph",
-          "body": "آتلیه فقط تا سه ماه پس از تحویل نهایی مسئول نگهداری فایل‌های عکس و فیلم انتخاب‌شده است؛ پس از آن فایل‌ها از سیستم حذف می‌شوند."
+          "type": "note",
+          "title": "نگهداری فایل",
+          "body": "آتلیه فقط تا سه ماه پس از تحویل نهایی مسئول نگهداری فایل‌های انتخاب‌شده است."
         },
         {
           "id": "oc-7",
-          "type": "paragraph",
-          "body": "عکاسی و فیلمبرداری فضای باز در مکان عمومی انجام می‌شود."
+          "type": "text",
+          "body": "عکاسی و فیلمبرداری فضای باز در مکان عمومی انجام می‌شود. پرداخت هزینه به منزله پذیرش شرایط است."
         },
         {
-          "id": "oc-8",
-          "type": "paragraph",
-          "body": "پرداخت هزینه توسط مشتری به منزله پذیرش شرایط عکاسی فضای باز است."
+          "id": "oc-img",
+          "type": "image",
+          "imageUrl": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&q=80",
+          "imageAlt": "عکاسی فضای باز"
         }
       ],
       "closingMessage": "منتظر حضور گرمتان هستیم",
       "instagramUrl": "https://www.instagram.com/",
       "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
       "showInstagram": true,
-      "showMaps": false
+      "showMaps": false,
+      "published": true
     },
     {
       "slug": "outdoor-prep",
       "title": "آمادگی فضای باز",
       "subtitle": "آمادگی جهت عکاسی در فضای باز",
+      "moodTag": "آرامش و راهنمایی",
       "brandLabel": "آتلیه آلما",
       "greeting": "سلام دوست عزیز",
-      "heroImageUrl": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=900&q=80",
+      "heroImageUrl": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200&q=80",
       "introTheme": "outdoor-prep",
       "introLabel": "آمادگی باغ",
+      "phone": "",
       "blocks": [
         {
           "id": "op-1",
-          "type": "paragraph",
-          "body": "لطفاً قبل از تاریخ فیلمبرداری، تسویه فاکتور را انجام دهید."
+          "type": "note",
+          "title": "تسویه",
+          "body": "لطفاً قبل از تاریخ فیلمبرداری، تسویه فاکتور را انجام دهید.",
+          "bold": true
         },
         {
           "id": "op-2",
@@ -92,13 +221,20 @@
         },
         {
           "id": "op-4",
-          "type": "paragraph",
-          "body": "لطفاً سر ساعت حضور یابید تا بتوانیم همه صحنه‌ها را ثبت کنیم. ترافیک مسیر را در نظر بگیرید."
+          "type": "text",
+          "title": "چک‌لیست آمادگی",
+          "body": "لباس هماهنگ خانواده، کفش راحت، آب و میان‌وعده کودک، و رسیدن زودتر از موعد با احتساب ترافیک."
         },
         {
           "id": "op-5",
-          "type": "paragraph",
+          "type": "text",
           "body": "آتلیه مسئولیتی در قبال تمیزی کفش‌ها ندارد."
+        },
+        {
+          "id": "op-contact",
+          "type": "contact",
+          "title": "هماهنگی",
+          "body": "برای هماهنگی مسیر و زمان با آتلیه تماس بگیرید."
         }
       ],
       "closingMessage": "منتظر حضور گرمتان هستیم",
@@ -107,96 +243,8 @@
       "instagramUrl": "https://www.instagram.com/",
       "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
       "showInstagram": true,
-      "showMaps": true
-    },
-    {
-      "slug": "studio-prep",
-      "title": "آمادگی جهت عکاسی",
-      "subtitle": "آمادگی جهت عکاسی در آتلیه آلما",
-      "brandLabel": "آتلیه آلما",
-      "greeting": "پدر و مادر نازنین، با تشکر از حسن انتخاب شما، ورودتان را به آتلیه آلما خیرمقدم عرض می‌نماییم",
-      "heroImageUrl": "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=900&q=80",
-      "introTheme": "studio-prep",
-      "introLabel": "نور آتلیه",
-      "blocks": [
-        {
-          "id": "sp-1",
-          "type": "heading",
-          "title": "آدرس آتلیه شعبه شهرری",
-          "body": ""
-        },
-        {
-          "id": "sp-2",
-          "type": "paragraph",
-          "body": "تهران، شهرری، ابتدای خیابان ۲۴ متری، پاساژ مروارید طبقه ۵ واحد ۵۰۳، آتلیه آلما"
-        },
-        {
-          "id": "sp-3",
-          "type": "note",
-          "title": "پارکینگ",
-          "body": "پارکینگ عمومی دور میدان شاه‌عبدالعظیم می‌باشد؛ محدوده آتلیه جای پارک نیست."
-        },
-        {
-          "id": "sp-4",
-          "type": "paragraph",
-          "body": "لطفاً سر ساعت در مرکز حضور یابید تا بتوانیم تمامی دکورهای مدنظرتان را عکاسی کنیم. لطفاً ترافیک مسیر را در نظر داشته باشید."
-        },
-        {
-          "id": "sp-5",
-          "type": "note",
-          "title": "پیگیری",
-          "body": "اگر بعد از یک ماه با شما تماس گرفته نشد، خودتان با آتلیه تماس بگیرید؛ ممکن است آتلیه تلاش کرده باشد و در دسترس نبوده باشید."
-        }
-      ],
-      "closingMessage": "منتظر حضور گرمتان هستیم",
-      "addressTitle": "آدرس و مسیریابی",
-      "address": "تهران، شهرری، ابتدای خیابان ۲۴ متری، پاساژ مروارید طبقه ۵ واحد ۵۰۳",
-      "instagramUrl": "https://www.instagram.com/",
-      "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
-      "showInstagram": true,
-      "showMaps": true
-    },
-    {
-      "slug": "studio-conditions",
-      "title": "شرایط آتلیه آلما",
-      "subtitle": "مالیات، بیعانه و پذیرش",
-      "brandLabel": "آتلیه آلما",
-      "greeting": "سلام دوست عزیز، از اینکه آلما را برای ثبت لحظه‌های زیبایتان انتخاب کردید سپاسگزاریم",
-      "heroImageUrl": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=900&q=80",
-      "introTheme": "studio-conditions",
-      "introLabel": "سیب آلما",
-      "blocks": [
-        {
-          "id": "sc-1",
-          "type": "note",
-          "title": "مالیات بر ارزش افزوده",
-          "body": "طبق مرحله دهم قانون مالیات از دی ۱۴۰۲، آتلیه موظف است ۱۰٪ مالیات بر ارزش افزوده را به فاکتور نهایی اضافه کند."
-        },
-        {
-          "id": "sc-2",
-          "type": "paragraph",
-          "body": "از نبود پارکینگ اختصاصی و سختی یافتن جای پارک در محدوده آتلیه پوزش می‌طلبیم."
-        },
-        {
-          "id": "sc-3",
-          "type": "heading",
-          "title": "بیعانه و رزرو",
-          "body": ""
-        },
-        {
-          "id": "sc-4",
-          "type": "note",
-          "title": "شماره کارت",
-          "body": "۶۲۱۹-۸۶۱۰-۹۱۱۷-۱۳۶۲ به نام سیما حسنی — پس از واریز رسید را در پیام‌رسان ارسال کنید. عدم ارسال رسید تا ۴ ساعت موجب لغو رزرو می‌شود."
-        }
-      ],
-      "closingMessage": "با مهر، آتلیه آلما",
-      "addressTitle": "آدرس آتلیه آلما",
-      "address": "تهران، شهرری، میدان شاه‌عبدالعظیم، خیابان زکریای رازی، پاساژ مروارید طبقه ۵ واحد ۵۰۳",
-      "instagramUrl": "https://www.instagram.com/",
-      "mapsUrl": "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C",
-      "showInstagram": true,
-      "showMaps": true
+      "showMaps": true,
+      "published": true
     }
   ]
 }

@@ -34,10 +34,10 @@ export function AdminLoginForm() {
   }
 
   return (
-    <form className="admin-form admin-card" onSubmit={onSubmit}>
-      <h1 style={{ margin: 0, color: "var(--alma-red-deep)" }}>ورود مدیریت</h1>
+    <form className="admin-form admin-card glass" onSubmit={onSubmit} style={{ marginTop: "1rem" }}>
+      <h1 style={{ margin: 0, color: "var(--alma-red)" }}>ورود مدیریت</h1>
       <p style={{ margin: 0, color: "var(--alma-muted)" }}>
-        برای ویرایش لینک‌های مشتریان وارد شوید.
+        برای ویرایش بصری لینک‌های مشتریان وارد شوید.
       </p>
       <label>
         نام کاربری

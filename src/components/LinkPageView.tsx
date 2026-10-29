@@ -2,20 +2,24 @@
 
 import { useEffect, useState } from "react";
 import type { LinkPageContent } from "@/lib/types";
+import { PAGE_THEMES } from "@/lib/themes";
+import { AlmaAppleLogo } from "./AlmaAppleLogo";
 import { IntroAnimation } from "./IntroAnimation";
+import { BlockRenderer } from "./BlockRenderer";
 import { CtaButtons } from "./CtaButtons";
+import { ContactBar } from "./ContactBar";
+import { GlassCard } from "./GlassCard";
 
 export function LinkPageView({ page }: { page: LinkPageContent }) {
   const [skipIntro, setSkipIntro] = useState(false);
-  const [ready, setReady] = useState(false);
+  const theme = PAGE_THEMES[page.introTheme];
+  const garden = page.introTheme.startsWith("outdoor");
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
     const skip =
-      params.has("shot") ||
+      new URLSearchParams(window.location.search).has("shot") ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setSkipIntro(skip);
-    if (skip) setReady(true);
   }, []);
 
   return (
@@ -27,47 +31,57 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
           label={page.introLabel}
         />
       ) : null}
+
       <main
-        className={`link-page${ready || skipIntro ? " link-page--ready" : ""}`}
-        onAnimationEnd={() => setReady(true)}
+        className={`link-shell${skipIntro ? " link-shell--ready" : ""} theme-${garden ? "garden" : "studio"}`}
       >
-        <header className="link-hero">
+        <header className="hero">
           <div
-            className="link-hero-media"
+            className="hero-media"
             style={{ backgroundImage: `url(${page.heroImageUrl})` }}
             role="img"
             aria-label={page.title}
           />
-          <div className="link-hero-veil" />
-          <div className="link-hero-copy">
-            <p className="link-brand">{page.brandLabel}</p>
-            <h1 className="link-title">{page.title}</h1>
-            {page.subtitle ? <p className="link-subtitle">{page.subtitle}</p> : null}
+          <div className="hero-veil" style={{ background: theme.heroOverlay }} />
+          <div className="hero-copy">
+            <div className="hero-glass">
+              <p className="mood-pill">{page.moodTag || theme.mood}</p>
+              <div className="hero-brand-row">
+                <AlmaAppleLogo size={34} />
+                <p className="hero-brand">{page.brandLabel}</p>
+              </div>
+              <h1 className="hero-title">{page.title}</h1>
+              {page.subtitle ? <p className="hero-sub">{page.subtitle}</p> : null}
+            </div>
           </div>
         </header>
 
         <div className="link-body">
+          {!page.published ? (
+            <p className="draft-badge" style={{ marginBottom: "1rem" }}>
+              پیش‌نویس
+            </p>
+          ) : null}
+
           {page.greeting ? <p className="link-greeting">{page.greeting}</p> : null}
 
-          <div className="link-blocks">
+          <div className="blocks">
             {page.blocks.map((block, index) => (
-              <section
+              <BlockRenderer
                 key={block.id}
-                className={`link-block link-block--${block.type}`}
-                style={{ animationDelay: `${0.08 + index * 0.05}s` }}
-              >
-                {block.title ? <h2>{block.title}</h2> : null}
-                {block.body ? <p>{block.body}</p> : null}
-                {block.price ? <p className="link-price">{block.price}</p> : null}
-              </section>
+                block={block}
+                pagePhone={page.phone}
+                accentGarden={garden}
+                index={index}
+              />
             ))}
           </div>
 
           {page.address ? (
-            <section className="link-address">
+            <GlassCard className="link-address" solid>
               {page.addressTitle ? <h2>{page.addressTitle}</h2> : null}
               <p>{page.address}</p>
-            </section>
+            </GlassCard>
           ) : null}
 
           {page.closingMessage ? (
@@ -79,9 +93,17 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
             showMaps={page.showMaps}
             instagramUrl={page.instagramUrl}
             mapsUrl={page.mapsUrl}
+            garden={garden}
           />
         </div>
       </main>
+
+      <ContactBar
+        phone={page.phone}
+        showMaps={page.showMaps}
+        mapsUrl={page.mapsUrl}
+        garden={garden}
+      />
     </>
   );
 }

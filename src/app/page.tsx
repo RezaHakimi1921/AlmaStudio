@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { readContent } from "@/lib/content";
+import { AlmaAppleLogo } from "@/components/AlmaAppleLogo";
 
 export const dynamic = "force-dynamic";
 
@@ -8,23 +9,32 @@ export default async function HomePage() {
 
   return (
     <main className="home-shell">
-      <p className="home-brand animate-rise">آلما</p>
-      <p className="home-lead animate-rise" style={{ animationDelay: "0.08s" }}>
-        آتلیه عکاسی نوزاد و بارداری — لینک‌های اختصاصی مشتریان برای شرایط و آمادگی
-        جلسات.
+      <AlmaAppleLogo size={52} variant="lockup" />
+      <p className="home-brand" style={{ marginTop: "0.75rem" }}>
+        آلما
+      </p>
+      <p className="home-lead">
+        آتلیه عکاسی نوزاد و بارداری — لینک‌های اختصاصی مشتریان با هویت یکپارچه آلما و تجربه
+        جدا برای هر موضوع.
       </p>
       <ul className="home-list">
-        {content.pages.map((page, i) => (
-          <li key={page.slug} className="animate-rise" style={{ animationDelay: `${0.12 + i * 0.05}s` }}>
-            <Link href={`/links/${page.slug}`}>
+        {content.pages.map((page) => (
+          <li key={page.slug}>
+            <Link href={`/links/${page.slug}`} className="glass">
               <strong>{page.title}</strong>
-              <span>/links/{page.slug}</span>
+              <span>
+                {page.moodTag} · /links/{page.slug}
+              </span>
             </Link>
           </li>
         ))}
       </ul>
       <p style={{ marginTop: "1.75rem" }}>
-        <Link href="/admin" className="cta-btn" style={{ display: "inline-flex", width: "auto", paddingInline: "1.4rem" }}>
+        <Link
+          href="/admin"
+          className="cta-btn"
+          style={{ display: "inline-flex", width: "auto", paddingInline: "1.4rem" }}
+        >
           ورود به پنل مدیریت
         </Link>
       </p>

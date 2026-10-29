@@ -3,6 +3,7 @@ type Props = {
   showMaps: boolean;
   instagramUrl: string;
   mapsUrl: string;
+  garden?: boolean;
 };
 
 export function CtaButtons({
@@ -10,16 +11,17 @@ export function CtaButtons({
   showMaps,
   instagramUrl,
   mapsUrl,
+  garden = false,
 }: Props) {
   if (!showInstagram && !showMaps) return null;
 
   return (
     <div className="cta-stack">
-      {showInstagram && (
+      {showInstagram ? (
         <div>
           <p className="cta-heading">شبکه‌های اجتماعی</p>
           <a
-            className="cta-btn"
+            className={`cta-btn${garden ? " cta-btn--garden" : ""}`}
             href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -28,12 +30,12 @@ export function CtaButtons({
             <span>اینستاگرام</span>
           </a>
         </div>
-      )}
-      {showMaps && (
+      ) : null}
+      {showMaps ? (
         <div>
           <p className="cta-heading">آدرس و مسیریابی</p>
           <a
-            className="cta-btn cta-btn--maps"
+            className="cta-btn cta-btn--ghost"
             href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -42,7 +44,7 @@ export function CtaButtons({
             <span>مسیریاب گوگل</span>
           </a>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

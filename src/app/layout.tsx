@@ -12,6 +12,10 @@ const vazirmatn = Vazirmatn({
 export const metadata: Metadata = {
   title: "آتلیه آلما | Alma Studio",
   description: "لینک‌های اختصاصی مشتریان آتلیه آلما — عکاسی نوزاد و بارداری",
+  icons: {
+    icon: [{ url: "/alma-apple.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/alma-apple.svg" }],
+  },
 };
 
 export default function RootLayout({
