@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { defaultContent } from "./default-content";
-import type { LinkPageContent, LinkSlug, SiteContent } from "./types";
+import type { HubContent, LinkPageContent, LinkSlug, SiteContent } from "./types";
 import { LINK_SLUGS } from "./types";
 
 const DATA_PATH = path.join(process.cwd(), "data", "content.json");
@@ -52,10 +52,27 @@ function migratePage(raw: Record<string, unknown>, fallback: LinkPageContent): L
   };
 }
 
+function migrateHub(raw: unknown): HubContent {
+  const fallback = defaultContent.hub;
+  if (!raw || typeof raw !== "object") return structuredClone(fallback);
+  const h = raw as Record<string, unknown>;
+  return {
+    title: String(h.title ?? fallback.title),
+    subtitle: String(h.subtitle ?? fallback.subtitle),
+    heroImageUrl: String(h.heroImageUrl ?? fallback.heroImageUrl),
+  };
+}
+
 function migrateContent(parsed: unknown): SiteContent {
   if (!parsed || typeof parsed !== "object") return structuredClone(defaultContent);
-  const pages = (parsed as { pages?: unknown }).pages;
-  if (!Array.isArray(pages) || !pages.length) return structuredClone(defaultContent);
+  const obj = parsed as { pages?: unknown; hub?: unknown };
+  const pages = obj.pages;
+  if (!Array.isArray(pages) || !pages.length) {
+    return {
+      hub: migrateHub(obj.hub),
+      pages: structuredClone(defaultContent.pages),
+    };
+  }
 
   const bySlug = new Map(
     pages.map((p) => {
@@ -65,6 +82,7 @@ function migrateContent(parsed: unknown): SiteContent {
   );
 
   return {
+    hub: migrateHub(obj.hub),
     pages: LINK_SLUGS.map((slug) => {
       const fallback = defaultContent.pages.find((p) => p.slug === slug)!;
       const raw = bySlug.get(slug);
@@ -106,6 +124,13 @@ export async function updatePage(
     { ...page, slug } as unknown as Record<string, unknown>,
     fallback,
   );
+  await writeContent(content);
+  return content;
+}
+
+export async function updateHub(hub: HubContent): Promise<SiteContent> {
+  const content = await readContent();
+  content.hub = migrateHub(hub);
   await writeContent(content);
   return content;
 }

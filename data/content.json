@@ -1,4 +1,9 @@
 {
+  "hub": {
+    "title": "آتلیه آلما",
+    "subtitle": "عکاسی نوزاد، بارداری و فضای باز — لینک‌های اختصاصی مشتریان",
+    "heroImageUrl": "/heroes/garden-morning.jpg"
+  },
   "pages": [
     {
       "slug": "studio-conditions",

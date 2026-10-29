@@ -96,7 +96,7 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         {!draft.published ? <span className="draft-badge">پیش‌نویس</span> : null}
       </div>
       <p style={{ margin: 0, color: "var(--alma-muted)" }}>
-        ویرایش ساده · /links/{page.slug}
+        ویرایش ساده · {publicPathForSlug(page.slug)} · هیرو و اینترو (عنوان، زیرعنوان، برچسب، تصویر)
       </p>
 
       <label>

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { isLinkSlug, readContent, updatePage } from "@/lib/content";
-import type { LinkPageContent } from "@/lib/types";
+import { isLinkSlug, readContent, updateHub, updatePage } from "@/lib/content";
+import type { HubContent, LinkPageContent } from "@/lib/types";
 
 export async function GET() {
   const content = await readContent();
@@ -13,7 +13,16 @@ export async function PUT(request: Request) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = (await request.json()) as { page?: LinkPageContent };
+  const body = (await request.json()) as {
+    page?: LinkPageContent;
+    hub?: HubContent;
+  };
+
+  if (body.hub) {
+    const content = await updateHub(body.hub);
+    return NextResponse.json({ ok: true, content });
+  }
+
   if (!body.page?.slug || !isLinkSlug(body.page.slug)) {
     return NextResponse.json({ ok: false, error: "اسلاگ نامعتبر" }, { status: 400 });
   }

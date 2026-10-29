@@ -31,7 +31,15 @@ export type LinkPageContent = {
   published: boolean;
 };
 
+/** Home hub (`/`) — hero + glass title/subtitle, admin-editable */
+export type HubContent = {
+  title: string;
+  subtitle: string;
+  heroImageUrl: string;
+};
+
 export type SiteContent = {
+  hub: HubContent;
   pages: LinkPageContent[];
 };
 

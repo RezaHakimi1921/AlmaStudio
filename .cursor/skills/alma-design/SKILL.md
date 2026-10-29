@@ -16,6 +16,7 @@ description: AlmaStudio visual and content system for client links and admin. Us
 ## Layout system
 
 - One shared shell; four themed experiences.
+- **Home hub (`/`):** full-bleed editable hero photo + glass title/subtitle; then a centered column (~760–780px) of four link cards with **icons only** (no big card photos). RTL text inside cards; admin entry separated at the bottom. Direct client URLs stay short (`/fazabaz`, …).
 - **Heroes:** full-bleed **real photography** (stock OK if modest / hijab-preferring; no cartoon, stick figures, geometric people, or low-fi SVG landscapes).
 - **Intro:** short cinematic motion on the hero photo (Ken Burns / soft veil / brand reveal) then content — intentional, premium; respect `prefers-reduced-motion` and `?shot=1`.
 - Liquid glass on hero title card, floating CTAs, soft content cards — not on dense legal/rule text (cream solid `#F8F3ED`, high contrast).
@@ -43,7 +44,8 @@ description: AlmaStudio visual and content system for client links and admin. Us
 ## Admin
 
 - Login: `admin` / `alma123` (local default).
-- Simple form — one rich textarea with Bold helper; plain packages/notes fields. Not many block types to assemble.
+- Hub form: hero image upload + title + subtitle for `/`.
+- Per-link form — hero/intro fields + rich textarea with Bold helper; plain packages/notes. Not many block types to assemble.
 - Draft/publish toggle OK.
 
 ## Anti-patterns
