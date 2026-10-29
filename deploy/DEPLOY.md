@@ -13,31 +13,44 @@
 
 Legacy `/links/...` redirects to the short paths.
 
+## SSH
+
+```bash
+ssh -p 2238 -i ~/.ssh/arte_service_deploy -o IdentitiesOnly=yes cluadai@78.39.51.105
+```
+
+Port **2238** (not 22). Edge reverse proxy is **Caddy** (`personalwallet-caddy-1`), not host nginx.
+The Alma container joins Docker network `personalwallet_default` as alias `alma-studio`.
+
 ## Compose how-to (on server)
 
 ```bash
-cd /opt
-git clone https://github.com/RezaHakimi1921/AlmaStudio.git
-cd AlmaStudio
-git checkout cursor/client-links-localhost-eb59   # or main after merge
+cd ~
+git clone https://github.com/RezaHakimi1921/AlmaStudio.git alma-studio
+cd alma-studio
+git checkout cursor/alma-caddy-deploy-eb59   # or main after merge
 
 cp .env.example .env
-nano .env   # set ADMIN_PASSWORD + ADMIN_SESSION_SECRET
+# set ADMIN_PASSWORD + ADMIN_SESSION_SECRET (openssl rand -hex 32)
 
 docker compose build
 docker compose up -d
 
-cp deploy/nginx-alma.artepersia.com.conf /etc/nginx/sites-available/alma.artepersia.com
-ln -sf /etc/nginx/sites-available/alma.artepersia.com /etc/nginx/sites-enabled/
-nginx -t && systemctl reload nginx
-
-# After DNS A record:
-certbot --nginx -d alma.artepersia.com
+# Edge Caddy — append fragment once
+grep -q 'alma.artepersia.com' /home/personalwallet/personalwallet/Caddyfile \
+  || cat deploy/Caddyfile.alma.fragment >> /home/personalwallet/personalwallet/Caddyfile
+docker exec personalwallet-caddy-1 caddy reload --config /etc/caddy/Caddyfile
 ```
 
 ```bash
 # updates
-cd /opt/AlmaStudio && git pull && docker compose build && docker compose up -d
+cd ~/alma-studio && git pull && docker compose build && docker compose up -d
 ```
 
 Volumes `alma_data` / `alma_uploads` persist content and uploads.
+
+## Notes
+
+- DNS A record `alma.artepersia.com` → `78.39.51.105` (already live).
+- `deploy/nginx-alma.artepersia.com.conf` is optional/legacy; this host uses Caddy.
+- Root key `alma_deploy_ed25519` is not required when using `cluadai` + `arte_service_deploy`.

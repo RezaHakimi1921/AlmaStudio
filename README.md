@@ -30,14 +30,14 @@ Legacy `/links/outdoor-conditions` (etc.) → redirects to short paths.
 - Simple fields + hero **file upload** → `public/uploads/`
 - Persistence: `data/content.json`
 
-## Docker + nginx (production)
+## Docker + Caddy (production)
 
 See [deploy/DEPLOY.md](deploy/DEPLOY.md).
 
 ```bash
 cp .env.example .env   # set ADMIN_PASSWORD, ADMIN_SESSION_SECRET
 docker compose build && docker compose up -d
-# nginx: deploy/nginx-alma.artepersia.com.conf → alma.artepersia.com → 127.0.0.1:3000
+# Edge: PersonalWallet Caddy → alma-studio:3000 (see deploy/Caddyfile.alma.fragment)
 ```
 
-Host: `alma.artepersia.com` → `78.39.51.105`.
+Host: `alma.artepersia.com` → `78.39.51.105` (SSH port **2238**, user `cluadai`).

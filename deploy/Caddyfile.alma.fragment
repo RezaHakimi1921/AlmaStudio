@@ -1,0 +1,10 @@
+# Append to /home/personalwallet/personalwallet/Caddyfile (edge TLS)
+# Then: docker exec personalwallet-caddy-1 caddy reload --config /etc/caddy/Caddyfile
+
+alma.artepersia.com {
+	encode zstd gzip
+	request_body {
+		max_size 12MB
+	}
+	reverse_proxy alma-studio:3000
+}
