@@ -1,20 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { hasShotParam, useClientValue } from "@/lib/client";
 import type { LinkPageContent } from "@/lib/types";
 import { PAGE_THEMES } from "@/lib/themes";
 import { IntroAnimation } from "./IntroAnimation";
 import { HeroSection } from "./HeroSection";
 import { CtaButtons } from "./CtaButtons";
 import { ContactBar } from "./ContactBar";
-import { GlassCard } from "./GlassCard";
+import { QuickActions } from "./QuickActions";
+import { AddressCard } from "./AddressCard";
+import { CheckIcon, InfoIcon, SparkIcon, TagIcon } from "./Icons";
 
 function readSkipIntro() {
-  if (typeof window === "undefined") return true;
-  return (
-    new URLSearchParams(window.location.search).has("shot") ||
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+  return hasShotParam() || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 function linesToParagraphs(text: string) {
@@ -25,33 +24,61 @@ function linesToParagraphs(text: string) {
 }
 
 export function LinkPageView({ page }: { page: LinkPageContent }) {
-  const [skipIntro, setSkipIntro] = useState(true);
-  const [introArmed, setIntroArmed] = useState(false);
+  const skipIntro = useClientValue(readSkipIntro);
+  const [introDone, setIntroDone] = useState(false);
+  const entered = skipIntro === true || introDone;
+  const shellRef = useRef<HTMLElement>(null);
   const theme = PAGE_THEMES[page.introTheme];
   const garden = page.introTheme.startsWith("outdoor");
 
+  const onIntroDone = useCallback(() => setIntroDone(true), []);
+
+  // Scroll-reveal for cards
   useEffect(() => {
-    const skip = readSkipIntro();
-    setSkipIntro(skip);
-    setIntroArmed(!skip);
-  }, []);
+    const shell = shellRef.current;
+    if (!shell || !entered) return;
+    const items = Array.from(shell.querySelectorAll<HTMLElement>("[data-reveal]"));
+    if (!("IntersectionObserver" in window) || hasShotParam()) {
+      items.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+    shell.classList.add("js-reveal");
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -40px 0px", threshold: 0 },
+    );
+    items.forEach((el, i) => {
+      el.style.setProperty("--reveal-delay", `${Math.min(i, 3) * 70}ms`);
+      io.observe(el);
+    });
+    return () => io.disconnect();
+  }, [entered]);
 
   const packages = linesToParagraphs(page.packagesText || "");
   const notes = linesToParagraphs(page.notesText || "");
 
   return (
     <>
-      {introArmed && !skipIntro ? (
+      {skipIntro !== true ? (
         <IntroAnimation
           theme={page.introTheme}
           brand={page.brandLabel}
           label={page.introLabel}
           heroImageUrl={page.heroImageUrl}
+          onDone={onIntroDone}
         />
       ) : null}
 
       <main
-        className={`link-shell link-shell--ready theme-${garden ? "garden" : "studio"}`}
+        ref={shellRef}
+        className={`link-shell theme-${garden ? "garden" : "studio"}${entered ? " is-entered" : ""}`}
       >
         <HeroSection
           title={page.title}
@@ -63,10 +90,21 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
         />
 
         <div
+          id="content"
           className="link-body link-body--on-photo"
           style={{ ["--page-hero" as string]: `url(${page.heroImageUrl})` }}
         >
           <div className="link-body-photo" aria-hidden="true" />
+
+          <QuickActions
+            phone={page.phone}
+            garden={garden}
+            brand={page.brandLabel}
+            showInstagram={page.showInstagram}
+            instagramUrl={page.instagramUrl}
+            showMaps={page.showMaps}
+            mapsUrl={page.mapsUrl}
+          />
 
           {!page.published ? (
             <p className="draft-badge" style={{ marginBottom: "1rem" }}>
@@ -75,50 +113,79 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
           ) : null}
 
           {page.bodyHtml ? (
-            <GlassCard className="rich-body glass">
+            <section className="glass rich-body" data-reveal>
+              <h2 className="card-title">
+                <span className="card-title__icon">
+                  <SparkIcon />
+                </span>
+                خوش آمدید
+              </h2>
               <div
                 className="rich-body__html"
                 dangerouslySetInnerHTML={{ __html: page.bodyHtml }}
               />
-            </GlassCard>
+            </section>
           ) : null}
 
           {packages.length ? (
-            <GlassCard className="section-card glass">
-              <h2>پکیج‌ها و قیمت</h2>
-              <ul className="plain-list">
+            <section className="glass section-card" data-reveal>
+              <h2 className="card-title">
+                <span className="card-title__icon">
+                  <TagIcon />
+                </span>
+                پکیج‌ها و قیمت
+              </h2>
+              <ul className="check-list">
                 {packages.map((line) => (
-                  <li key={line}>{line}</li>
+                  <li key={line}>
+                    <span className="check-list__dot">
+                      <CheckIcon size={12} />
+                    </span>
+                    <span>{line}</span>
+                  </li>
                 ))}
               </ul>
-            </GlassCard>
+            </section>
           ) : null}
 
           {notes.length ? (
-            <div className="solid-card cream-surface section-card">
-              <h2>نکات مهم</h2>
-              <ul className="plain-list">
-                {notes.map((line) => (
-                  <li key={line}>{line}</li>
+            <section className="solid-card cream-surface section-card section-card--notes" data-reveal>
+              <h2 className="card-title">
+                <span className="card-title__icon">
+                  <InfoIcon />
+                </span>
+                نکات مهم
+              </h2>
+              <ol className="step-list">
+                {notes.map((line, i) => (
+                  <li key={line}>
+                    <span className="step-list__num">{(i + 1).toLocaleString("fa-IR")}</span>
+                    <span>{line}</span>
+                  </li>
                 ))}
-              </ul>
-            </div>
+              </ol>
+            </section>
           ) : null}
 
           {page.address ? (
-            <GlassCard className="link-address" solid>
-              {page.addressTitle ? <h2>{page.addressTitle}</h2> : null}
-              <p>{page.address}</p>
-            </GlassCard>
+            <AddressCard
+              title={page.addressTitle}
+              address={page.address}
+              mapsUrl={page.mapsUrl}
+              showMaps={page.showMaps}
+            />
           ) : null}
 
           {page.closingMessage ? (
-            <p className="link-closing">{page.closingMessage}</p>
+            <p className="link-closing" data-reveal>
+              <span className="link-closing__mark" aria-hidden="true">❦</span>
+              {page.closingMessage}
+            </p>
           ) : null}
 
           <CtaButtons
             showInstagram={page.showInstagram}
-            showMaps={page.showMaps}
+            showMaps={false}
             instagramUrl={page.instagramUrl}
             mapsUrl={page.mapsUrl}
             garden={garden}
@@ -131,6 +198,8 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
         showMaps={page.showMaps}
         mapsUrl={page.mapsUrl}
         garden={garden}
+        brand={page.brandLabel}
+        visible={entered}
       />
     </>
   );

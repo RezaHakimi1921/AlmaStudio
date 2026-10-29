@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { hasShotParam, useClientValue } from "@/lib/client";
+import { CallButton } from "./CallButton";
+import { PinIcon } from "./Icons";
 
 type Props = {
   phone: string;
   showMaps?: boolean;
   mapsUrl?: string;
   garden?: boolean;
+  brand?: string;
+  visible?: boolean;
 };
 
 export function ContactBar({
@@ -14,31 +18,21 @@ export function ContactBar({
   showMaps = false,
   mapsUrl = "",
   garden = false,
+  brand,
+  visible = true,
 }: Props) {
-  const [shot, setShot] = useState(false);
-  useEffect(() => {
-    setShot(new URLSearchParams(window.location.search).has("shot"));
-  }, []);
+  const shot = useClientValue(hasShotParam) === true;
 
-  const ready = phone.trim().length > 0;
   const split = showMaps && Boolean(mapsUrl);
 
   return (
-    <div
-      className={`float-cta glass-strong${split ? " float-cta--split" : ""}${shot ? " float-cta--static" : ""}`}
+    <nav
+      aria-label="تماس سریع"
+      className={`float-cta glass-strong${garden ? " float-cta--garden" : ""}${split ? " float-cta--split" : ""}${shot ? " float-cta--static" : ""}${visible ? "" : " is-waiting"}`}
     >
-      {ready ? (
-        <a
-          className={`cta-btn${garden ? " cta-btn--garden" : ""}`}
-          href={`tel:${phone.replace(/\s+/g, "")}`}
-        >
-          تماس
-        </a>
-      ) : (
-        <button type="button" className="cta-btn is-disabled" disabled>
-          تماس
-        </button>
-      )}
+      <CallButton phone={phone} garden={garden} brand={brand} className="call-btn--primary">
+        <span>تماس با آتلیه</span>
+      </CallButton>
       {split ? (
         <a
           className="cta-btn cta-btn--ghost"
@@ -46,9 +40,10 @@ export function ContactBar({
           target="_blank"
           rel="noopener noreferrer"
         >
-          مسیریاب
+          <PinIcon size={18} />
+          <span>مسیریاب</span>
         </a>
       ) : null}
-    </div>
+    </nav>
   );
 }
