@@ -881,6 +881,44 @@ nextjs-portal,
   font-weight: 700;
 }
 
+.hero-upload {
+  margin: 0;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(168, 50, 50, 0.18);
+  background: rgba(248, 243, 237, 0.65);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.hero-upload legend {
+  padding: 0 0.35rem;
+  font-weight: 700;
+  color: var(--alma-red-deep);
+}
+
+.hero-upload__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--alma-muted);
+}
+
+.hero-upload__preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.hero-upload input[type="file"] {
+  width: 100%;
+  padding: 0.55rem;
+  border: 1px dashed rgba(168, 50, 50, 0.35);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
 @media (min-width: 768px) {
   .link-shell {
     width: min(100%, 520px);
@@ -894,6 +932,22 @@ nextjs-portal,
   .admin-shell,
   .home-shell {
     width: min(100%, 880px);
+  }
+
+  .admin-form {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem 1rem;
+  }
+
+  .admin-form > h1,
+  .admin-form > p,
+  .admin-form > fieldset,
+  .admin-form > .admin-actions,
+  .admin-form > div,
+  .admin-form > .admin-error,
+  .admin-form > .admin-ok,
+  .admin-form label:has(textarea) {
+    grid-column: 1 / -1;
   }
 
   .block-editor-item {

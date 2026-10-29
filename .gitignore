@@ -22,6 +22,11 @@
 .DS_Store
 *.pem
 
+# uploaded heroes (keep folder via .gitkeep)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+
 # debug
 
 npm-debug.log*

@@ -7,10 +7,12 @@ import type { LinkPageContent } from "@/lib/types";
 export function AdminEditForm({ page }: { page: LinkPageContent }) {
   const router = useRouter();
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState<LinkPageContent>({ ...page });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   function updateField<K extends keyof LinkPageContent>(
     key: K,
@@ -35,6 +37,30 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
       const pos = start + 3 + selected.length;
       el.setSelectionRange(pos, pos);
     });
+  }
+
+  async function onHeroUpload(file: File | null) {
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    setMessage("");
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body });
+      const data = (await res.json()) as { ok?: boolean; url?: string; error?: string };
+      if (!res.ok || !data.ok || !data.url) {
+        setError(data.error || "آپلود ناموفق بود");
+        return;
+      }
+      updateField("heroImageUrl", data.url);
+      setMessage("تصویر هیرو آپلود شد — برای اعمال ذخیره کنید");
+    } catch {
+      setError("خطا در آپلود");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   }
 
   async function onSave(e: React.FormEvent) {
@@ -92,18 +118,38 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         برچسب اینترو
         <input value={draft.introLabel} onChange={(e) => updateField("introLabel", e.target.value)} />
       </label>
-      <label>
-        تصویر هیرو (URL یا مسیر مثل /heroes/…)
-        <input value={draft.heroImageUrl} onChange={(e) => updateField("heroImageUrl", e.target.value)} />
-      </label>
-      {draft.heroImageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={draft.heroImageUrl}
-          alt=""
-          style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 12 }}
-        />
-      ) : null}
+      <fieldset className="hero-upload">
+        <legend>تصویر هیرو</legend>
+        <label>
+          آپلود از دستگاه
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            disabled={uploading}
+            onChange={(e) => onHeroUpload(e.target.files?.[0] || null)}
+          />
+        </label>
+        <p className="hero-upload__hint">
+          {uploading ? "در حال آپلود…" : "JPG / PNG / WebP / GIF تا ۸MB — در public/uploads ذخیره می‌شود"}
+        </p>
+        <label>
+          یا URL / مسیر (fallback)
+          <input
+            value={draft.heroImageUrl}
+            onChange={(e) => updateField("heroImageUrl", e.target.value)}
+            placeholder="/uploads/… یا https://…"
+          />
+        </label>
+        {draft.heroImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={draft.heroImageUrl}
+            alt=""
+            className="hero-upload__preview"
+          />
+        ) : null}
+      </fieldset>
 
       <label>
         تلفن تماس (خالی = دکمه غیرفعال)

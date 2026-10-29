@@ -33,3 +33,16 @@ Append `?shot=1` to skip intro animation.
 
 - Tokens: Alma red `#A83232`, cream `#F8F3ED`, garden `#58745A`
 - Skill: `.cursor/skills/alma-design/SKILL.md`
+
+### Hero upload (admin)
+
+In `/admin/[slug]`, use **آپلود از دستگاه** to save into `public/uploads/` (path written into `heroImageUrl`). URL/path field remains as fallback. Requires login.
+
+### Docker (ready — do not deploy until SSH keys set)
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+Later host: `alma.artepersia.com` → `78.39.51.105`. Volumes persist `data/` and `public/uploads/`.

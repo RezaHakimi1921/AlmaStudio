@@ -1,0 +1,25 @@
+# Production-ready compose for AlmaStudio
+# Domain (later): alma.artepersia.com → 78.39.51.105
+# Do not deploy until SSH keys are ready on the server.
+
+services:
+  alma:
+    build: .
+    image: alma-studio:latest
+    container_name: alma-studio
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-alma123}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-change-me-in-production}
+    volumes:
+      # Persist admin content + uploaded heroes
+      - alma_data:/app/data
+      - alma_uploads:/app/public/uploads
+
+volumes:
+  alma_data:
+  alma_uploads:
