@@ -20,7 +20,7 @@ export function BlockRenderer({
   if (block.type === "image") {
     return (
       <div className="block-item" style={delay}>
-        <GlassCard className={`block-image${bold}`}>
+        <GlassCard className={`block-image glass${bold}`}>
           {block.title ? <h3>{block.title}</h3> : null}
           {block.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -36,7 +36,7 @@ export function BlockRenderer({
   if (block.type === "price") {
     return (
       <div className="block-item" style={delay}>
-        <GlassCard className={`block-price${bold}`}>
+        <GlassCard className={`block-price glass${bold}`}>
           {block.title ? <h3>{block.title}</h3> : null}
           {block.body ? <p>{block.body}</p> : null}
           {block.price ? <p className="price-value">{block.price}</p> : null}
@@ -48,7 +48,8 @@ export function BlockRenderer({
   if (block.type === "note") {
     return (
       <div className="block-item" style={delay}>
-        <div className={`solid-card block-note${bold}`}>
+        {/* Dense rules: cream solid for contrast (alma-design) */}
+        <div className={`solid-card block-note cream-surface${bold}`}>
           {block.title ? <h3>{block.title}</h3> : null}
           {block.body ? <p>{block.body}</p> : null}
         </div>
@@ -90,7 +91,7 @@ export function BlockRenderer({
 
   return (
     <div className="block-item" style={delay}>
-      <div className={`block-text${bold}`}>
+      <div className={`solid-card block-text cream-surface${bold}`}>
         {block.title ? <h3>{block.title}</h3> : null}
         {block.body ? <p>{block.body}</p> : null}
       </div>

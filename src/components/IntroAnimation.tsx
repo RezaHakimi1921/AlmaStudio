@@ -13,7 +13,7 @@ type Props = {
 const DURATION_MS = 2100;
 
 function shouldSkipIntro() {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined") return true;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
   return new URLSearchParams(window.location.search).has("shot");
 }

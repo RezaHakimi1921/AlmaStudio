@@ -3,28 +3,37 @@
 import { useEffect, useState } from "react";
 import type { LinkPageContent } from "@/lib/types";
 import { PAGE_THEMES } from "@/lib/themes";
-import { AlmaAppleLogo } from "./AlmaAppleLogo";
 import { IntroAnimation } from "./IntroAnimation";
+import { HeroSection } from "./HeroSection";
 import { BlockRenderer } from "./BlockRenderer";
 import { CtaButtons } from "./CtaButtons";
 import { ContactBar } from "./ContactBar";
 import { GlassCard } from "./GlassCard";
 
+function readSkipIntro() {
+  if (typeof window === "undefined") return true;
+  return (
+    new URLSearchParams(window.location.search).has("shot") ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 export function LinkPageView({ page }: { page: LinkPageContent }) {
-  const [skipIntro, setSkipIntro] = useState(false);
+  // Start skipped to avoid intro flash covering heroes in screenshots/hydration
+  const [skipIntro, setSkipIntro] = useState(true);
+  const [introArmed, setIntroArmed] = useState(false);
   const theme = PAGE_THEMES[page.introTheme];
   const garden = page.introTheme.startsWith("outdoor");
 
   useEffect(() => {
-    const skip =
-      new URLSearchParams(window.location.search).has("shot") ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const skip = readSkipIntro();
     setSkipIntro(skip);
+    setIntroArmed(!skip);
   }, []);
 
   return (
     <>
-      {!skipIntro ? (
+      {introArmed && !skipIntro ? (
         <IntroAnimation
           theme={page.introTheme}
           brand={page.brandLabel}
@@ -33,37 +42,34 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
       ) : null}
 
       <main
-        className={`link-shell${skipIntro ? " link-shell--ready" : ""} theme-${garden ? "garden" : "studio"}`}
+        className={`link-shell link-shell--ready theme-${garden ? "garden" : "studio"}`}
       >
-        <header className="hero">
-          <div
-            className="hero-media"
-            style={{ backgroundImage: `url(${page.heroImageUrl})` }}
-            role="img"
-            aria-label={page.title}
-          />
-          <div className="hero-veil" style={{ background: theme.heroOverlay }} />
-          <div className="hero-copy">
-            <div className="hero-glass">
-              <p className="mood-pill">{page.moodTag || theme.mood}</p>
-              <div className="hero-brand-row">
-                <AlmaAppleLogo size={34} />
-                <p className="hero-brand">{page.brandLabel}</p>
-              </div>
-              <h1 className="hero-title">{page.title}</h1>
-              {page.subtitle ? <p className="hero-sub">{page.subtitle}</p> : null}
-            </div>
-          </div>
-        </header>
+        <HeroSection
+          title={page.title}
+          subtitle={page.subtitle}
+          brandLabel={page.brandLabel}
+          moodTag={page.moodTag || theme.mood}
+          heroImageUrl={page.heroImageUrl}
+          overlay={theme.heroOverlay}
+        />
 
-        <div className="link-body">
+        <div
+          className="link-body link-body--on-photo"
+          style={{ ["--page-hero" as string]: `url(${page.heroImageUrl})` }}
+        >
+          <div className="link-body-photo" aria-hidden="true" />
+
           {!page.published ? (
             <p className="draft-badge" style={{ marginBottom: "1rem" }}>
               پیش‌نویس
             </p>
           ) : null}
 
-          {page.greeting ? <p className="link-greeting">{page.greeting}</p> : null}
+          {page.greeting ? (
+            <GlassCard className="link-greeting-card glass">
+              <p className="link-greeting">{page.greeting}</p>
+            </GlassCard>
+          ) : null}
 
           <div className="blocks">
             {page.blocks.map((block, index) => (

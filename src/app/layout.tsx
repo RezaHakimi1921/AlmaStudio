@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   description: "لینک‌های اختصاصی مشتریان آتلیه آلما — عکاسی نوزاد و بارداری",
   icons: {
     icon: [{ url: "/alma-apple.svg", type: "image/svg+xml" }],
+    shortcut: ["/alma-apple.svg"],
     apple: [{ url: "/alma-apple.svg" }],
   },
 };

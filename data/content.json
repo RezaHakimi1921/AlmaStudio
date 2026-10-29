@@ -7,7 +7,7 @@
       "moodTag": "شفافیت و اعتبار",
       "brandLabel": "آتلیه آلما",
       "greeting": "سلام دوست عزیز، از اینکه آلما را برای ثبت لحظه‌های زیبایتان انتخاب کردید سپاسگزاریم",
-      "heroImageUrl": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80",
+      "heroImageUrl": "/heroes/studio-newborn.jpg",
       "introTheme": "studio-conditions",
       "introLabel": "سیب آلما",
       "phone": "",
@@ -15,8 +15,8 @@
         {
           "id": "sc-img-1",
           "type": "image",
-          "imageUrl": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80",
-          "imageAlt": "ست بارداری آتلیه آلما",
+          "imageUrl": "/heroes/newborn-detail.jpg",
+          "imageAlt": "ست نوزاد آتلیه آلما",
           "title": "ست‌های بارداری و نوزاد"
         },
         {
@@ -45,10 +45,17 @@
           "body": "هماهنگی تغییر نوبت حداقل ۴۸ ساعت قبل؛ تحویل فایل‌های نهایی طبق زمان اعلام‌شده در فاکتور انجام می‌شود."
         },
         {
+          "id": "sc-price",
+          "type": "price",
+          "title": "نمونه پکیج استودیو",
+          "body": "عکاسی نوزاد + انتخاب فایل‌ها (جزئیات در فاکتور)",
+          "price": "طبق قرارداد شعبه"
+        },
+        {
           "id": "sc-contact",
           "type": "contact",
           "title": "تماس با آتلیه",
-          "body": "برای هماهنگی رزرو و سوالات، از دکمه تماس استفاده کنید."
+          "body": "برای هماهنگی رزرو و سوالات، از دکمه تماس استفاده کنید. شماره از پنل ادمین قابل تنظیم است."
         }
       ],
       "closingMessage": "با مهر، آتلیه آلما",
@@ -67,11 +74,18 @@
       "moodTag": "حرفه‌ای و صمیمی",
       "brandLabel": "آتلیه آلما",
       "greeting": "پدر و مادر نازنین، با تشکر از حسن انتخاب شما، ورودتان را به آتلیه آلما خیرمقدم عرض می‌نماییم",
-      "heroImageUrl": "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=1200&q=80",
+      "heroImageUrl": "/heroes/studio-set.jpg",
       "introTheme": "studio-prep",
       "introLabel": "نور آتلیه",
       "phone": "",
       "blocks": [
+        {
+          "id": "sp-img",
+          "type": "image",
+          "imageUrl": "/heroes/studio-set.jpg",
+          "imageAlt": "فضای آتلیه آلما",
+          "title": "محیط آتلیه"
+        },
         {
           "id": "sp-1",
           "type": "text",
@@ -126,11 +140,18 @@
       "moodTag": "طبیعت و اعتماد",
       "brandLabel": "آتلیه آلما",
       "greeting": "سلام دوست عزیز",
-      "heroImageUrl": "https://images.unsplash.com/photo-1609220136736-4259432112bd?w=1200&q=80",
+      "heroImageUrl": "/heroes/garden-family.jpg",
       "introTheme": "outdoor-conditions",
       "introLabel": "فضای باز آلما",
       "phone": "",
       "blocks": [
+        {
+          "id": "oc-img",
+          "type": "image",
+          "imageUrl": "/heroes/garden-morning.jpg",
+          "imageAlt": "عکاسی فضای باز",
+          "title": "عکاسی خانوادگی در باغ"
+        },
         {
           "id": "oc-1",
           "type": "text",
@@ -140,7 +161,7 @@
           "id": "oc-2",
           "type": "text",
           "title": "شرایط کودک",
-          "body": "",
+          "body": "پکیج‌های زیر برای جلسات کودک در فضای باز تعریف شده‌اند.",
           "bold": true
         },
         {
@@ -175,10 +196,10 @@
           "body": "عکاسی و فیلمبرداری فضای باز در مکان عمومی انجام می‌شود. پرداخت هزینه به منزله پذیرش شرایط است."
         },
         {
-          "id": "oc-img",
-          "type": "image",
-          "imageUrl": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&q=80",
-          "imageAlt": "عکاسی فضای باز"
+          "id": "oc-contact",
+          "type": "contact",
+          "title": "تماس",
+          "body": "برای هماهنگی پکیج فضای باز با آتلیه تماس بگیرید."
         }
       ],
       "closingMessage": "منتظر حضور گرمتان هستیم",
@@ -195,11 +216,18 @@
       "moodTag": "آرامش و راهنمایی",
       "brandLabel": "آتلیه آلما",
       "greeting": "سلام دوست عزیز",
-      "heroImageUrl": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200&q=80",
+      "heroImageUrl": "/heroes/garden-morning.jpg",
       "introTheme": "outdoor-prep",
       "introLabel": "آمادگی باغ",
       "phone": "",
       "blocks": [
+        {
+          "id": "op-img",
+          "type": "image",
+          "imageUrl": "/heroes/garden-family.jpg",
+          "imageAlt": "مسیر باغ",
+          "title": "صبح آرام باغ"
+        },
         {
           "id": "op-1",
           "type": "note",

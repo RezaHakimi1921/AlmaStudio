@@ -73,6 +73,13 @@ select {
   border: 0;
 }
 
+/* Hide Next.js floating "N" badge during local review / screenshots */
+nextjs-portal,
+[data-next-badge],
+[data-nextjs-toast] {
+  display: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -171,26 +178,32 @@ select {
 
 /* Liquid glass — photos, cards, floating CTAs */
 .glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(18px) saturate(1.25);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 10px 36px rgba(42, 26, 26, 0.08);
+  background: rgba(248, 243, 237, 0.58);
+  backdrop-filter: blur(22px) saturate(1.35);
+  -webkit-backdrop-filter: blur(22px) saturate(1.35);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 10px 36px rgba(42, 26, 26, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .glass-strong {
-  background: rgba(248, 243, 237, 0.72);
-  backdrop-filter: blur(22px) saturate(1.3);
-  -webkit-backdrop-filter: blur(22px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow: 0 12px 40px rgba(42, 26, 26, 0.1);
+  background: rgba(248, 243, 237, 0.78);
+  backdrop-filter: blur(26px) saturate(1.4);
+  -webkit-backdrop-filter: blur(26px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow:
+    0 14px 44px rgba(42, 26, 26, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
-/* High-contrast rule surface — NOT glass */
-.solid-card {
-  background: #fffdf9;
-  border: 1px solid rgba(168, 50, 50, 0.14);
-  box-shadow: 0 4px 18px rgba(42, 26, 26, 0.04);
+/* High-contrast cream surfaces for rules/text */
+.solid-card,
+.cream-surface {
+  background: #f8f3ed;
+  border: 1px solid rgba(168, 50, 50, 0.16);
+  box-shadow: 0 6px 22px rgba(42, 26, 26, 0.06);
+  color: #2a1a1a;
 }
 
 .alma-logo {
@@ -319,10 +332,11 @@ select {
   animation-delay: 0s;
 }
 
-.link-shell--ready .hero-media,
+.link-shell--ready .hero-photo,
 .link-shell--ready .hero-copy,
 .link-shell--ready .block-item {
   animation-delay: 0s !important;
+  opacity: 1 !important;
 }
 
 .hero {
@@ -331,20 +345,25 @@ select {
   display: flex;
   align-items: flex-end;
   overflow: hidden;
+  background: #3a1818;
 }
 
-.hero-media {
+.hero-photo {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center;
-  transform: scale(1.03);
-  animation: alma-fade 1s 1.95s ease both;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transform: scale(1.02);
+  animation: alma-fade 0.9s 1.9s ease both;
 }
 
 .hero-veil {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
 .hero-copy {
@@ -357,12 +376,15 @@ select {
 }
 
 .hero-glass {
-  padding: 1rem 1.05rem 1.15rem;
-  border-radius: 20px;
-  background: rgba(248, 243, 237, 0.18);
-  backdrop-filter: blur(14px) saturate(1.2);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  padding: 1.05rem 1.1rem 1.2rem;
+  border-radius: 22px;
+  background: rgba(248, 243, 237, 0.28);
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .mood-pill {
@@ -406,14 +428,54 @@ select {
 }
 
 .link-body {
+  position: relative;
   padding: 1.35rem 1.1rem 0;
+  isolation: isolate;
+}
+
+.link-body--on-photo {
+  margin-top: -1.25rem;
+  padding-top: 1.75rem;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+}
+
+.link-body-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--page-hero);
+  background-size: cover;
+  background-position: center top;
+  filter: blur(28px) saturate(1.15);
+  transform: scale(1.12);
+  opacity: 0.38;
+}
+
+.link-body-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(248, 243, 237, 0.55) 0%,
+    rgba(248, 243, 237, 0.82) 35%,
+    rgba(248, 243, 237, 0.94) 100%
+  );
+}
+
+.link-greeting-card {
+  margin: 0 0 1.1rem;
+  padding: 1rem 1.05rem;
+  border-radius: 16px;
 }
 
 .link-greeting {
-  margin: 0 0 1.2rem;
+  margin: 0;
   text-align: center;
   line-height: 1.9;
   font-size: 1.02rem;
+  color: var(--alma-ink);
 }
 
 .blocks {
@@ -579,6 +641,15 @@ select {
   gap: 0.45rem;
   padding: 0.55rem;
   border-radius: 18px;
+}
+
+.float-cta--static {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  width: min(100%, 430px);
+  margin: 1.25rem auto 0;
 }
 
 .float-cta--split {

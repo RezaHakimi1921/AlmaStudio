@@ -4,20 +4,13 @@ const IG = "https://www.instagram.com/";
 const MAPS =
   "https://maps.google.com/?q=%D8%A2%D8%AA%D9%84%DB%8C%D9%87+%D8%A2%D9%84%D9%85%D8%A7+%D8%B4%D9%87%D8%B1+%D8%B1%DB%8C";
 
-/** Modest / family / studio placeholders — admin-replaceable later */
+/** Local placeholders under /public/heroes — admin can replace with real Alma photo URLs */
 const IMG = {
-  newborn:
-    "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80",
-  studioSet:
-    "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=1200&q=80",
-  gardenFamily:
-    "https://images.unsplash.com/photo-1609220136736-4259432112bd?w=1200&q=80",
-  gardenPath:
-    "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200&q=80",
-  maternityModest:
-    "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1200&q=80",
-  outdoorSoft:
-    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&q=80",
+  newborn: "/heroes/studio-newborn.jpg",
+  studioSet: "/heroes/studio-set.jpg",
+  gardenFamily: "/heroes/garden-family.jpg",
+  gardenMorning: "/heroes/garden-morning.jpg",
+  newbornDetail: "/heroes/newborn-detail.jpg",
 };
 
 export const defaultContent: SiteContent = {
@@ -38,8 +31,8 @@ export const defaultContent: SiteContent = {
         {
           id: "sc-img-1",
           type: "image",
-          imageUrl: IMG.maternityModest,
-          imageAlt: "ست بارداری آتلیه آلما",
+          imageUrl: IMG.newbornDetail,
+          imageAlt: "ست نوزاد آتلیه آلما",
           title: "ست‌های بارداری و نوزاد",
         },
         {
@@ -68,10 +61,17 @@ export const defaultContent: SiteContent = {
           body: "هماهنگی تغییر نوبت حداقل ۴۸ ساعت قبل؛ تحویل فایل‌های نهایی طبق زمان اعلام‌شده در فاکتور انجام می‌شود.",
         },
         {
+          id: "sc-price",
+          type: "price",
+          title: "نمونه پکیج استودیو",
+          body: "عکاسی نوزاد + انتخاب فایل‌ها (جزئیات در فاکتور)",
+          price: "طبق قرارداد شعبه",
+        },
+        {
           id: "sc-contact",
           type: "contact",
           title: "تماس با آتلیه",
-          body: "برای هماهنگی رزرو و سوالات، از دکمه تماس استفاده کنید.",
+          body: "برای هماهنگی رزرو و سوالات، از دکمه تماس استفاده کنید. شماره از پنل ادمین قابل تنظیم است.",
         },
       ],
       closingMessage: "با مهر، آتلیه آلما",
@@ -97,6 +97,13 @@ export const defaultContent: SiteContent = {
       introLabel: "نور آتلیه",
       phone: "",
       blocks: [
+        {
+          id: "sp-img",
+          type: "image",
+          imageUrl: IMG.studioSet,
+          imageAlt: "فضای آتلیه آلما",
+          title: "محیط آتلیه",
+        },
         {
           id: "sp-1",
           type: "text",
@@ -158,6 +165,13 @@ export const defaultContent: SiteContent = {
       phone: "",
       blocks: [
         {
+          id: "oc-img",
+          type: "image",
+          imageUrl: IMG.gardenMorning,
+          imageAlt: "عکاسی فضای باز",
+          title: "عکاسی خانوادگی در باغ",
+        },
+        {
           id: "oc-1",
           type: "text",
           body: "فیلمبرداری و عکاسی در باغ (۳ عنوان: کودک، بارداری، تعیین جنسیت)",
@@ -166,7 +180,7 @@ export const defaultContent: SiteContent = {
           id: "oc-2",
           type: "text",
           title: "شرایط کودک",
-          body: "",
+          body: "پکیج‌های زیر برای جلسات کودک در فضای باز تعریف شده‌اند.",
           bold: true,
         },
         {
@@ -201,10 +215,10 @@ export const defaultContent: SiteContent = {
           body: "عکاسی و فیلمبرداری فضای باز در مکان عمومی انجام می‌شود. پرداخت هزینه به منزله پذیرش شرایط است.",
         },
         {
-          id: "oc-img",
-          type: "image",
-          imageUrl: IMG.outdoorSoft,
-          imageAlt: "عکاسی فضای باز",
+          id: "oc-contact",
+          type: "contact",
+          title: "تماس",
+          body: "برای هماهنگی پکیج فضای باز با آتلیه تماس بگیرید.",
         },
       ],
       closingMessage: "منتظر حضور گرمتان هستیم",
@@ -221,11 +235,18 @@ export const defaultContent: SiteContent = {
       moodTag: "آرامش و راهنمایی",
       brandLabel: "آتلیه آلما",
       greeting: "سلام دوست عزیز",
-      heroImageUrl: IMG.gardenPath,
+      heroImageUrl: IMG.gardenMorning,
       introTheme: "outdoor-prep",
       introLabel: "آمادگی باغ",
       phone: "",
       blocks: [
+        {
+          id: "op-img",
+          type: "image",
+          imageUrl: IMG.gardenFamily,
+          imageAlt: "مسیر باغ",
+          title: "صبح آرام باغ",
+        },
         {
           id: "op-1",
           type: "note",

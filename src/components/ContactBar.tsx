@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 type Props = {
   phone: string;
   showMaps?: boolean;
@@ -11,11 +15,18 @@ export function ContactBar({
   mapsUrl = "",
   garden = false,
 }: Props) {
+  const [shot, setShot] = useState(false);
+  useEffect(() => {
+    setShot(new URLSearchParams(window.location.search).has("shot"));
+  }, []);
+
   const ready = phone.trim().length > 0;
   const split = showMaps && Boolean(mapsUrl);
 
   return (
-    <div className={`float-cta glass-strong${split ? " float-cta--split" : ""}`}>
+    <div
+      className={`float-cta glass-strong${split ? " float-cta--split" : ""}${shot ? " float-cta--static" : ""}`}
+    >
       {ready ? (
         <a
           className={`cta-btn${garden ? " cta-btn--garden" : ""}`}
