@@ -1,4 +1,4 @@
-import type { SiteContent } from "./types";
+import type { SiteContent, SiteSettings } from "./types";
 
 const IG = "https://www.instagram.com/";
 const MAPS =
@@ -10,6 +10,52 @@ const HERO = {
   studioSet: "/heroes/studio-set.jpg",
   gardenFamily: "/heroes/garden-family.jpg",
   gardenMorning: "/heroes/garden-morning.jpg",
+};
+
+export const defaultSettings: SiteSettings = {
+  announcement: {
+    enabled: false,
+    tone: "festival",
+    text: "جشنواره پاییزی آلما — ۱۵٪ تخفیف عکاسی بارداری و نوزاد",
+    linkLabel: "رزرو",
+    linkUrl: "",
+    startDate: "",
+    endDate: "",
+  },
+  hours: {
+    enabled: false,
+    note: "پذیرش با هماهنگی و رزرو قبلی",
+    days: [0, 1, 2, 3, 4, 5, 6].map((day) => ({
+      day,
+      open: day !== 6,
+      from: "10:00",
+      to: day === 5 ? "14:00" : "20:00",
+    })),
+  },
+  faq: {
+    enabled: false,
+    items: [
+      {
+        id: "faq-age",
+        question: "بهترین زمان برای عکاسی نوزاد چه روزهایی است؟",
+        answer: "معمولاً روزهای ۵ تا ۱۴ پس از تولد، زمانی که نوزاد بیشتر می‌خوابد و ژست‌های نوزادی راحت‌تر انجام می‌شود.",
+        visible: true,
+      },
+      {
+        id: "faq-pregnancy",
+        question: "عکاسی بارداری در چه ماهی انجام شود؟",
+        answer: "بهترین زمان معمولاً هفته‌های ۲۸ تا ۳۴ بارداری است؛ فرم شکم زیباست و مادر هنوز احساس راحتی دارد.",
+        visible: true,
+      },
+      {
+        id: "faq-delivery",
+        question: "فایل‌های نهایی چه زمانی تحویل داده می‌شود؟",
+        answer: "زمان تحویل در فاکتور شما درج می‌شود. در صورت نیاز می‌توانید با آتلیه تماس بگیرید.",
+        visible: true,
+      },
+    ],
+  },
+  gallery: { enabled: true, images: [] },
 };
 
 export const defaultContent: SiteContent = {
@@ -137,4 +183,5 @@ export const defaultContent: SiteContent = {
       published: true,
     },
   ],
+  settings: defaultSettings,
 };

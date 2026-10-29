@@ -2,18 +2,22 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { hasShotParam, useClientValue } from "@/lib/client";
-import type { LinkPageContent } from "@/lib/types";
+import { markIntroSeen, shouldSkipIntro } from "@/lib/intro";
+import { track } from "@/lib/track";
+import { TrackProvider } from "@/lib/track-context";
+import type { LinkPageContent, SiteSettings } from "@/lib/types";
 import { PAGE_THEMES } from "@/lib/themes";
 import { IntroAnimation } from "./IntroAnimation";
 import { HeroSection } from "./HeroSection";
 import { CtaButtons } from "./CtaButtons";
 import { ContactBar } from "./ContactBar";
 import { AddressCard } from "./AddressCard";
+import { AnnouncementBar } from "./AnnouncementBar";
+import { HoursCard } from "./HoursCard";
+import { FaqSection } from "./FaqSection";
+import { ShareCard } from "./ShareCard";
+import { GalleryTeaser } from "./GalleryTeaser";
 import { CheckIcon, InfoIcon, SparkIcon, TagIcon } from "./Icons";
-
-function readSkipIntro() {
-  return hasShotParam() || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 function linesToParagraphs(text: string) {
   return text
@@ -22,15 +26,30 @@ function linesToParagraphs(text: string) {
     .filter(Boolean);
 }
 
-export function LinkPageView({ page }: { page: LinkPageContent }) {
-  const skipIntro = useClientValue(readSkipIntro);
+type Props = {
+  page: LinkPageContent;
+  settings: SiteSettings;
+  /** computed on the server: announcement on + inside its date window */
+  announcementLive: boolean;
+};
+
+export function LinkPageView({ page, settings, announcementLive }: Props) {
+  const skipIntro = useClientValue(shouldSkipIntro);
   const [introDone, setIntroDone] = useState(false);
   const entered = skipIntro === true || introDone;
   const shellRef = useRef<HTMLElement>(null);
   const theme = PAGE_THEMES[page.introTheme];
   const garden = page.introTheme.startsWith("outdoor");
 
-  const onIntroDone = useCallback(() => setIntroDone(true), []);
+  const onIntroDone = useCallback(() => {
+    markIntroSeen();
+    setIntroDone(true);
+  }, []);
+
+  // anonymous page-view counter (once per mount)
+  useEffect(() => {
+    track(page.slug, "view");
+  }, [page.slug]);
 
   // Scroll-reveal for cards
   useEffect(() => {
@@ -71,8 +90,11 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
       : null,
   ].filter((m): m is { key: string; label: string; href: string } => m !== null);
 
+  const { hours, faq, gallery } = settings;
+  const showGallery = gallery.enabled && gallery.images.length > 0;
+
   return (
-    <>
+    <TrackProvider page={page.slug}>
       {skipIntro !== true ? (
         <IntroAnimation
           theme={page.introTheme}
@@ -87,6 +109,8 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
         ref={shellRef}
         className={`link-shell theme-${garden ? "garden" : "studio"}${entered ? " is-entered" : ""}`}
       >
+        {announcementLive ? <AnnouncementBar announcement={settings.announcement} /> : null}
+
         <HeroSection
           title={page.title}
           subtitle={page.subtitle}
@@ -102,7 +126,6 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
           style={{ ["--page-hero" as string]: `url(${page.heroImageUrl})` }}
         >
           <div className="link-body-photo" aria-hidden="true" />
-
 
           {!page.published ? (
             <p className="draft-badge" style={{ marginBottom: "1rem" }}>
@@ -165,9 +188,17 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
             </section>
           ) : null}
 
+          {showGallery ? <GalleryTeaser images={gallery.images} /> : null}
+
+          {hours.enabled ? <HoursCard hours={hours} /> : null}
+
           {page.address ? (
             <AddressCard title={page.addressTitle} address={page.address} />
           ) : null}
+
+          {faq.enabled ? <FaqSection items={faq.items} /> : null}
+
+          <ShareCard title={page.title} garden={garden} />
 
           {page.closingMessage ? (
             <p className="link-closing" data-reveal>
@@ -193,6 +224,6 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
         brand={page.brandLabel}
         visible={entered}
       />
-    </>
+    </TrackProvider>
   );
 }

@@ -1,9 +1,16 @@
 import { notFound } from "next/navigation";
-import { getPage } from "@/lib/content";
+import { getPage, getSettings } from "@/lib/content";
+import { isAnnouncementLive } from "@/lib/announcement";
 import { LinkPageView } from "@/components/LinkPageView";
 
 export async function LinkPageLoader({ slug }: { slug: string }) {
-  const page = await getPage(slug);
+  const [page, settings] = await Promise.all([getPage(slug), getSettings()]);
   if (!page) notFound();
-  return <LinkPageView page={page} />;
+  return (
+    <LinkPageView
+      page={page}
+      settings={settings}
+      announcementLive={isAnnouncementLive(settings.announcement)}
+    />
+  );
 }

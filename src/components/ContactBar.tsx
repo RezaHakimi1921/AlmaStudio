@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { hasShotParam, useClientValue, useIsClient } from "@/lib/client";
+import { useTrack } from "@/lib/track-context";
 import { CallButton } from "./CallButton";
 import { CloseIcon, NavigateIcon, PinIcon } from "./Icons";
 
@@ -24,6 +25,8 @@ export function ContactBar({ phone, maps, garden = false, brand, visible = true 
   const shot = useClientValue(hasShotParam) === true;
   const isClient = useIsClient();
   const [sheet, setSheet] = useState(false);
+  const trackEvent = useTrack();
+  const mapEvent = (key: string) => (key === "neshan" ? "map_neshan" : "map_google");
 
   useEffect(() => {
     if (!sheet) return;
@@ -56,6 +59,7 @@ export function ContactBar({ phone, maps, garden = false, brand, visible = true 
             href={maps[0].href}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent(mapEvent(maps[0].key))}
           >
             <PinIcon size={18} />
             <span>مسیریاب</span>
@@ -99,7 +103,10 @@ export function ContactBar({ phone, maps, garden = false, brand, visible = true 
                     href={m.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() => setSheet(false)}
+                    onClick={() => {
+                      trackEvent(mapEvent(m.key));
+                      setSheet(false);
+                    }}
                   >
                     <span className="map-sheet__icon">
                       {m.key === "neshan" ? <NavigateIcon /> : <PinIcon />}

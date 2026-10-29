@@ -1,21 +1,30 @@
 import type { Metadata } from "next";
-import { Vazirmatn } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const vazirmatn = Vazirmatn({
+/** Self-hosted Vazirmatn (OFL) — no dependency on Google Fonts at build or runtime */
+const vazirmatn = localFont({
+  src: "./fonts/Vazirmatn-Variable.woff2",
   variable: "--font-vazirmatn",
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: "100 900",
   display: "swap",
 });
 
+const SITE_URL = process.env.SITE_URL || "https://alma.artepersia.com";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "آتلیه آلما | Alma Studio",
   description: "لینک‌های اختصاصی مشتریان آتلیه آلما — عکاسی نوزاد و بارداری",
   icons: {
     icon: [{ url: "/alma-apple.svg", type: "image/svg+xml" }],
     shortcut: ["/alma-apple.svg"],
     apple: [{ url: "/alma-apple.svg" }],
+  },
+  openGraph: {
+    siteName: "آتلیه آلما",
+    locale: "fa_IR",
+    type: "website",
   },
 };
 

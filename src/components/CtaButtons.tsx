@@ -1,3 +1,6 @@
+"use client";
+
+import { useTrack } from "@/lib/track-context";
 import { ChatIcon, InstagramIcon } from "./Icons";
 
 type Props = {
@@ -18,6 +21,7 @@ export function CtaButtons({
 }: Props) {
   const instagram = showInstagram && Boolean(instagramUrl);
   const bale = showBale && Boolean(baleUrl);
+  const trackEvent = useTrack();
   if (!instagram && !bale) return null;
 
   return (
@@ -30,6 +34,7 @@ export function CtaButtons({
             href={instagramUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent("instagram")}
           >
             <InstagramIcon />
             <span>اینستاگرام</span>
@@ -41,6 +46,7 @@ export function CtaButtons({
             href={baleUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent("bale")}
           >
             <ChatIcon />
             <span>پیام در بله</span>

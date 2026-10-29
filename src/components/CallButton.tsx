@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useIsClient } from "@/lib/client";
+import { useTrack } from "@/lib/track-context";
 import { CloseIcon, PhoneIcon } from "./Icons";
 
 type Props = {
@@ -50,6 +51,7 @@ export function CallButton({
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const timers = useRef<number[]>([]);
   const mounted = useIsClient();
+  const trackEvent = useTrack();
   const ready = phone.trim().length > 0;
   const href = telHref(phone);
 
@@ -90,11 +92,12 @@ export function CallButton({
   // The tel: link is never blocked or delayed: the phone's own dialer opens
   // right away, and the visual effect plays at the same time.
   const onClick = useCallback(() => {
+    trackEvent("call");
     if (prefersReducedMotion()) return;
     navigator.vibrate?.([14, 50, 14]);
     setCalling(true);
     timers.current.push(window.setTimeout(() => setCalling(false), OVERLAY_MS));
-  }, []);
+  }, [trackEvent]);
 
   if (!ready) {
     return (

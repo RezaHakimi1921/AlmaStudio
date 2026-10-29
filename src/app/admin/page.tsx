@@ -40,6 +40,26 @@ export default async function AdminPage() {
         <AdminLogoutButton />
       </div>
 
+      <nav className="admin-tiles" aria-label="بخش‌های پنل">
+        <Link href="/admin/settings" className="admin-tile">
+          <strong>اطلاعیه، ساعات و سوالات</strong>
+          <span>جشنواره و تخفیف · ساعات پذیرش · سوالات متداول</span>
+        </Link>
+        <Link href="/admin/gallery" className="admin-tile">
+          <strong>نمونه‌کارها</strong>
+          <span>
+            گالری بارداری، نوزاد و کودک · {content.settings.gallery.images.length.toLocaleString("fa-IR")}{" "}
+            تصویر
+          </span>
+        </Link>
+        <Link href="/admin/stats" className="admin-tile">
+          <strong>آمار بازدید و کلیک</strong>
+          <span>بازدید هر صفحه، تماس، مسیریابی و اشتراک‌گذاری</span>
+        </Link>
+      </nav>
+
+      <h2 className="admin-section-title">لینک‌های مشتریان</h2>
+
       <ul className="home-list">
         {content.pages.map((page) => (
           <li key={page.slug}>

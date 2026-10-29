@@ -32,6 +32,14 @@ export default async function HomePage() {
             </li>
           );
         })}
+        {content.settings.gallery.enabled ? (
+          <li>
+            <Link href="/nemoone-kar" className="glass">
+              <strong>نمونه‌کارها</strong>
+              <span>بارداری · نوزاد · کودک · /nemoone-kar</span>
+            </Link>
+          </li>
+        ) : null}
       </ul>
       <p style={{ marginTop: "1.75rem" }}>
         <Link

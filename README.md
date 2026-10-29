@@ -19,7 +19,11 @@ npx next dev -p 3000
 | `/amadegi-fazabaz` | آمادگی فضای باز |
 | `/amadegi-atelier` | آمادگی جهت عکاسی |
 | `/sharaet-alma` | شرایط آتلیه آلما |
+| `/nemoone-kar` | نمونه‌کارها (بارداری · نوزاد · کودک) |
 | `/admin` | Admin (`admin` / env password) |
+| `/admin/settings` | نوار اطلاعیه، ساعات پذیرش، سوالات متداول |
+| `/admin/gallery` | مدیریت نمونه‌کارها |
+| `/admin/stats` | آمار بازدید و کلیک (بدون اطلاعات شخصی) |
 
 Legacy `/links/outdoor-conditions` (etc.) → redirects to short paths.  
 `?shot=1` skips intro animation.
@@ -28,7 +32,10 @@ Legacy `/links/outdoor-conditions` (etc.) → redirects to short paths.
 
 - Login: `ADMIN_USERNAME` / `ADMIN_PASSWORD` (defaults `admin` / `alma123` locally)
 - Simple fields + hero **file upload** → `public/uploads/`
-- Persistence: `data/content.json`
+- Persistence: `data/content.json` (pages + site settings), `data/stats.json` (anonymous daily counters)
+- Uploaded files are served by `src/app/uploads/[name]/route.ts` (Next only serves `public/` files that existed at build time)
+- Font: Vazirmatn is self-hosted (`src/app/fonts`, OFL) — builds work offline
+- `SITE_URL` env sets the absolute address used in link previews (og:image)
 
 ## Docker + nginx (production)
 
