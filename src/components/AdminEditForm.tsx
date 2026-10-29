@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { LinkPageContent } from "@/lib/types";
@@ -19,9 +19,13 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
+  // after router.refresh() the server sends a fresh `page`: reset the draft
+  // during render (React's "adjust state on prop change" pattern, no effect)
+  const [syncedPage, setSyncedPage] = useState(page);
+  if (syncedPage !== page) {
+    setSyncedPage(page);
     setDraft({ ...page, heroImageUrl: normalizeMediaUrl(page.heroImageUrl) });
-  }, [page]);
+  }
 
   function updateField<K extends keyof LinkPageContent>(
     key: K,
@@ -237,7 +241,26 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
       </div>
 
       <label>
-        پکیج‌ها و قیمت (هر خط یک مورد — اختیاری)
+        پکیج‌های این صفحه
+        <select
+          value={draft.packageFilter}
+          onChange={(e) =>
+            updateField("packageFilter", e.target.value as LinkPageContent["packageFilter"])
+          }
+        >
+          <option value="none">نمایش نده (یا از متن ساده پایین استفاده کن)</option>
+          <option value="all">همه پکیج‌ها</option>
+          <option value="pregnancy">فقط پکیج‌های بارداری</option>
+          <option value="newborn">فقط پکیج‌های نوزاد</option>
+          <option value="kids">فقط پکیج‌های کودک</option>
+        </select>
+        <small className="hero-upload__hint">
+          پکیج‌ها را در «پنل ← پکیج‌ها» تعریف کنید. اگر اینجا پکیجی انتخاب شود، متن ساده پایین نمایش داده
+          نمی‌شود.
+        </small>
+      </label>
+      <label>
+        پکیج‌ها و قیمت — متن ساده قدیمی (هر خط یک مورد — اختیاری)
         <textarea
           value={draft.packagesText}
           onChange={(e) => updateField("packagesText", e.target.value)}

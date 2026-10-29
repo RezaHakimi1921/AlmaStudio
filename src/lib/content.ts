@@ -2,14 +2,17 @@ import { promises as fs } from "fs";
 import path from "path";
 import { defaultContent, defaultSettings } from "./default-content";
 import { normalizeMediaUrl } from "./media";
+import { parseFaNumber } from "./tehran";
 import type {
   DayHours,
+  Decor,
   FaqItem,
   GalleryImage,
   LinkPageContent,
   LinkSlug,
   SiteContent,
   SiteSettings,
+  StudioPackage,
 } from "./types";
 import { GALLERY_CATEGORIES, LINK_SLUGS } from "./types";
 
@@ -46,6 +49,9 @@ function migratePage(raw: Record<string, unknown>, fallback: LinkPageContent): L
       : raw.greeting
         ? `<p>${String(raw.greeting)}</p>\n${blocksToHtml(raw.blocks)}`
         : fallback.bodyHtml,
+    packageFilter: (["none", "all", ...GALLERY_CATEGORIES] as string[]).includes(String(raw.packageFilter))
+      ? (raw.packageFilter as LinkPageContent["packageFilter"])
+      : "none",
     packagesText:
       raw.packagesText != null ? String(raw.packagesText) : fallback.packagesText || "",
     notesText: raw.notesText != null ? String(raw.notesText) : fallback.notesText || "",
@@ -136,6 +142,53 @@ export function migrateSettings(raw: unknown): SiteSettings {
     : [];
   const gallery = { enabled: bool(g.enabled, d.gallery.enabled), images };
 
+  const isCat = (v: unknown): v is GalleryImage["category"] =>
+    (GALLERY_CATEGORIES as readonly string[]).includes(str(v));
+  const money = (v: unknown) => {
+    const n = typeof v === "number" ? Math.round(v) : parseFaNumber(str(v));
+    return Number.isFinite(n) && n > 0 ? Math.min(n, 1e12) : 0;
+  };
+
+  const dc = obj(r.decors);
+  const decorItems: Decor[] = Array.isArray(dc.items)
+    ? dc.items
+        .map(obj)
+        .map((x, i) => ({
+          id: str(x.id) || `decor-${Date.now()}-${i}`,
+          number: Math.max(1, Math.min(9999, Math.round(Number(x.number)) || i + 1)),
+          name: str(x.name).trim().slice(0, 80),
+          category: isCat(x.category) ? x.category : "newborn",
+          imageUrl: str(x.imageUrl).trim(),
+          note: str(x.note).trim().slice(0, 300),
+          visible: bool(x.visible, true),
+        }))
+        .filter((x) => x.imageUrl)
+        .sort((a, b) => a.number - b.number)
+    : [];
+  const decors = { enabled: bool(dc.enabled, d.decors.enabled), items: decorItems };
+
+  const pk = obj(r.packages);
+  const packageItems: StudioPackage[] = Array.isArray(pk.items)
+    ? pk.items
+        .map(obj)
+        .map((x, i) => ({
+          id: str(x.id) || `pkg-${Date.now()}-${i}`,
+          name: str(x.name).trim().slice(0, 80),
+          price: money(x.price),
+          oldPrice: money(x.oldPrice),
+          badge: str(x.badge).trim().slice(0, 30),
+          description: str(x.description).trim().slice(0, 300),
+          features: (Array.isArray(x.features) ? x.features : [])
+            .map((f) => str(f).trim().slice(0, 140))
+            .filter(Boolean)
+            .slice(0, 20),
+          category: isCat(x.category) ? x.category : "newborn",
+          visible: bool(x.visible, true),
+        }))
+        .filter((x) => x.name)
+    : [];
+  const packages = { items: packageItems };
+
   const hubRaw = obj(r.hub);
   const hub = {
     title: str(hubRaw.title, d.hub.title).slice(0, 80) || d.hub.title,
@@ -144,7 +197,7 @@ export function migrateSettings(raw: unknown): SiteSettings {
       normalizeMediaUrl(str(hubRaw.heroImageUrl, d.hub.heroImageUrl)) || d.hub.heroImageUrl,
   };
 
-  return { hub, announcement, hours, faq, gallery };
+  return { hub, announcement, hours, faq, gallery, decors, packages };
 }
 
 function migrateContent(parsed: unknown): SiteContent {

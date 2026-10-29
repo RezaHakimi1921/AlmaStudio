@@ -6,6 +6,8 @@ import { GALLERY_PATH, GALLERY_THEMES } from "@/lib/gallery";
 import { toFaDigits } from "@/lib/tehran";
 import type { GalleryCategory, GalleryImage, SiteSettings } from "@/lib/types";
 import { GALLERY_CATEGORIES } from "@/lib/types";
+import { uploadImage } from "@/lib/upload-client";
+import { MAX_UPLOAD_MB, faBytes } from "@/lib/upload-limits";
 import { Switch, saveSettings } from "./AdminSettingsForm";
 
 export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
@@ -46,25 +48,17 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
     setMessage("");
     const added: GalleryImage[] = [];
     const list = Array.from(files);
+    let before = 0;
+    let after = 0;
     for (let i = 0; i < list.length; i++) {
-      setBusy(`در حال آپلود ${toFaDigits(i + 1)} از ${toFaDigits(list.length)}…`);
-      const body = new FormData();
-      body.append("file", list[i]);
+      setBusy(`در حال آپلود و فشرده‌سازی ${toFaDigits(i + 1)} از ${toFaDigits(list.length)}…`);
       try {
-        const res = await fetch("/api/upload", { method: "POST", body });
-        const data = (await res.json()) as { ok?: boolean; url?: string; error?: string };
-        if (!res.ok || !data.ok || !data.url) {
-          setError(`${list[i].name}: ${data.error || "آپلود ناموفق"}`);
-          continue;
-        }
-        added.push({
-          id: `img-${Date.now()}-${i}`,
-          url: data.url,
-          caption: "",
-          category: cat,
-        });
-      } catch {
-        setError(`${list[i].name}: خطا در آپلود`);
+        const r = await uploadImage(list[i], "gallery");
+        before += r.originalBytes;
+        after += r.savedBytes;
+        added.push({ id: `img-${Date.now()}-${i}`, url: r.url, caption: "", category: cat });
+      } catch (err) {
+        setError((err as Error).message || `${list[i].name}: خطا در آپلود`);
       }
     }
     if (fileRef.current) fileRef.current.value = "";
@@ -72,7 +66,10 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
     if (added.length) {
       const next = { ...s, gallery: { ...s.gallery, images: [...added, ...s.gallery.images] } };
       setS(next);
-      await persist(next, `${toFaDigits(added.length)} تصویر اضافه و ذخیره شد ✓`);
+      await persist(
+        next,
+        `${toFaDigits(added.length)} تصویر اضافه شد ✓ — حجم ${faBytes(before)} ← ${faBytes(after)}`,
+      );
     }
   }
 
@@ -144,7 +141,10 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
             onChange={(e) => onFiles(e.target.files)}
           />
           <strong>{busy || `+ افزودن تصویر به «${GALLERY_THEMES[cat].label}»`}</strong>
-          <span>چند تصویر را با هم انتخاب کنید · JPG / PNG / WebP تا ۸ مگابایت</span>
+          <span>
+            چند تصویر را با هم انتخاب کنید · JPG، PNG یا WebP تا {toFaDigits(MAX_UPLOAD_MB)} مگابایت
+            برای هر عکس · عکس‌ها خودکار سبک و فشرده می‌شوند
+          </span>
         </label>
 
         {inCat.length ? (

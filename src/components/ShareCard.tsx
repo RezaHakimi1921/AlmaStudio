@@ -10,7 +10,8 @@ export function ShareCard({ title, garden = false }: { title: string; garden?: b
   const trackEvent = useTrack();
 
   async function share() {
-    const url = `${window.location.origin}${window.location.pathname}`;
+    // shared links are tagged so the stats show visits that came via the partner
+    const url = `${window.location.origin}${window.location.pathname}?src=hamrah`;
     const text = `${title} — آتلیه آلما`;
     trackEvent("share");
     if (navigator.share) {

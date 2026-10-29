@@ -3,42 +3,54 @@ import { redirect } from "next/navigation";
 import { isAuthenticated } from "@/lib/auth";
 import { readContent } from "@/lib/content";
 import { readStats } from "@/lib/stats";
-import { faJalali, tehranDateKey, toFaDigits } from "@/lib/tehran";
+import { buildReport, change, n } from "@/lib/stats-report";
+import type { Counts } from "@/lib/stats-report";
+import { publicPathForSlug } from "@/lib/routes";
+import { sourceLabel } from "@/lib/sources";
+import { faJalali, toFaDigits } from "@/lib/tehran";
 import type { TrackEvent } from "@/lib/types";
 import { AdminHeader } from "@/components/AdminHeader";
+import { AdminLinkBuilder } from "@/components/AdminLinkBuilder";
 
 export const dynamic = "force-dynamic";
 
 const RANGES = [7, 30, 90] as const;
 
-const EVENT_LABELS: { key: TrackEvent | "maps"; label: string }[] = [
+type Col = { key: TrackEvent | "maps"; label: string };
+
+const PAGE_COLS: Col[] = [
   { key: "view", label: "بازدید" },
   { key: "call", label: "تماس" },
   { key: "maps", label: "مسیریابی" },
   { key: "instagram", label: "اینستاگرام" },
   { key: "bale", label: "بله" },
   { key: "share", label: "ارسال برای همراه" },
-  { key: "gallery", label: "رفتن به نمونه‌کارها" },
+  { key: "gallery", label: "نمونه‌کارها" },
+  { key: "decor", label: "دکورها" },
+  { key: "decor_pick", label: "انتخاب دکور" },
 ];
 
-type Counts = Partial<Record<TrackEvent, number>>;
+const SOURCE_COLS: Col[] = [
+  { key: "view", label: "بازدید" },
+  { key: "call", label: "تماس" },
+  { key: "maps", label: "مسیریابی" },
+  { key: "share", label: "ارسال برای همراه" },
+];
 
-function lastDays(n: number) {
-  const out: string[] = [];
-  const now = Date.now();
-  for (let i = n - 1; i >= 0; i--) out.push(tehranDateKey(new Date(now - i * 86_400_000)));
-  return out;
-}
+const fa = (v: number) => toFaDigits(v.toLocaleString("en-US").replace(/,/g, "٬"));
+const value = (c: Counts | undefined, key: TrackEvent | "maps") =>
+  !c ? 0 : key === "maps" ? n(c.map_google) + n(c.map_neshan) : n(c[key]);
 
-const n = (v: number | undefined) => v ?? 0;
-const fa = (v: number) => toFaDigits(v.toLocaleString("en-US"));
-const value = (c: Counts, key: TrackEvent | "maps") =>
-  key === "maps" ? n(c.map_google) + n(c.map_neshan) : n(c[key]);
-
-function add(into: Counts, from: Counts) {
-  for (const [k, v] of Object.entries(from)) {
-    into[k as TrackEvent] = n(into[k as TrackEvent]) + n(v);
-  }
+function Delta({ now, before }: { now: number; before: number }) {
+  const d = change(now, before);
+  if (d === null) return <em className="stat-delta">دوره قبل: بدون داده</em>;
+  const cls = d > 0 ? "is-up" : d < 0 ? "is-down" : "";
+  const sign = d > 0 ? "▲" : d < 0 ? "▼" : "•";
+  return (
+    <em className={`stat-delta ${cls}`}>
+      {sign} {toFaDigits(Math.abs(d))}٪ نسبت به دوره قبل
+    </em>
+  );
 }
 
 type Props = { searchParams: Promise<{ d?: string }> };
@@ -49,70 +61,74 @@ export default async function AdminStatsPage({ searchParams }: Props) {
   const range = RANGES.includes(Number(d) as (typeof RANGES)[number]) ? Number(d) : 30;
 
   const [stats, content] = await Promise.all([readStats(), readContent()]);
-  const days = lastDays(range);
-
-  const names: Record<string, string> = Object.fromEntries(
-    content.pages.map((p) => [p.slug, p.title]),
-  );
+  const names: Record<string, string> = Object.fromEntries(content.pages.map((p) => [p.slug, p.title]));
   names.gallery = "صفحه نمونه‌کارها";
-  const pageKeys = [...content.pages.map((p) => p.slug), "gallery"];
+  names.decor = "صفحه دکورها";
+  const pageKeys = [...content.pages.map((p) => p.slug), "gallery", "decor"];
 
-  const total: Counts = {};
-  const perPage: Record<string, Counts> = Object.fromEntries(pageKeys.map((k) => [k, {}]));
-  const perDay = days.map((day) => {
-    const c: Counts = {};
-    for (const [page, counts] of Object.entries(stats.days[day] ?? {})) {
-      add(c, counts);
-      add(total, counts);
-      if (perPage[page]) add(perPage[page], counts);
-    }
-    return { day, c };
-  });
+  const r = buildReport(stats, range, pageKeys);
+  const maxViews = Math.max(1, ...r.perDay.map((x) => n(x.c.view)));
+  const views = n(r.total.view);
+  const callRate = views ? (n(r.total.call) / views) * 100 : 0;
+  const prevViews = n(r.previous.view);
+  const prevRate = prevViews ? (n(r.previous.call) / prevViews) * 100 : 0;
 
-  const maxViews = Math.max(1, ...perDay.map((x) => n(x.c.view)));
-  const linkViews = pageKeys
-    .filter((k) => k !== "gallery")
-    .reduce((sum, k) => sum + n(perPage[k].view), 0);
-  const callRate = linkViews ? (n(total.call) / linkViews) * 100 : 0;
+  const sources = Object.entries(r.perSource).sort((a, b) => n(b[1].view) - n(a[1].view));
+
+  const builderPages = [
+    ...content.pages.map((p) => ({ path: publicPathForSlug(p.slug), label: p.title })),
+    { path: "/nemoone-kar", label: "نمونه‌کارها" },
+    { path: "/dekor", label: "دکورها" },
+  ];
 
   return (
     <main className="admin-shell admin-stats">
       <AdminHeader title="آمار بازدید و کلیک" subtitle="بدون ذخیره هیچ اطلاعات شخصی — فقط شمارش" />
 
       <nav className="admin-cat-tabs" aria-label="بازه زمانی">
-        {RANGES.map((r) => (
-          <Link key={r} href={`/admin/stats?d=${r}`} className={r === range ? "is-active" : undefined}>
-            {toFaDigits(r)} روز اخیر
+        {RANGES.map((x) => (
+          <Link key={x} href={`/admin/stats?d=${x}`} className={x === range ? "is-active" : undefined}>
+            {toFaDigits(x)} روز اخیر
           </Link>
         ))}
       </nav>
+      <p className="hero-upload__hint">
+        {faJalali(r.days[0])} تا {faJalali(r.days[r.days.length - 1])} — در مقایسه با {toFaDigits(range)} روز
+        قبل از آن
+      </p>
 
       <div className="stat-tiles">
         <div className="stat-tile">
           <span>بازدید</span>
-          <strong>{fa(n(total.view))}</strong>
+          <strong>{fa(views)}</strong>
+          <Delta now={views} before={prevViews} />
         </div>
         <div className="stat-tile stat-tile--accent">
           <span>تماس</span>
-          <strong>{fa(n(total.call))}</strong>
+          <strong>{fa(n(r.total.call))}</strong>
+          <Delta now={n(r.total.call)} before={n(r.previous.call)} />
         </div>
         <div className="stat-tile">
           <span>مسیریابی</span>
-          <strong>{fa(value(total, "maps"))}</strong>
+          <strong>{fa(value(r.total, "maps"))}</strong>
+          <Delta now={value(r.total, "maps")} before={value(r.previous, "maps")} />
         </div>
         <div className="stat-tile">
           <span>نرخ تماس از بازدید</span>
           <strong>
-            {toFaDigits(callRate.toFixed(1))}
+            {toFaDigits(callRate.toFixed(1)).replace(".", "٫")}
             <small>٪</small>
           </strong>
+          <em className="stat-delta">
+            دوره قبل: {prevViews ? `${toFaDigits(prevRate.toFixed(1)).replace(".", "٫")}٪` : "بدون داده"}
+          </em>
         </div>
       </div>
 
       <section className="admin-card glass admin-section">
         <h2>روند روزانه بازدید</h2>
         <div className="day-chart" role="img" aria-label="نمودار بازدید روزانه">
-          {perDay.map(({ day, c }) => (
+          {r.perDay.map(({ day, c }) => (
             <div
               key={day}
               className="day-chart__col"
@@ -125,12 +141,54 @@ export default async function AdminStatsPage({ searchParams }: Props) {
           ))}
         </div>
         <div className="day-chart__legend">
-          <span>{faJalali(days[0])}</span>
+          <span>{faJalali(r.days[0], false)}</span>
           <span>
             <i className="day-chart__call day-chart__call--legend" /> روزهایی که تماس داشته
           </span>
-          <span>{faJalali(days[days.length - 1])}</span>
+          <span>{faJalali(r.days[r.days.length - 1], false)}</span>
         </div>
+      </section>
+
+      <section className="admin-card glass admin-section">
+        <h2>از کجا آمده‌اند؟</h2>
+        {sources.length ? (
+          <div className="stat-table-wrap">
+            <table className="stat-table">
+              <thead>
+                <tr>
+                  <th>کانال</th>
+                  {SOURCE_COLS.map((c) => (
+                    <th key={c.key}>{c.label}</th>
+                  ))}
+                  <th>نرخ تماس</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sources.map(([src, c]) => (
+                  <tr key={src}>
+                    <th>{sourceLabel(src)}</th>
+                    {SOURCE_COLS.map((col) => (
+                      <td key={col.key}>{fa(value(c, col.key))}</td>
+                    ))}
+                    <td>
+                      {n(c.view)
+                        ? `${toFaDigits(((n(c.call) / n(c.view)) * 100).toFixed(0))}٪`
+                        : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="hero-upload__hint">هنوز داده‌ای برای این بازه ثبت نشده است.</p>
+        )}
+        <h3 className="link-builder__title">ساخت لینک برای هر کانال</h3>
+        <p className="hero-upload__hint">
+          برای بیو اینستاگرام، پیام بله، پیامک و… لینک جدا بسازید تا معلوم شود هر کانال چند بازدید و تماس آورده.
+          لینک‌هایی که مشتری با «ارسال برای همراه» می‌فرستد خودکار «ارسال برای همراه» ثبت می‌شوند.
+        </p>
+        <AdminLinkBuilder pages={builderPages} />
       </section>
 
       <section className="admin-card glass admin-section">
@@ -140,7 +198,7 @@ export default async function AdminStatsPage({ searchParams }: Props) {
             <thead>
               <tr>
                 <th>صفحه</th>
-                {EVENT_LABELS.map((e) => (
+                {PAGE_COLS.map((e) => (
                   <th key={e.key}>{e.label}</th>
                 ))}
               </tr>
@@ -149,8 +207,8 @@ export default async function AdminStatsPage({ searchParams }: Props) {
               {pageKeys.map((k) => (
                 <tr key={k}>
                   <th>{names[k] ?? k}</th>
-                  {EVENT_LABELS.map((e) => (
-                    <td key={e.key}>{fa(value(perPage[k], e.key))}</td>
+                  {PAGE_COLS.map((e) => (
+                    <td key={e.key}>{fa(value(r.perPage[k], e.key))}</td>
                   ))}
                 </tr>
               ))}
@@ -158,7 +216,7 @@ export default async function AdminStatsPage({ searchParams }: Props) {
           </table>
         </div>
         <p className="hero-upload__hint">
-          بازدیدها و کلیک‌ها به وقت تهران و روزانه شمرده می‌شوند. بازدیدهای پنل مدیریت و ربات‌های
+          بازدیدها و کلیک‌ها به وقت تهران و روزانه شمرده می‌شوند. بازدیدهای خودتان (وقتی وارد پنل هستید) و ربات‌های
           پیش‌نمایش لینک (تلگرام، واتس‌اپ و…) شمرده نمی‌شوند.
         </p>
       </section>

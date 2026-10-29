@@ -20,10 +20,13 @@ npx next dev -p 3000
 | `/amadegi-atelier` | آمادگی جهت عکاسی |
 | `/sharaet-alma` | شرایط آتلیه آلما |
 | `/nemoone-kar` | نمونه‌کارها (بارداری · نوزاد · کودک) |
+| `/dekor` | دکورهای آتلیه — انتخاب با شماره |
 | `/admin` | Admin (`admin` / env password) |
 | `/admin/settings` | نوار اطلاعیه، ساعات پذیرش، سوالات متداول |
 | `/admin/gallery` | مدیریت نمونه‌کارها |
-| `/admin/stats` | آمار بازدید و کلیک (بدون اطلاعات شخصی) |
+| `/admin/stats` | آمار بازدید و کلیک + منبع ورود (`?src=insta`) |
+| `/admin/packages` | پکیج‌ها و قیمت با پیش‌نمایش |
+| `/admin/decors` | کاتالوگ دکورها |
 
 Legacy `/links/outdoor-conditions` (etc.) → redirects to short paths.  
 `?shot=1` skips intro animation.
@@ -34,6 +37,11 @@ Legacy `/links/outdoor-conditions` (etc.) → redirects to short paths.
 - Simple fields + hero **file upload** → `public/uploads/`
 - Persistence: `data/content.json` (pages + site settings), `data/stats.json` (anonymous daily counters)
 - Uploaded files are served by `src/app/uploads/[name]/route.ts` (Next only serves `public/` files that existed at build time)
+- Uploads are auto-rotated, resized and converted to WebP (sharp), max 25 MB per photo
+- Dates: stored Gregorian ISO, always shown/picked as شمسی — see AGENTS.md
+- Tests: `npm test` (Jalali conversion vs Intl, stats aggregation)
+- Backups: admin → «دانلود پشتیبان», and nightly `deploy/backup.sh` on the server
+- Ideas for later: [docs/IDEAS.md](docs/IDEAS.md)
 - Font: Vazirmatn is self-hosted (`src/app/fonts`, OFL) — builds work offline
 - `SITE_URL` env sets the absolute address used in link previews (og:image)
 

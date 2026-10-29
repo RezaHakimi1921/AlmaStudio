@@ -2,6 +2,9 @@
 
 import { useRef, useState } from "react";
 import { mediaPreviewSrc, normalizeMediaUrl } from "@/lib/media";
+import { toFaDigits } from "@/lib/tehran";
+import { uploadImage } from "@/lib/upload-client";
+import { MAX_UPLOAD_MB, faBytes } from "@/lib/upload-limits";
 
 type Props = {
   label?: string;
@@ -29,20 +32,15 @@ export function HeroImageField({
     onError?.("");
     onMessage?.("");
     try {
-      const body = new FormData();
-      body.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body });
-      const data = (await res.json()) as { ok?: boolean; url?: string; error?: string };
-      if (!res.ok || !data.ok || !data.url) {
-        onError?.(data.error || "آپلود ناموفق بود");
-        return;
-      }
-      const url = normalizeMediaUrl(data.url);
+      const r = await uploadImage(file, "hero");
+      const url = normalizeMediaUrl(r.url);
       onChange(url);
       setBust(Date.now());
-      onMessage?.("تصویر آپلود شد — برای اعمال ذخیره کنید");
-    } catch {
-      onError?.("خطا در آپلود");
+      onMessage?.(
+        `تصویر آپلود شد (${faBytes(r.originalBytes)} ← ${faBytes(r.savedBytes)}) — برای اعمال ذخیره کنید`,
+      );
+    } catch (err) {
+      onError?.((err as Error).message || "خطا در آپلود");
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -63,7 +61,9 @@ export function HeroImageField({
         />
       </label>
       <p className="hero-upload__hint">
-        {uploading ? "در حال آپلود…" : "JPG / PNG / WebP / GIF تا ۸MB — بدون اسلش انتهایی در مسیر"}
+        {uploading
+          ? "در حال آپلود و فشرده‌سازی…"
+          : `JPG، PNG یا WebP تا ${toFaDigits(MAX_UPLOAD_MB)} مگابایت — عکس خودکار سبک می‌شود (معمولاً زیر ۶۰۰ کیلوبایت)`}
       </p>
       <label>
         یا URL / مسیر

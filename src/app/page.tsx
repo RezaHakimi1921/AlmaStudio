@@ -55,6 +55,20 @@ export default async function HomePage() {
                 </li>
               );
             })}
+          {content.settings.decors.enabled && content.settings.decors.items.some((d) => d.visible) ? (
+            <li>
+              <Link href="/dekor" className="hub-card glass">
+                <span className="hub-card__text">
+                  <strong className="hub-card__title">دکورهای آتلیه</strong>
+                  <span className="hub-card__mood">انتخاب با شماره</span>
+                  <span className="hub-card__desc">دکور دلخواهتان را قبل از جلسه انتخاب کنید</span>
+                </span>
+                <span className="hub-card__enter" aria-hidden="true">
+                  ورود
+                </span>
+              </Link>
+            </li>
+          ) : null}
           {content.settings.gallery.enabled ? (
             <li>
               <Link href="/nemoone-kar" className="hub-card glass">

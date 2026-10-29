@@ -17,6 +17,8 @@ import { HoursCard } from "./HoursCard";
 import { FaqSection } from "./FaqSection";
 import { ShareCard } from "./ShareCard";
 import { GalleryTeaser } from "./GalleryTeaser";
+import { DecorTeaser } from "./DecorTeaser";
+import { PackagesSection } from "./PackagesSection";
 import { CheckIcon, InfoIcon, SparkIcon, TagIcon } from "./Icons";
 
 function linesToParagraphs(text: string) {
@@ -90,8 +92,15 @@ export function LinkPageView({ page, settings, announcementLive }: Props) {
       : null,
   ].filter((m): m is { key: string; label: string; href: string } => m !== null);
 
-  const { hours, faq, gallery } = settings;
+  const { hours, faq, gallery, decors } = settings;
   const showGallery = gallery.enabled && gallery.images.length > 0;
+  const visibleDecors = decors.enabled ? decors.items.filter((d) => d.visible) : [];
+  const pagePackages =
+    page.packageFilter === "none"
+      ? []
+      : settings.packages.items.filter(
+          (p) => p.visible && (page.packageFilter === "all" || p.category === page.packageFilter),
+        );
 
   return (
     <TrackProvider page={page.slug}>
@@ -148,7 +157,9 @@ export function LinkPageView({ page, settings, announcementLive }: Props) {
             </section>
           ) : null}
 
-          {packages.length ? (
+          {pagePackages.length ? (
+            <PackagesSection packages={pagePackages} garden={garden} />
+          ) : packages.length ? (
             <section className="glass section-card" data-reveal>
               <h2 className="card-title">
                 <span className="card-title__icon">
@@ -187,6 +198,8 @@ export function LinkPageView({ page, settings, announcementLive }: Props) {
               </ol>
             </section>
           ) : null}
+
+          {visibleDecors.length ? <DecorTeaser items={visibleDecors} /> : null}
 
           {showGallery ? <GalleryTeaser images={gallery.images} /> : null}
 

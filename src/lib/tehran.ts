@@ -1,3 +1,5 @@
+import { FA_MONTHS, isoToJalali } from "./jalali";
+
 /** Date helpers pinned to Tehran time (works the same on server and client). */
 const TZ = "Asia/Tehran";
 
@@ -56,15 +58,23 @@ export function faTime(t: string) {
   return `${toFaDigits(h12)}${m ? `:${toFaDigits(String(m).padStart(2, "0"))}` : ""} ${part}`;
 }
 
-/** Gregorian YYYY-MM-DD → Persian (Jalali) date label */
-export function faJalali(dateKey: string) {
-  if (!dateKey) return "";
-  const d = new Date(`${dateKey}T12:00:00+03:30`);
-  if (Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
-    timeZone: TZ,
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(d);
+/** Gregorian YYYY-MM-DD → "۸ آبان ۱۴۰۵" (Jalali, Persian digits) */
+export function faJalali(dateKey: string, withYear = true) {
+  const j = isoToJalali(dateKey);
+  if (!j) return "";
+  return toFaDigits(`${j.jd} ${FA_MONTHS[j.jm - 1]}${withYear ? ` ${j.jy}` : ""}`);
+}
+
+/** "۱۲٬۵۰۰" / "١٢,٥٠٠" / "12500" → 12500 (NaN if no digits) */
+export function parseFaNumber(value: string) {
+  const latin = value
+    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
+    .replace(/[^\d]/g, "");
+  return latin ? Number(latin) : NaN;
+}
+
+/** 4500000 → "۴٬۵۰۰٬۰۰۰" */
+export function faMoney(n: number) {
+  return toFaDigits(Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "٬"));
 }

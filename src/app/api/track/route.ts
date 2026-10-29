@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
 import { recordEvent } from "@/lib/stats";
+import { normalizeSource } from "@/lib/sources";
 import { LINK_SLUGS, TRACK_EVENTS } from "@/lib/types";
 import type { TrackEvent } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const PAGES = new Set<string>([...LINK_SLUGS, "gallery"]);
+const PAGES = new Set<string>([...LINK_SLUGS, "gallery", "decor"]);
 const EVENTS = new Set<string>(TRACK_EVENTS);
 const BOT_RE = /bot|crawler|spider|preview|facebookexternalhit|telegrambot|whatsapp/i;
 
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
   if (await isAuthenticated()) {
     return new NextResponse(null, { status: 204 });
   }
-  let body: { page?: unknown; event?: unknown };
+  let body: { page?: unknown; event?: unknown; src?: unknown };
   try {
     body = JSON.parse(await request.text());
   } catch {
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     return new NextResponse(null, { status: 400 });
   }
   try {
-    await recordEvent(page, event as TrackEvent);
+    await recordEvent(page, event as TrackEvent, normalizeSource(body.src));
   } catch {
     /* stats are best-effort */
   }

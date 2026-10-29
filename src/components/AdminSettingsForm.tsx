@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FA_DAYS, faJalali } from "@/lib/tehran";
 import { normalizeMediaUrl } from "@/lib/media";
 import type { DayHours, FaqItem, SiteSettings } from "@/lib/types";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { HeroImageField } from "./HeroImageField";
+import { JalaliDatePicker, PersianTimeSelect } from "./JalaliDatePicker";
 
 export function Switch({
   checked,
@@ -44,9 +45,12 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  // fresh server data after router.refresh() → reset the form (no effect needed)
+  const [syncedInitial, setSyncedInitial] = useState(initial);
+  if (syncedInitial !== initial) {
+    setSyncedInitial(initial);
     setS(initial);
-  }, [initial]);
+  }
 
   const a = s.announcement;
   const hub = s.hub;
@@ -179,16 +183,28 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
               placeholder="https://ble.ir/… یا tel:…"
             />
           </label>
-          <label>
-            از تاریخ (اختیاری)
-            <input type="date" value={a.startDate} onChange={(e) => setA({ startDate: e.target.value })} />
-            <small>{a.startDate ? faJalali(a.startDate) : "از همین حالا"}</small>
-          </label>
-          <label>
-            تا تاریخ (اختیاری)
-            <input type="date" value={a.endDate} onChange={(e) => setA({ endDate: e.target.value })} />
-            <small>{a.endDate ? `${faJalali(a.endDate)} — بعد از آن خودکار پنهان می‌شود` : "بدون پایان"}</small>
-          </label>
+          <div className="admin-field">
+            <span>از تاریخ (اختیاری)</span>
+            <JalaliDatePicker
+              value={a.startDate}
+              onChange={(v) => setA({ startDate: v })}
+              placeholder="از همین حالا"
+              label="تاریخ شروع"
+            />
+            <small>{a.startDate ? `از ابتدای ${faJalali(a.startDate)} نمایش داده می‌شود` : "از همین حالا"}</small>
+          </div>
+          <div className="admin-field">
+            <span>تا تاریخ (اختیاری)</span>
+            <JalaliDatePicker
+              value={a.endDate}
+              onChange={(v) => setA({ endDate: v })}
+              placeholder="بدون پایان"
+              label="تاریخ پایان"
+            />
+            <small>
+              {a.endDate ? `تا پایان ${faJalali(a.endDate)} — بعد از آن خودکار پنهان می‌شود` : "بدون پایان"}
+            </small>
+          </div>
         </div>
 
         {a.text.trim() ? (
@@ -217,20 +233,19 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
                 onChange={(v) => setDay(d.day, { open: v })}
                 label={FA_DAYS[d.day]}
               />
-              <input
-                type="time"
+              <span className="admin-hours__label">از</span>
+              <PersianTimeSelect
                 value={d.from}
                 disabled={!d.open}
-                aria-label={`شروع ${FA_DAYS[d.day]}`}
-                onChange={(e) => setDay(d.day, { from: e.target.value })}
+                label={`شروع ${FA_DAYS[d.day]}`}
+                onChange={(v) => setDay(d.day, { from: v })}
               />
-              <span>تا</span>
-              <input
-                type="time"
+              <span className="admin-hours__label">تا</span>
+              <PersianTimeSelect
                 value={d.to}
                 disabled={!d.open}
-                aria-label={`پایان ${FA_DAYS[d.day]}`}
-                onChange={(e) => setDay(d.day, { to: e.target.value })}
+                label={`پایان ${FA_DAYS[d.day]}`}
+                onChange={(v) => setDay(d.day, { to: v })}
               />
             </div>
           ))}

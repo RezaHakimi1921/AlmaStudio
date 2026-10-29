@@ -52,11 +52,35 @@ export default async function AdminPage() {
             تصویر
           </span>
         </Link>
+        <Link href="/admin/packages" className="admin-tile">
+          <strong>پکیج‌ها و قیمت</strong>
+          <span>
+            {content.settings.packages.items.length.toLocaleString("fa-IR")} پکیج · با پیش‌نمایش آنچه
+            مشتری می‌بیند
+          </span>
+        </Link>
+        <Link href="/admin/decors" className="admin-tile">
+          <strong>دکورهای آتلیه</strong>
+          <span>
+            {content.settings.decors.items.length.toLocaleString("fa-IR")} دکور شماره‌دار · مشتری
+            انتخاب می‌کند
+          </span>
+        </Link>
         <Link href="/admin/stats" className="admin-tile">
           <strong>آمار بازدید و کلیک</strong>
           <span>بازدید هر صفحه، تماس، مسیریابی و اشتراک‌گذاری</span>
         </Link>
       </nav>
+
+      <div className="admin-backup glass">
+        <div>
+          <strong>نسخه پشتیبان</strong>
+          <span>همه متن‌ها، تنظیمات، آمار و عکس‌ها در یک فایل — هفته‌ای یک بار دانلود کنید</span>
+        </div>
+        <a className="admin-btn admin-btn--ghost" href="/api/backup" download>
+          دانلود پشتیبان
+        </a>
+      </div>
 
       <h2 className="admin-section-title">لینک‌های مشتریان</h2>
 

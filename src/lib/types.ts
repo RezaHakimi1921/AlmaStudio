@@ -17,8 +17,10 @@ export type LinkPageContent = {
   phone: string;
   /** Main rich body — HTML with optional <b>/<strong>/<br>/<p> */
   bodyHtml: string;
-  /** Optional packages / pricing plain text (line breaks OK) */
+  /** Optional packages / pricing plain text (line breaks OK) — legacy, used when packageFilter is "none" */
   packagesText: string;
+  /** Show structured package cards from the catalogue */
+  packageFilter: PackageFilter;
   /** Optional notes / rules plain text */
   notesText: string;
   closingMessage: string;
@@ -104,12 +106,44 @@ export type HubSettings = {
   heroImageUrl: string;
 };
 
+/** A studio set-up the visitor can pick by its number ("دکور ۱۲") */
+export type Decor = {
+  id: string;
+  number: number;
+  name: string;
+  category: GalleryCategory;
+  imageUrl: string;
+  note: string;
+  visible: boolean;
+};
+
+/** A priced package card (replaces the old free-text packages list) */
+export type StudioPackage = {
+  id: string;
+  name: string;
+  /** Toman */
+  price: number;
+  /** Toman — optional "before discount" price, shown struck through */
+  oldPrice: number;
+  /** e.g. "پیشنهاد ما" — highlights the card */
+  badge: string;
+  description: string;
+  features: string[];
+  category: GalleryCategory;
+  visible: boolean;
+};
+
+/** which structured packages a link page shows */
+export type PackageFilter = "none" | "all" | GalleryCategory;
+
 export type SiteSettings = {
   hub: HubSettings;
   announcement: Announcement;
   hours: WorkingHours;
   faq: { enabled: boolean; items: FaqItem[] };
   gallery: { enabled: boolean; images: GalleryImage[] };
+  decors: { enabled: boolean; items: Decor[] };
+  packages: { items: StudioPackage[] };
 };
 
 export type TrackEvent =
@@ -120,7 +154,9 @@ export type TrackEvent =
   | "instagram"
   | "bale"
   | "share"
-  | "gallery";
+  | "gallery"
+  | "decor"
+  | "decor_pick";
 
 export const TRACK_EVENTS: readonly TrackEvent[] = [
   "view",
@@ -131,4 +167,6 @@ export const TRACK_EVENTS: readonly TrackEvent[] = [
   "bale",
   "share",
   "gallery",
+  "decor",
+  "decor_pick",
 ];
