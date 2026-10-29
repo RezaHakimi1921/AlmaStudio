@@ -34,12 +34,12 @@ export function AdminLoginForm() {
   }
 
   return (
-    <form className="admin-form admin-card glass" onSubmit={onSubmit} style={{ marginTop: "1rem" }}>
-      <h1 style={{ margin: 0, color: "var(--alma-red)" }}>ورود مدیریت</h1>
-      <p style={{ margin: 0, color: "var(--alma-muted)" }}>
-        برای ویرایش بصری لینک‌های مشتریان وارد شوید.
+    <form className="admin-login glass" onSubmit={onSubmit}>
+      <h1 className="admin-login__title">ورود مدیریت</h1>
+      <p className="admin-login__lead">
+        برای ویرایش هاب و لینک‌های مشتریان وارد شوید.
       </p>
-      <label>
+      <label className="admin-login__field">
         نام کاربری
         <input
           value={username}
@@ -48,7 +48,7 @@ export function AdminLoginForm() {
           required
         />
       </label>
-      <label>
+      <label className="admin-login__field">
         رمز عبور
         <input
           type="password"
@@ -59,11 +59,9 @@ export function AdminLoginForm() {
         />
       </label>
       {error ? <p className="admin-error">{error}</p> : null}
-      <div className="admin-actions">
-        <button className="admin-btn" type="submit" disabled={loading}>
-          {loading ? "در حال ورود..." : "ورود"}
-        </button>
-      </div>
+      <button className="admin-btn admin-login__submit" type="submit" disabled={loading}>
+        {loading ? "در حال ورود..." : "ورود"}
+      </button>
     </form>
   );
 }

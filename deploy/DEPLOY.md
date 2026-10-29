@@ -28,10 +28,13 @@ The Alma container joins Docker network `personalwallet_default` as alias `alma-
 cd ~
 git clone https://github.com/RezaHakimi1921/AlmaStudio.git alma-studio
 cd alma-studio
-git checkout cursor/alma-caddy-deploy-eb59   # or main after merge
+git checkout cursor/hub-rebuild-eb59   # or main after merge
 
 cp .env.example .env
-# set ADMIN_PASSWORD + ADMIN_SESSION_SECRET (openssl rand -hex 32)
+# Default login: admin / alma123
+# Prefer a strong ADMIN_SESSION_SECRET: openssl rand -hex 32
+# If login fails after deploy, check ~/alma-studio/.env — a random password
+# may have been generated earlier; reset ADMIN_PASSWORD and recreate the container.
 
 docker compose build
 docker compose up -d
