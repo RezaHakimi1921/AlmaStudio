@@ -33,7 +33,7 @@ export default async function AdminPage() {
         <div>
           <AlmaAppleLogo size={40} variant="lockup" />
           <p className="home-lead" style={{ marginBottom: "1rem" }}>
-            ویرایش بصری چهار لینک مشتری
+            ویرایش ساده هر لینک — عنوان، تصویر، متن، تلفن
           </p>
         </div>
         <AdminLogoutButton />

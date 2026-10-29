@@ -5,7 +5,6 @@ import type { LinkPageContent } from "@/lib/types";
 import { PAGE_THEMES } from "@/lib/themes";
 import { IntroAnimation } from "./IntroAnimation";
 import { HeroSection } from "./HeroSection";
-import { BlockRenderer } from "./BlockRenderer";
 import { CtaButtons } from "./CtaButtons";
 import { ContactBar } from "./ContactBar";
 import { GlassCard } from "./GlassCard";
@@ -18,8 +17,14 @@ function readSkipIntro() {
   );
 }
 
+function linesToParagraphs(text: string) {
+  return text
+    .split(/\n+/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+}
+
 export function LinkPageView({ page }: { page: LinkPageContent }) {
-  // Start skipped to avoid intro flash covering heroes in screenshots/hydration
   const [skipIntro, setSkipIntro] = useState(true);
   const [introArmed, setIntroArmed] = useState(false);
   const theme = PAGE_THEMES[page.introTheme];
@@ -31,6 +36,9 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
     setIntroArmed(!skip);
   }, []);
 
+  const packages = linesToParagraphs(page.packagesText || "");
+  const notes = linesToParagraphs(page.notesText || "");
+
   return (
     <>
       {introArmed && !skipIntro ? (
@@ -38,6 +46,7 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
           theme={page.introTheme}
           brand={page.brandLabel}
           label={page.introLabel}
+          heroImageUrl={page.heroImageUrl}
         />
       ) : null}
 
@@ -65,23 +74,36 @@ export function LinkPageView({ page }: { page: LinkPageContent }) {
             </p>
           ) : null}
 
-          {page.greeting ? (
-            <GlassCard className="link-greeting-card glass">
-              <p className="link-greeting">{page.greeting}</p>
+          {page.bodyHtml ? (
+            <GlassCard className="rich-body glass">
+              <div
+                className="rich-body__html"
+                dangerouslySetInnerHTML={{ __html: page.bodyHtml }}
+              />
             </GlassCard>
           ) : null}
 
-          <div className="blocks">
-            {page.blocks.map((block, index) => (
-              <BlockRenderer
-                key={block.id}
-                block={block}
-                pagePhone={page.phone}
-                accentGarden={garden}
-                index={index}
-              />
-            ))}
-          </div>
+          {packages.length ? (
+            <GlassCard className="section-card glass">
+              <h2>پکیج‌ها و قیمت</h2>
+              <ul className="plain-list">
+                {packages.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </GlassCard>
+          ) : null}
+
+          {notes.length ? (
+            <div className="solid-card cream-surface section-card">
+              <h2>نکات مهم</h2>
+              <ul className="plain-list">
+                {notes.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
           {page.address ? (
             <GlassCard className="link-address" solid>

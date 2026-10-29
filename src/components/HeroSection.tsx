@@ -21,7 +21,6 @@ export function HeroSection({
 }: Props) {
   return (
     <header className="hero">
-      {/* Full-bleed photo — admin-replaceable URL */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="hero-photo"

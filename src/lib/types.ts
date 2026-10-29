@@ -4,35 +4,26 @@ export type IntroTheme =
   | "studio-prep"
   | "studio-conditions";
 
-export type BlockType = "text" | "note" | "price" | "image" | "contact";
-
-export type ContentBlock = {
-  id: string;
-  type: BlockType;
-  title?: string;
-  body?: string;
-  price?: string;
-  imageUrl?: string;
-  imageAlt?: string;
-  phone?: string;
-  bold?: boolean;
-};
-
+/** Simplified page model — no block builder */
 export type LinkPageContent = {
   slug: string;
   title: string;
-  subtitle?: string;
+  subtitle: string;
   moodTag: string;
   brandLabel: string;
-  greeting?: string;
   heroImageUrl: string;
   introTheme: IntroTheme;
   introLabel: string;
   phone: string;
-  blocks: ContentBlock[];
-  closingMessage?: string;
-  addressTitle?: string;
-  address?: string;
+  /** Main rich body — HTML with optional <b>/<strong>/<br>/<p> */
+  bodyHtml: string;
+  /** Optional packages / pricing plain text (line breaks OK) */
+  packagesText: string;
+  /** Optional notes / rules plain text */
+  notesText: string;
+  closingMessage: string;
+  addressTitle: string;
+  address: string;
   instagramUrl: string;
   mapsUrl: string;
   showInstagram: boolean;
@@ -52,11 +43,3 @@ export const LINK_SLUGS = [
 ] as const;
 
 export type LinkSlug = (typeof LINK_SLUGS)[number];
-
-export const BLOCK_TYPE_LABELS: Record<BlockType, string> = {
-  text: "متن",
-  note: "نکته",
-  price: "قیمت",
-  image: "تصویر",
-  contact: "تماس",
-};
