@@ -22,9 +22,18 @@ type Props = {
   phone: string;
   maps: { key: string; label: string; href: string }[];
   announcement: Announcement | null;
+  /** Link page (or hub) to return to via the back button */
+  backHref?: string;
 };
 
-export function GalleryView({ images, initial, phone, maps, announcement }: Props) {
+export function GalleryView({
+  images,
+  initial,
+  phone,
+  maps,
+  announcement,
+  backHref = "/",
+}: Props) {
   const [cat, setCat] = useState<GalleryCategory>(initial);
   const [open, setOpen] = useState<number | null>(null);
   const isClient = useIsClient();
@@ -66,7 +75,7 @@ export function GalleryView({ images, initial, phone, maps, announcement }: Prop
         {announcement ? <AnnouncementBar announcement={announcement} /> : null}
 
         <header className="gallery-head">
-          <Link href="/" className="gallery-head__back" aria-label="بازگشت">
+          <Link href={backHref} className="gallery-head__back" aria-label="بازگشت">
             <ArrowRightIcon />
           </Link>
           <AlmaAppleLogo size={44} />

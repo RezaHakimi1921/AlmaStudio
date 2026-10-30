@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { readContent } from "@/lib/content";
 import { isAnnouncementLive } from "@/lib/announcement";
 import { GalleryView } from "@/components/GalleryView";
+import { safeBackHref } from "@/lib/routes";
 import { GALLERY_CATEGORIES } from "@/lib/types";
 import type { GalleryCategory } from "@/lib/types";
 
@@ -19,10 +20,10 @@ export const metadata: Metadata = {
   },
 };
 
-type Props = { searchParams: Promise<{ c?: string }> };
+type Props = { searchParams: Promise<{ c?: string; from?: string }> };
 
 export default async function GalleryPage({ searchParams }: Props) {
-  const [{ c }, content] = await Promise.all([searchParams, readContent()]);
+  const [{ c, from }, content] = await Promise.all([searchParams, readContent()]);
   const { gallery, announcement } = content.settings;
   if (!gallery.enabled) notFound();
 
@@ -47,6 +48,7 @@ export default async function GalleryPage({ searchParams }: Props) {
       phone={withPhone?.phone ?? ""}
       maps={maps}
       announcement={isAnnouncementLive(announcement) ? announcement : null}
+      backHref={safeBackHref(from)}
     />
   );
 }

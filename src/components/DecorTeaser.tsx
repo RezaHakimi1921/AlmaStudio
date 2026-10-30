@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTrack } from "@/lib/track-context";
+import { withFromParam } from "@/lib/routes";
 import { toFaDigits } from "@/lib/tehran";
 import type { Decor } from "@/lib/types";
 import { ArrowLeftIcon } from "./Icons";
@@ -9,13 +10,18 @@ import { ArrowLeftIcon } from "./Icons";
 export const DECOR_PATH = "/dekor";
 
 /** Invites visitors to browse the numbered studio sets before their session. */
-export function DecorTeaser({ items }: { items: Decor[] }) {
+export function DecorTeaser({ items, from }: { items: Decor[]; from: string }) {
   const trackEvent = useTrack();
   const shown = items.slice(0, 4);
   if (!shown.length) return null;
 
   return (
-    <Link href={DECOR_PATH} className="decor-teaser" data-reveal onClick={() => trackEvent("decor")}>
+    <Link
+      href={withFromParam(DECOR_PATH, from)}
+      className="decor-teaser"
+      data-reveal
+      onClick={() => trackEvent("decor")}
+    >
       <div className="decor-teaser__thumbs" aria-hidden="true">
         {shown.map((d) => (
           <span key={d.id}>

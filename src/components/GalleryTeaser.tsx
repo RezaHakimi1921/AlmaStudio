@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useTrack } from "@/lib/track-context";
 import { GALLERY_PATH, GALLERY_THEMES } from "@/lib/gallery";
+import { withFromParam } from "@/lib/routes";
 import type { GalleryImage } from "@/lib/types";
 import { GALLERY_CATEGORIES } from "@/lib/types";
 import { ArrowLeftIcon, ImagesIcon } from "./Icons";
 
 /** Inviting card that leads to the full gallery ("نمونه‌کارها"). */
-export function GalleryTeaser({ images }: { images: GalleryImage[] }) {
+export function GalleryTeaser({ images, from }: { images: GalleryImage[]; from: string }) {
   const trackEvent = useTrack();
   const covers = GALLERY_CATEGORIES.map((c) => images.find((i) => i.category === c)).filter(
     (i): i is GalleryImage => Boolean(i),
@@ -18,7 +19,7 @@ export function GalleryTeaser({ images }: { images: GalleryImage[] }) {
 
   return (
     <Link
-      href={GALLERY_PATH}
+      href={withFromParam(GALLERY_PATH, from)}
       className="gallery-teaser"
       data-reveal
       onClick={() => trackEvent("gallery")}

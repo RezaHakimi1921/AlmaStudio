@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { readContent } from "@/lib/content";
 import { isAnnouncementLive } from "@/lib/announcement";
 import { DecorCatalog } from "@/components/DecorCatalog";
+import { safeBackHref } from "@/lib/routes";
 
 export const dynamic = "force-dynamic";
 
@@ -17,8 +18,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function DecorPage() {
-  const content = await readContent();
+type Props = { searchParams: Promise<{ from?: string }> };
+
+export default async function DecorPage({ searchParams }: Props) {
+  const [{ from }, content] = await Promise.all([searchParams, readContent()]);
   const { decors, announcement } = content.settings;
   if (!decors.enabled) notFound();
 
@@ -36,6 +39,7 @@ export default async function DecorPage() {
       phone={withPhone?.phone ?? ""}
       maps={maps}
       announcement={isAnnouncementLive(announcement) ? announcement : null}
+      backHref={safeBackHref(from)}
     />
   );
 }

@@ -21,13 +21,15 @@ type Props = {
   phone: string;
   maps: { key: string; label: string; href: string }[];
   announcement: Announcement | null;
+  /** Link page (or hub) to return to via the back button */
+  backHref?: string;
 };
 
 type Filter = "all" | GalleryCategory;
 
 const faList = (nums: number[]) => nums.map((n) => toFaDigits(n)).join("، ");
 
-export function DecorCatalog({ items, phone, maps, announcement }: Props) {
+export function DecorCatalog({ items, phone, maps, announcement, backHref = "/" }: Props) {
   const isClient = useIsClient();
   const picksRaw = useSyncExternalStore(subscribePicks, getPicksSnapshot, () => "");
   const valid = useMemo(() => new Set(items.map((d) => d.number)), [items]);
@@ -85,7 +87,7 @@ export function DecorCatalog({ items, phone, maps, announcement }: Props) {
         {announcement ? <AnnouncementBar announcement={announcement} /> : null}
 
         <header className="gallery-head decor-head">
-          <Link href="/" className="gallery-head__back" aria-label="بازگشت">
+          <Link href={backHref} className="gallery-head__back" aria-label="بازگشت">
             <ArrowRightIcon />
           </Link>
           <AlmaAppleLogo size={44} />

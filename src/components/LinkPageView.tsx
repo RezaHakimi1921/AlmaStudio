@@ -6,6 +6,7 @@ import { markIntroSeen, shouldSkipIntro } from "@/lib/intro";
 import { track } from "@/lib/track";
 import { TrackProvider } from "@/lib/track-context";
 import type { LinkPageContent, SiteSettings } from "@/lib/types";
+import { publicPathForSlug } from "@/lib/routes";
 import { PAGE_THEMES } from "@/lib/themes";
 import { IntroAnimation } from "./IntroAnimation";
 import { HeroSection } from "./HeroSection";
@@ -199,9 +200,13 @@ export function LinkPageView({ page, settings, announcementLive }: Props) {
             </section>
           ) : null}
 
-          {visibleDecors.length ? <DecorTeaser items={visibleDecors} /> : null}
+          {visibleDecors.length ? (
+            <DecorTeaser items={visibleDecors} from={publicPathForSlug(page.slug)} />
+          ) : null}
 
-          {showGallery ? <GalleryTeaser images={gallery.images} /> : null}
+          {showGallery ? (
+            <GalleryTeaser images={gallery.images} from={publicPathForSlug(page.slug)} />
+          ) : null}
 
           {hours.enabled ? <HoursCard hours={hours} /> : null}
 
