@@ -142,6 +142,8 @@ export default async function AdminPage() {
           دانلود پشتیبان
         </a>
       </div>
+
+      <p className="admin-version" dir="ltr">نسخه {process.env.GIT_SHA || "dev"}</p>
     </main>
   );
 }

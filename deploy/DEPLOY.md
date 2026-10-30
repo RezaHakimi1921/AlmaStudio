@@ -30,6 +30,39 @@ docker compose build
 docker compose up -d
 ```
 
+## Auto deploy (push to `main` → live in ~2 minutes)
+
+One time, on the server:
+
+```bash
+cd /opt/AlmaStudio
+git fetch origin && git checkout -f -B main origin/main
+sudo bash deploy/auto-deploy.sh --install
+```
+
+From then on the server checks GitHub every 2 minutes. When `main` has a new commit it:
+
+1. takes a backup (`deploy/backup.sh`),
+2. checks out the new commit and runs `docker compose build && docker compose up -d`,
+3. waits until `/api/health` reports the new commit,
+4. **rolls back automatically** to the previous commit if the build or the health check fails
+   (that broken commit is then skipped until a newer one is pushed).
+
+Nobody needs SSH access and no secrets leave the server (it only *pulls* from GitHub).
+`.env` and the Docker volumes (content, photos, stats) are never touched.
+
+```bash
+sudo bash deploy/auto-deploy.sh --status     # timer, deployed commit, health, last log lines
+sudo bash deploy/auto-deploy.sh              # deploy right now instead of waiting
+tail -f /var/log/alma-deploy.log
+sudo bash deploy/auto-deploy.sh --uninstall
+```
+
+The running version is shown at the bottom of the admin panel («نسخه abc1234») and at `/api/health`.
+
+> Don't edit tracked files directly on the server — the next deploy parks such edits in `git stash`
+> (logged as a warning). Change them in the repo instead.
+
 ## 2. HTTPS (one time)
 
 DNS A record `alma.artepersia.com → 78.39.51.105` must exist and port 80/443 must be open.

@@ -13,6 +13,9 @@ RUN npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
+# which commit is running (shown in /api/health and the admin footer)
+ARG GIT_SHA=dev
+ENV GIT_SHA=$GIT_SHA
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000

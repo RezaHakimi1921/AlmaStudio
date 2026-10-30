@@ -6,7 +6,10 @@ name: alma-studio
 
 services:
   alma:
-    build: .
+    build:
+      context: .
+      args:
+        GIT_SHA: ${GIT_SHA:-dev}
     image: alma-studio:latest
     container_name: alma-studio
     restart: unless-stopped

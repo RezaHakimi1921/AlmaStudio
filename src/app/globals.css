@@ -5090,3 +5090,11 @@ nextjs-portal,
     transform: scaleX(0);
   }
 }
+
+.admin-version {
+  margin: 0.6rem 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--alma-muted);
+  opacity: 0.7;
+}
