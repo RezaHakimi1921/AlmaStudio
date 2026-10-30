@@ -26,3 +26,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ### Privacy
 - Click stats are anonymous counters only — no IP, cookie or personal data is stored.
+
+### Design & motion rules (قواعد دیزاین و انیمیشن)
+- Design skills by Emil Kowalski (MIT) live in `.claude/skills/` — **use them for every UI change**:
+  `emil-design-eng` (main rules), `animate`, `review-animations`, `animation-performance`,
+  `mobile-native`, `break-ui`, `remove-animations`, `find-animation-opportunities`, `apple-design`.
+  Quick tables: `docs/design/ui-cheatsheet.md`, `docs/design/performance-cheatsheet.md`.
+- Defaults: animate only `transform`/`opacity`; never `transition: all`; entering/exiting = `var(--ease-out)`
+  (never `ease-in`); buttons get `:active { transform: scale(0.97) }`; nothing animates from `scale(0)`;
+  numbers use `tabular-nums`; keep `prefers-reduced-motion` working; use `100dvh`, not `100vh`.
+- Every new UI must also survive worst-case data (long names, empty lists) — see `break-ui`.

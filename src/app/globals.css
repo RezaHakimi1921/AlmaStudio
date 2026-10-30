@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --alma-red: #a83232;
   --alma-red-deep: #7a2222;
   --alma-cream: #f8f3ed;
@@ -1061,7 +1063,7 @@ nextjs-portal,
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.2s ease;
+  transition: transform 0.15s var(--ease-out), background 0.2s ease;
 }
 
 .theme-garden .chip-btn {
@@ -1873,7 +1875,7 @@ nextjs-portal,
   display: block;
   padding: 1rem 1.05rem;
   border-radius: 16px;
-  transition: transform 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s var(--ease-out), background 0.2s ease;
   cursor: pointer;
 }
 
@@ -2140,7 +2142,7 @@ nextjs-portal,
   border: 1px solid rgba(168, 50, 50, 0.14);
   font-weight: 700;
   color: var(--alma-ink);
-  transition: transform 0.15s ease;
+  transition: transform 0.15s var(--ease-out);
 }
 
 .map-sheet__option:active {
@@ -2658,6 +2660,7 @@ nextjs-portal,
   z-index: 1;
   width: min(100%, 760px);
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0 auto;
   padding: 0 0 7rem;
   background:
@@ -2989,7 +2992,7 @@ nextjs-portal,
   color: #f8f3ed;
   background: linear-gradient(135deg, #a83232, #7a2222);
   box-shadow: 0 10px 26px rgba(122, 34, 34, 0.22);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s var(--ease-out);
 }
 
 .admin-tile:nth-child(2) {
@@ -3984,6 +3987,7 @@ nextjs-portal,
   z-index: 1;
   width: min(100%, 760px);
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0 auto;
   padding: 0 0 7rem;
   background:
@@ -4617,7 +4621,7 @@ nextjs-portal,
 .edit-section__chev {
   flex: none;
   color: var(--alma-red);
-  transition: transform 0.25s ease;
+  transition: transform 0.25s var(--ease-out);
 }
 
 .edit-section[open] .edit-section__chev {
@@ -4920,7 +4924,7 @@ nextjs-portal,
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(168, 50, 50, 0.12);
   box-shadow: 0 8px 20px rgba(42, 26, 26, 0.05);
-  transition: transform 0.2s ease;
+  transition: transform 0.2s var(--ease-out);
 }
 
 .dash-card:hover {
@@ -5027,7 +5031,7 @@ nextjs-portal,
   outline-offset: 2px;
   box-shadow: 0 16px 34px rgba(42, 26, 26, 0.2);
   transform: scale(1.02);
-  transition: transform 0.15s ease;
+  transition: transform 0.15s var(--ease-out);
 }
 
 .undo-toast {
@@ -5106,4 +5110,11 @@ nextjs-portal,
   border-radius: 12px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
   object-fit: cover;
+}
+
+/* touch: no grey tap flash on links/buttons */
+a,
+button,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
 }
