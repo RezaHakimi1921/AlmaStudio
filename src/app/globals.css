@@ -1709,17 +1709,47 @@ nextjs-portal,
 
 .hub-card {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 0.85rem;
   padding: 0.95rem 1rem;
   border-radius: 18px;
-  min-height: 88px;
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  min-height: 92px;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease;
+  cursor: pointer;
 }
 
 .hub-card:hover {
   transform: translateY(-2px);
+  box-shadow:
+    0 14px 36px rgba(42, 26, 26, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.hub-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--alma-red);
+  background: rgba(168, 50, 50, 0.1);
+  border: 1px solid rgba(168, 50, 50, 0.16);
+}
+
+.hub-card__icon[data-slug^="outdoor"] {
+  color: var(--alma-garden-deep);
+  background: rgba(88, 116, 90, 0.12);
+  border-color: rgba(88, 116, 90, 0.2);
+}
+
+.hub-card__svg {
+  width: 24px;
+  height: 24px;
 }
 
 .hub-card__text {
@@ -1733,10 +1763,12 @@ nextjs-portal,
   font-size: 1.02rem;
   font-weight: 700;
   color: var(--alma-red-deep);
+  line-height: 1.35;
 }
 
 .hub-card__mood {
   display: inline-block;
+  justify-self: start;
   width: fit-content;
   padding: 0.12rem 0.55rem;
   border-radius: 999px;
@@ -1753,10 +1785,18 @@ nextjs-portal,
 }
 
 .hub-card__enter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
   color: var(--alma-red);
   font-size: 0.82rem;
   font-weight: 650;
   white-space: nowrap;
+  opacity: 0.85;
+}
+
+.hub-card:hover .hub-card__enter {
+  opacity: 1;
 }
 
 .hub-admin {
