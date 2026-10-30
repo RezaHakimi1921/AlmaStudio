@@ -61,10 +61,20 @@ A backup contains `data/` (pages, settings, packages, decors, FAQ, stats) and `p
 Admins can also download one any time from the panel: **«دانلود پشتیبان»**.
 Copy a backup off the server now and then (e.g. weekly download from the panel).
 
+## SSH
+
+```bash
+ssh -p 2238 -i ~/.ssh/arte_service_deploy -o IdentitiesOnly=yes cluadai@78.39.51.105
+```
+
+Port **2238** (not 22). App lives in `~/alma-studio`. Edge reverse proxy is **Caddy**
+(`personalwallet-caddy-1`); the Alma container must stay on Docker network `personalwallet_default`
+(see `docker-compose.yml` `networks.edge`).
+
 ## Updates
 
 ```bash
-cd /opt/AlmaStudio && git pull && docker compose build && docker compose up -d
+cd ~/alma-studio && git pull origin main && docker compose build && docker compose up -d
 ```
 
 Volumes `alma_data` / `alma_uploads` persist content and uploads across rebuilds.

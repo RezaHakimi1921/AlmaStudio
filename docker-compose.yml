@@ -1,5 +1,8 @@
 # Production compose — alma.artepersia.com → 78.39.51.105
+# Edge TLS: PersonalWallet Caddy on personalwallet_default.
 # Put secrets in `.env` next to this file (see .env.example).
+
+name: alma-studio
 
 services:
   alma:
@@ -8,7 +11,7 @@ services:
     container_name: alma-studio
     restart: unless-stopped
     ports:
-      # Bound to localhost so nginx (host) proxies publicly
+      # Host loopback only — useful for curl/debug; public traffic goes via Caddy.
       - "127.0.0.1:3000:3000"
     environment:
       NODE_ENV: production
@@ -19,6 +22,9 @@ services:
     volumes:
       - alma_data:/app/data
       - alma_uploads:/app/public/uploads
+    networks:
+      edge:
+        aliases: [alma-studio]
     healthcheck:
       test:
         [
@@ -32,6 +38,10 @@ services:
       retries: 3
       start_period: 40s
 
+networks:
+  edge:
+    external: true
+    name: ${EDGE_NETWORK:-personalwallet_default}
 
 volumes:
   alma_data:
