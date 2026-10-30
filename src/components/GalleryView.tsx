@@ -1,5 +1,6 @@
 "use client";
 
+import type { MapLink } from "@/lib/maps";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent } from "react";
@@ -20,7 +21,7 @@ type Props = {
   images: GalleryImage[];
   initial: GalleryCategory;
   phone: string;
-  maps: { key: string; label: string; href: string }[];
+  maps: MapLink[];
   announcement: Announcement | null;
   /** Link page (or hub) to return to via the back button */
   backHref?: string;

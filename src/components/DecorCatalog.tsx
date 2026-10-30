@@ -1,5 +1,6 @@
 "use client";
 
+import type { MapLink } from "@/lib/maps";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
@@ -19,7 +20,7 @@ import { ArrowRightIcon, CheckIcon, CloseIcon, CopyIcon, ShareIcon } from "./Ico
 type Props = {
   items: Decor[];
   phone: string;
-  maps: { key: string; label: string; href: string }[];
+  maps: MapLink[];
   announcement: Announcement | null;
   /** Link page (or hub) to return to via the back button */
   backHref?: string;

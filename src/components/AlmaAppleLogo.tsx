@@ -24,15 +24,10 @@ export function AlmaAppleLogo({
         aria-hidden="true"
         className="alma-logo__mark"
       >
-        <path
-          d="M32 14c4.5-8 12.5-9.5 16-8.5-3.5 4.5-3.5 9-1 12.5 7 3.5 12.5 11.5 12.5 20.5C59.5 51 49 61 32 61S4.5 51 4.5 38.5c0-9 5.5-17 12.5-20.5 2.5-3.5 2.5-8-1-12.5C19.5 4.5 27.5 6 32 14z"
-          fill={apple}
-        />
-        <path
-          d="M32 14c0-6 4.5-10.5 9-12-1.5 6-4.5 9.5-9 12z"
-          fill={leaf}
-        />
-        <circle cx="38" cy="34" r="3" fill={onDark ? "#A83232" : "#F8F3ED"} opacity="0.85" />
+        <path d="M32 21C27 14 11 15 7.5 32 4.5 47 15.5 61 25.5 60.5 29 60.3 30.5 58.8 32 58.8S35 60.3 38.5 60.5C48.5 61 59.5 47 56.5 32 53 15 37 14 32 21Z" fill={apple} />
+        <path d="M16 31C16.5 25 20 21.5 24.5 20.5" fill="none" stroke={onDark ? "#A83232" : "#F8F3ED"} strokeWidth="3" strokeLinecap="round" opacity="0.55" />
+        <path d="M32 22C32.5 15 34.5 10 38 6" fill="none" stroke={onDark ? "#C5D5C4" : "#5B3A29"} strokeWidth="3.2" strokeLinecap="round" />
+        <path d="M35.5 14.5C37 8 44 5 51 6.5 49.5 13 43 17 35.5 14.5Z" fill={leaf} />
       </svg>
       {variant === "lockup" ? (
         <span className="alma-logo__label" style={{ fontSize: size * 0.42, color: apple }}>

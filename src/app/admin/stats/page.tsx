@@ -39,7 +39,7 @@ const SOURCE_COLS: Col[] = [
 
 const fa = (v: number) => toFaDigits(v.toLocaleString("en-US").replace(/,/g, "٬"));
 const value = (c: Counts | undefined, key: TrackEvent | "maps") =>
-  !c ? 0 : key === "maps" ? n(c.map_google) + n(c.map_neshan) : n(c[key]);
+  !c ? 0 : key === "maps" ? n(c.map_google) + n(c.map_neshan) + n(c.map_balad) + n(c.map_waze) : n(c[key]);
 
 function Delta({ now, before }: { now: number; before: number }) {
   const d = change(now, before);

@@ -30,6 +30,11 @@ export type LinkPageContent = {
   mapsUrl: string;
   /** Neshan map link (e.g. https://nshn.ir/…) — optional */
   neshanUrl: string;
+  /** Balad / Waze links — optional; built from the coordinates when empty */
+  baladUrl: string;
+  wazeUrl: string;
+  /** "35.7000, 51.4000" — lets all four map apps be linked from one value */
+  mapCoords: string;
   /** Bale messenger link (e.g. https://ble.ir/username) — optional */
   baleUrl: string;
   showInstagram: boolean;
@@ -149,6 +154,9 @@ export type StudioInfo = {
   instagramUrl: string;
   mapsUrl: string;
   neshanUrl: string;
+  baladUrl: string;
+  wazeUrl: string;
+  mapCoords: string;
   baleUrl: string;
 };
 
@@ -159,6 +167,9 @@ export const STUDIO_FIELDS = [
   "instagramUrl",
   "mapsUrl",
   "neshanUrl",
+  "baladUrl",
+  "wazeUrl",
+  "mapCoords",
   "baleUrl",
 ] as const satisfies readonly (keyof StudioInfo & keyof LinkPageContent)[];
 
@@ -178,6 +189,8 @@ export type TrackEvent =
   | "call"
   | "map_google"
   | "map_neshan"
+  | "map_balad"
+  | "map_waze"
   | "instagram"
   | "bale"
   | "share"
@@ -190,6 +203,8 @@ export const TRACK_EVENTS: readonly TrackEvent[] = [
   "call",
   "map_google",
   "map_neshan",
+  "map_balad",
+  "map_waze",
   "instagram",
   "bale",
   "share",

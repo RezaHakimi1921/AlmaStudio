@@ -5,9 +5,9 @@ import { createPortal } from "react-dom";
 import { hasShotParam, useClientValue, useIsClient } from "@/lib/client";
 import { useTrack } from "@/lib/track-context";
 import { CallButton } from "./CallButton";
-import { CloseIcon, NavigateIcon, PinIcon } from "./Icons";
+import { CloseIcon, PinIcon } from "./Icons";
+import { mapEvent, type MapLink } from "@/lib/maps";
 
-type MapLink = { key: string; label: string; href: string };
 
 type Props = {
   phone: string;
@@ -19,14 +19,13 @@ type Props = {
 
 /**
  * The single home for "call" and "directions" — always under the thumb.
- * One map app → direct link. Two (Google + Neshan) → a small chooser sheet.
+ * «مسیریاب» always opens a chooser with the map apps that have a link (Balad, Waze, Google Maps, Neshan).
  */
 export function ContactBar({ phone, maps, garden = false, brand, visible = true }: Props) {
   const shot = useClientValue(hasShotParam) === true;
   const isClient = useIsClient();
   const [sheet, setSheet] = useState(false);
   const trackEvent = useTrack();
-  const mapEvent = (key: string) => (key === "neshan" ? "map_neshan" : "map_google");
 
   useEffect(() => {
     if (!sheet) return;
@@ -53,20 +52,7 @@ export function ContactBar({ phone, maps, garden = false, brand, visible = true 
           </CallButton>
         ) : null}
 
-        {maps.length === 1 ? (
-          <a
-            className="cta-btn cta-btn--ghost"
-            href={maps[0].href}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackEvent(mapEvent(maps[0].key))}
-          >
-            <PinIcon size={18} />
-            <span>مسیریاب</span>
-          </a>
-        ) : null}
-
-        {maps.length > 1 ? (
+        {hasMaps ? (
           <button
             type="button"
             className="cta-btn cta-btn--ghost"
@@ -108,9 +94,8 @@ export function ContactBar({ phone, maps, garden = false, brand, visible = true 
                       setSheet(false);
                     }}
                   >
-                    <span className="map-sheet__icon">
-                      {m.key === "neshan" ? <NavigateIcon /> : <PinIcon />}
-                    </span>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img className="map-sheet__logo" src={m.logo} alt="" width={44} height={44} />
                     <span>{m.label}</span>
                   </a>
                 ))}

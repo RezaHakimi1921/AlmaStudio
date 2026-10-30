@@ -63,8 +63,8 @@ export default async function AdminPage() {
         </Link>
         <Link href="/admin/stats?d=7" className="dash-stat">
           <span>مسیریابی امروز</span>
-          <strong>{fa((today.map_google ?? 0) + (today.map_neshan ?? 0))}</strong>
-          <small>۷ روز: {fa((week.map_google ?? 0) + (week.map_neshan ?? 0))}</small>
+          <strong>{fa((today.map_google ?? 0) + (today.map_neshan ?? 0) + (today.map_balad ?? 0) + (today.map_waze ?? 0))}</strong>
+          <small>۷ روز: {fa((week.map_google ?? 0) + (week.map_neshan ?? 0) + (week.map_balad ?? 0) + (week.map_waze ?? 0))}</small>
         </Link>
       </section>
 

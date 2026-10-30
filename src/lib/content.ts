@@ -62,10 +62,15 @@ function migratePage(raw: Record<string, unknown>, fallback: LinkPageContent): L
     instagramUrl: String(raw.instagramUrl ?? fallback.instagramUrl),
     mapsUrl: String(raw.mapsUrl ?? fallback.mapsUrl),
     neshanUrl: String(raw.neshanUrl ?? fallback.neshanUrl ?? ""),
+    baladUrl: String(raw.baladUrl ?? fallback.baladUrl ?? ""),
+    wazeUrl: String(raw.wazeUrl ?? fallback.wazeUrl ?? ""),
+    mapCoords: String(raw.mapCoords ?? fallback.mapCoords ?? ""),
     baleUrl: String(raw.baleUrl ?? fallback.baleUrl ?? ""),
     showInstagram:
       raw.showInstagram != null ? Boolean(raw.showInstagram) : fallback.showInstagram,
-    showMaps: raw.showMaps != null ? Boolean(raw.showMaps) : fallback.showMaps,
+    // the old separate Neshan switch now simply turns the directions button on
+    showMaps:
+      (raw.showMaps != null ? Boolean(raw.showMaps) : fallback.showMaps) || Boolean(raw.showNeshan),
     // older data: a page with no address never showed the address card — keep it that way
     showAddress:
       raw.showAddress != null ? Boolean(raw.showAddress) : String(raw.address ?? "").trim().length > 0,
@@ -94,6 +99,9 @@ export function migrateSettings(raw: unknown): SiteSettings {
     instagramUrl: str(st.instagramUrl, d.studio.instagramUrl).trim(),
     mapsUrl: str(st.mapsUrl, d.studio.mapsUrl).trim(),
     neshanUrl: str(st.neshanUrl, d.studio.neshanUrl).trim(),
+    baladUrl: str(st.baladUrl, d.studio.baladUrl).trim(),
+    wazeUrl: str(st.wazeUrl, d.studio.wazeUrl).trim(),
+    mapCoords: str(st.mapCoords, d.studio.mapCoords).trim().slice(0, 60),
     baleUrl: str(st.baleUrl, d.studio.baleUrl).trim(),
   };
 

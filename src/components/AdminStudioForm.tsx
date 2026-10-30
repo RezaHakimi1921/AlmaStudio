@@ -13,8 +13,11 @@ const FIELDS: { key: keyof StudioInfo; label: string; hint?: string; ltr?: boole
   { key: "phone", label: "شماره تماس", hint: "برای دکمه «تماس با آتلیه»", ltr: true, placeholder: "09121234567" },
   { key: "addressTitle", label: "عنوان کارت آدرس", placeholder: "آدرس آتلیه آلما" },
   { key: "address", label: "آدرس", multiline: true },
-  { key: "mapsUrl", label: "لینک گوگل‌مپ", ltr: true, placeholder: "https://maps.google.com/…" },
-  { key: "neshanUrl", label: "لینک نشان", ltr: true, placeholder: "https://nshn.ir/…" },
+  { key: "mapCoords", label: "مختصات آتلیه (عرض، طول)", hint: "برای مسیریاب: از روی آن لینک بلد، ویز، گوگل‌مپ و نشان ساخته می‌شود", ltr: true, placeholder: "35.7000, 51.4000" },
+  { key: "baladUrl", label: "لینک بلد (اختیاری)", ltr: true, placeholder: "https://balad.ir/…" },
+  { key: "wazeUrl", label: "لینک ویز (اختیاری)", ltr: true, placeholder: "https://waze.com/ul?…" },
+  { key: "mapsUrl", label: "لینک گوگل‌مپ (اختیاری)", ltr: true, placeholder: "https://maps.google.com/…" },
+  { key: "neshanUrl", label: "لینک نشان (اختیاری)", ltr: true, placeholder: "https://nshn.ir/…" },
   { key: "instagramUrl", label: "لینک اینستاگرام", ltr: true, placeholder: "https://instagram.com/…" },
   { key: "baleUrl", label: "لینک بله", ltr: true, placeholder: "https://ble.ir/…" },
 ];

@@ -219,12 +219,7 @@ export function AdminEditForm({ page, settings }: Props) {
           <Switch
             checked={draft.showMaps}
             onChange={(v) => updateField("showMaps", v)}
-            label="دکمه گوگل‌مپ"
-          />
-          <Switch
-            checked={draft.showNeshan}
-            onChange={(v) => updateField("showNeshan", v)}
-            label="دکمه نشان"
+            label="دکمه مسیریاب (بلد، ویز، گوگل‌مپ، نشان)"
           />
           <Switch
             checked={draft.showInstagram}
@@ -262,24 +257,23 @@ export function AdminEditForm({ page, settings }: Props) {
           </>
         ) : null}
         {draft.showMaps ? (
-          <StudioField
-            label="لینک گوگل‌مپ"
-            value={draft.mapsUrl}
-            studioValue={studio.mapsUrl}
-            onChange={(v) => updateField("mapsUrl", v)}
-            ltr
-            inputMode="url"
-          />
-        ) : null}
-        {draft.showNeshan ? (
-          <StudioField
-            label="لینک نشان"
-            value={draft.neshanUrl}
-            studioValue={studio.neshanUrl}
-            onChange={(v) => updateField("neshanUrl", v)}
-            ltr
-            inputMode="url"
-          />
+          <>
+            <StudioField
+              label="مختصات مقصد (عرض، طول) — برای هر چهار برنامه"
+              value={draft.mapCoords}
+              studioValue={studio.mapCoords}
+              onChange={(v) => updateField("mapCoords", v)}
+              ltr
+            />
+            <p className="hero-upload__hint">
+              مختصات را از گوگل‌مپ (لمس طولانی روی نقطه) کپی کنید؛ یا لینک گوگل‌مپ/نشان را در یکی از کادرهای زیر بچسبانید.
+              هر برنامه که لینک جدا ندارد، از روی مختصات ساخته می‌شود.
+            </p>
+            <StudioField label="لینک بلد (اختیاری)" value={draft.baladUrl} studioValue={studio.baladUrl} onChange={(v) => updateField("baladUrl", v)} ltr inputMode="url" />
+            <StudioField label="لینک ویز (اختیاری)" value={draft.wazeUrl} studioValue={studio.wazeUrl} onChange={(v) => updateField("wazeUrl", v)} ltr inputMode="url" />
+            <StudioField label="لینک گوگل‌مپ (اختیاری)" value={draft.mapsUrl} studioValue={studio.mapsUrl} onChange={(v) => updateField("mapsUrl", v)} ltr inputMode="url" />
+            <StudioField label="لینک نشان (اختیاری)" value={draft.neshanUrl} studioValue={studio.neshanUrl} onChange={(v) => updateField("neshanUrl", v)} ltr inputMode="url" />
+          </>
         ) : null}
         {draft.showInstagram ? (
           <StudioField

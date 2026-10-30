@@ -21,6 +21,9 @@ export default async function AdminStudioPage() {
           ["instagramUrl", "اینستاگرام"],
           ["mapsUrl", "گوگل‌مپ"],
           ["neshanUrl", "نشان"],
+          ["baladUrl", "بلد"],
+          ["wazeUrl", "ویز"],
+          ["mapCoords", "مختصات"],
           ["baleUrl", "بله"],
         ] as const
       )

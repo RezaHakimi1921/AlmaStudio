@@ -1,5 +1,6 @@
 "use client";
 
+import { buildMapLinks } from "@/lib/maps";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { hasShotParam, useClientValue } from "@/lib/client";
 import { markIntroSeen, shouldSkipIntro } from "@/lib/intro";
@@ -88,14 +89,7 @@ export function LinkPageView({ page, settings, announcementLive, preview = false
 
   const packages = linesToParagraphs(page.packagesText || "");
   const notes = linesToParagraphs(page.notesText || "");
-  const mapLinks = [
-    page.showNeshan && page.neshanUrl.trim()
-      ? { key: "neshan", label: "نشان", href: page.neshanUrl.trim() }
-      : null,
-    page.showMaps && page.mapsUrl.trim()
-      ? { key: "google", label: "گوگل‌مپ", href: page.mapsUrl.trim() }
-      : null,
-  ].filter((m): m is { key: string; label: string; href: string } => m !== null);
+  const mapLinks = page.showMaps ? buildMapLinks(page) : [];
 
   const { hours, faq, gallery, decors } = settings;
   const showGallery = gallery.enabled && gallery.images.length > 0;
