@@ -103,13 +103,15 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
       <section className="admin-card glass admin-section">
         <div className="admin-section__head">
           <div>
-            <h2>تصویر هاب اصلی (/)</h2>
-            <p>بنر صفحهٔ ورود alma — عنوان، زیرعنوان و تصویر هیرو.</p>
+            <h2>هاب اصلی (/)</h2>
+            <p>
+              تصویر، عنوان و زیرعنوان شیشه‌ای صفحهٔ ورود — برای مشتریان روی alma.artepersia.com
+            </p>
           </div>
         </div>
         <div className="admin-grid">
           <label>
-            عنوان
+            عنوان هاب
             <input
               value={hub.title}
               maxLength={80}
@@ -118,16 +120,17 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
             />
           </label>
           <label className="span-2">
-            زیرعنوان
+            زیرعنوان هاب
             <input
               value={hub.subtitle}
               maxLength={200}
               onChange={(e) => setHub({ subtitle: e.target.value })}
+              required
             />
           </label>
         </div>
         <HeroImageField
-          label="تصویر بنر هاب"
+          label="تصویر هیرو هاب"
           value={hub.heroImageUrl}
           onChange={(url) => setHub({ heroImageUrl: url })}
           onMessage={setMessage}

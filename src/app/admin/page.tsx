@@ -4,7 +4,6 @@ import { readContent } from "@/lib/content";
 import { publicPathForSlug } from "@/lib/routes";
 import { AdminLoginForm } from "@/components/AdminLoginForm";
 import { AdminLogoutButton } from "@/components/AdminLogoutButton";
-import { AdminHubForm } from "@/components/AdminHubForm";
 import { AlmaAppleLogo } from "@/components/AlmaAppleLogo";
 
 export default async function AdminPage() {
@@ -35,18 +34,16 @@ export default async function AdminPage() {
         <div>
           <AlmaAppleLogo size={40} variant="lockup" />
           <p className="home-lead" style={{ marginBottom: "1rem" }}>
-            ویرایش هاب و چهار لینک مشتری
+            ویرایش ساده هر لینک — عنوان، تصویر، متن، تلفن
           </p>
         </div>
         <AdminLogoutButton />
       </div>
 
-      <AdminHubForm hub={content.settings.hub} settings={content.settings} />
-
-      <nav className="admin-tiles" aria-label="بخش‌های پنل" style={{ marginTop: "1.25rem" }}>
+      <nav className="admin-tiles" aria-label="بخش‌های پنل">
         <Link href="/admin/settings" className="admin-tile">
-          <strong>اطلاعیه، ساعات و سوالات</strong>
-          <span>جشنواره و تخفیف · ساعات پذیرش · سوالات متداول</span>
+          <strong>هاب، اطلاعیه، ساعات و سوالات</strong>
+          <span>بنر صفحه اصلی · جشنواره · ساعات پذیرش · سوالات متداول</span>
         </Link>
         <Link href="/admin/gallery" className="admin-tile">
           <strong>نمونه‌کارها</strong>
@@ -85,15 +82,8 @@ export default async function AdminPage() {
         </a>
       </div>
 
-      <h2
-        style={{
-          margin: "1.5rem 0 0.75rem",
-          color: "var(--alma-red-deep)",
-          fontSize: "1.15rem",
-        }}
-      >
-        صفحات لینک
-      </h2>
+      <h2 className="admin-section-title">لینک‌های مشتریان</h2>
+
       <ul className="home-list">
         {content.pages.map((page) => (
           <li key={page.slug}>
@@ -103,7 +93,8 @@ export default async function AdminPage() {
                 {!page.published ? <span className="draft-badge">پیش‌نویس</span> : null}
               </strong>
               <span>
-                {page.moodTag} · ویرایش · {publicPathForSlug(page.slug)}
+                {page.moodTag} · {publicPathForSlug(page.slug)} ·{" "}
+                {page.phone.trim() ? `تماس: ${page.phone.trim()}` : "بدون شماره تماس"}
               </span>
             </Link>
           </li>
