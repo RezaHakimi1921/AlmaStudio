@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx tests/jalali.test.ts && tsx tests/stats-report.test.ts"
+    "test": "tsx tests/jalali.test.ts && tsx tests/stats-report.test.ts && tsx tests/rich-text.test.ts"
   },
   "dependencies": {
     "next": "16.4.3",

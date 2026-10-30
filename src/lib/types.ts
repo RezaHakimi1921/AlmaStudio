@@ -34,6 +34,8 @@ export type LinkPageContent = {
   baleUrl: string;
   showInstagram: boolean;
   showMaps: boolean;
+  /** show the address card (address comes from the page, or the studio info when empty) */
+  showAddress: boolean;
   showNeshan: boolean;
   showBale: boolean;
   published: boolean;
@@ -136,7 +138,32 @@ export type StudioPackage = {
 /** which structured packages a link page shows */
 export type PackageFilter = "none" | "all" | GalleryCategory;
 
+/**
+ * Studio contact details, entered once. Each link page uses these unless it
+ * fills its own value (e.g. the garden address on the outdoor pages).
+ */
+export type StudioInfo = {
+  phone: string;
+  addressTitle: string;
+  address: string;
+  instagramUrl: string;
+  mapsUrl: string;
+  neshanUrl: string;
+  baleUrl: string;
+};
+
+export const STUDIO_FIELDS = [
+  "phone",
+  "addressTitle",
+  "address",
+  "instagramUrl",
+  "mapsUrl",
+  "neshanUrl",
+  "baleUrl",
+] as const satisfies readonly (keyof StudioInfo & keyof LinkPageContent)[];
+
 export type SiteSettings = {
+  studio: StudioInfo;
   hub: HubSettings;
   announcement: Announcement;
   hours: WorkingHours;

@@ -1,16 +1,90 @@
 "use client";
 
-import { useRef, useState } from "react";
-import Link from "next/link";
+import { useState } from "react";
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import type { LinkPageContent } from "@/lib/types";
+import type { LinkPageContent, SiteSettings, StudioInfo } from "@/lib/types";
 import { publicPathForSlug } from "@/lib/routes";
 import { normalizeMediaUrl } from "@/lib/media";
+import { withStudio } from "@/lib/studio";
+import { confirmLeave, useUnsavedGuard } from "@/lib/unsaved";
 import { HeroImageField } from "@/components/HeroImageField";
+import { Switch } from "./AdminSettingsForm";
+import { SimpleTextEditor } from "./SimpleTextEditor";
+import { LivePreview } from "./LivePreview";
+import { ChevronDownIcon } from "./Icons";
 
-export function AdminEditForm({ page }: { page: LinkPageContent }) {
+function Section({
+  title,
+  hint,
+  open = false,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  open?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <details className="edit-section" open={open}>
+      <summary>
+        <span>
+          <strong>{title}</strong>
+          {hint ? <small>{hint}</small> : null}
+        </span>
+        <ChevronDownIcon className="edit-section__chev" />
+      </summary>
+      <div className="edit-section__body">{children}</div>
+    </details>
+  );
+}
+
+/** A contact field that falls back to the studio info when left empty. */
+function StudioField({
+  label,
+  value,
+  studioValue,
+  onChange,
+  ltr = false,
+  multiline = false,
+  inputMode,
+}: {
+  label: string;
+  value: string;
+  studioValue: string;
+  onChange: (v: string) => void;
+  ltr?: boolean;
+  multiline?: boolean;
+  inputMode?: "tel" | "url";
+}) {
+  const own = value.trim().length > 0;
+  const common = {
+    value,
+    dir: ltr ? "ltr" : undefined,
+    placeholder: studioValue ? `از اطلاعات آتلیه: ${studioValue}` : "در «اطلاعات آتلیه» وارد نشده",
+    onChange: (e: { target: { value: string } }) => onChange(e.target.value),
+  } as const;
+  return (
+    <label className="studio-field">
+      <span className="studio-field__label">
+        {label}
+        <em className={own ? "is-own" : ""}>{own ? "مخصوص همین لینک" : "از اطلاعات آتلیه"}</em>
+      </span>
+      {multiline ? <textarea {...common} /> : <input {...common} inputMode={inputMode} />}
+      {own ? (
+        <button type="button" className="studio-field__reset" onClick={() => onChange("")}>
+          برگرداندن به اطلاعات آتلیه
+        </button>
+      ) : null}
+    </label>
+  );
+}
+
+type Props = { page: LinkPageContent; settings: SiteSettings };
+
+export function AdminEditForm({ page, settings }: Props) {
   const router = useRouter();
-  const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const studio: StudioInfo = settings.studio;
   const [draft, setDraft] = useState<LinkPageContent>({
     ...page,
     heroImageUrl: normalizeMediaUrl(page.heroImageUrl),
@@ -18,51 +92,30 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   // after router.refresh() the server sends a fresh `page`: reset the draft
-  // during render (React's "adjust state on prop change" pattern, no effect)
   const [syncedPage, setSyncedPage] = useState(page);
   if (syncedPage !== page) {
     setSyncedPage(page);
     setDraft({ ...page, heroImageUrl: normalizeMediaUrl(page.heroImageUrl) });
   }
 
-  function updateField<K extends keyof LinkPageContent>(
-    key: K,
-    value: LinkPageContent[K],
-  ) {
+  const dirty = JSON.stringify(draft) !== JSON.stringify({ ...page, heroImageUrl: normalizeMediaUrl(page.heroImageUrl) });
+  useUnsavedGuard(dirty);
+
+  function updateField<K extends keyof LinkPageContent>(key: K, value: LinkPageContent[K]) {
     setDraft((prev) => ({ ...prev, [key]: value }));
+    setMessage("");
   }
 
-  /** Wrap selected text in <b>…</b> inside the body textarea */
-  function wrapBold() {
-    const el = bodyRef.current;
-    if (!el) return;
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
-    const value = el.value;
-    const selected = value.slice(start, end) || "متن پررنگ";
-    const next =
-      value.slice(0, start) + `<b>${selected}</b>` + value.slice(end);
-    updateField("bodyHtml", next);
-    requestAnimationFrame(() => {
-      el.focus();
-      const pos = start + 3 + selected.length;
-      el.setSelectionRange(pos, pos);
-    });
-  }
-
-  async function onSave(e: React.FormEvent) {
-    e.preventDefault();
+  async function onSave(e?: React.FormEvent) {
+    e?.preventDefault();
     setSaving(true);
     setError("");
     setMessage("");
     try {
-      const payload = {
-        ...draft,
-        heroImageUrl: normalizeMediaUrl(draft.heroImageUrl),
-      };
-      setDraft(payload);
+      const payload = { ...draft, heroImageUrl: normalizeMediaUrl(draft.heroImageUrl) };
       const res = await fetch("/api/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -73,7 +126,7 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
         setError(data.error || "ذخیره ناموفق بود");
         return;
       }
-      setMessage("ذخیره شد");
+      setMessage("ذخیره شد ✓");
       router.refresh();
     } catch {
       setError("خطا در ذخیره");
@@ -82,240 +135,239 @@ export function AdminEditForm({ page }: { page: LinkPageContent }) {
     }
   }
 
+  const effective = withStudio(draft, studio);
+
   return (
-    <form className="admin-form admin-card glass" onSubmit={onSave}>
-      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-        <h1 style={{ margin: 0, color: "var(--alma-red)" }}>{page.title}</h1>
-        {!draft.published ? <span className="draft-badge">پیش‌نویس</span> : null}
-      </div>
-      <p style={{ margin: 0, color: "var(--alma-muted)" }}>
-        ویرایش ساده · {publicPathForSlug(page.slug)}
-      </p>
+    <form className="edit-form" onSubmit={onSave}>
+      <header className="edit-form__head">
+        <button
+          type="button"
+          className="admin-btn admin-btn--ghost"
+          onClick={() => confirmLeave(dirty) && router.push("/admin")}
+        >
+          بازگشت به پنل
+        </button>
+        <h1>{draft.title || page.title}</h1>
+        <p>
+          <a href={publicPathForSlug(page.slug)} target="_blank" rel="noreferrer" dir="ltr">
+            {publicPathForSlug(page.slug)}
+          </a>
+          {!draft.published ? <span className="draft-badge">پیش‌نویس — مشتری نمی‌بیند</span> : null}
+        </p>
+      </header>
 
-      <label>
-        عنوان
-        <input value={draft.title} onChange={(e) => updateField("title", e.target.value)} required />
-      </label>
-      <label>
-        زیرعنوان
-        <input value={draft.subtitle} onChange={(e) => updateField("subtitle", e.target.value)} />
-      </label>
-      <label>
-        برچسب حال‌وهوا
-        <input value={draft.moodTag} onChange={(e) => updateField("moodTag", e.target.value)} />
-      </label>
-      <label>
-        برند
-        <input value={draft.brandLabel} onChange={(e) => updateField("brandLabel", e.target.value)} />
-      </label>
-      <label>
-        برچسب اینترو
-        <input value={draft.introLabel} onChange={(e) => updateField("introLabel", e.target.value)} />
-      </label>
-      <HeroImageField
-        label="تصویر هیرو این لینک"
-        value={draft.heroImageUrl}
-        onChange={(url) => updateField("heroImageUrl", url)}
-        onMessage={setMessage}
-        onError={setError}
-      />
-
-      <fieldset className="hero-upload">
-        <legend>شماره تماس این لینک</legend>
+      <Section title="متن صفحه" hint="عنوان، متن اصلی، نکات و پیام پایانی" open>
         <label>
-          شماره برای دکمه «تماس با آتلیه» (هر لینک جدا)
+          عنوان صفحه
+          <input value={draft.title} onChange={(e) => updateField("title", e.target.value)} required />
+        </label>
+        <label>
+          یک خط زیر عنوان
+          <input value={draft.subtitle} onChange={(e) => updateField("subtitle", e.target.value)} />
+        </label>
+        <label>
+          جمله کوتاه بالای عنوان
           <input
-            value={draft.phone}
-            onChange={(e) => updateField("phone", e.target.value)}
-            placeholder="مثلاً 02155123456 یا 09121234567"
-            inputMode="tel"
-            dir="ltr"
-            autoComplete="tel"
+            value={draft.moodTag}
+            placeholder="مثلاً: حرفه‌ای و صمیمی"
+            onChange={(e) => updateField("moodTag", e.target.value)}
           />
         </label>
-        <p className="hero-upload__hint">
-          {draft.phone.trim()
-            ? "روی صفحهٔ عمومی دکمه تماس با همین شماره (tel:) نمایش داده می‌شود."
-            : "خالی بگذارید تا دکمه تماس روی این لینک نشان داده نشود."}
-        </p>
-      </fieldset>
-      <label>
-        اینستاگرام
-        <input value={draft.instagramUrl} onChange={(e) => updateField("instagramUrl", e.target.value)} />
-      </label>
-      <label>
-        مسیریاب گوگل
-        <input
-          value={draft.mapsUrl}
-          onChange={(e) => updateField("mapsUrl", e.target.value)}
-          dir="ltr"
-          placeholder="https://maps.google.com/…"
-        />
-      </label>
-      <label>
-        مسیریاب نشان (اختیاری)
-        <input
-          value={draft.neshanUrl}
-          onChange={(e) => updateField("neshanUrl", e.target.value)}
-          dir="ltr"
-          placeholder="https://nshn.ir/…"
-        />
-      </label>
-      <label>
-        پیام‌رسان بله (اختیاری)
-        <input
-          value={draft.baleUrl}
-          onChange={(e) => updateField("baleUrl", e.target.value)}
-          dir="ltr"
-          placeholder="https://ble.ir/username"
-        />
-      </label>
-
-      <div className="admin-actions">
-        <label style={{ flex: 1 }}>
-          نمایش اینستاگرام
-          <select
-            value={draft.showInstagram ? "1" : "0"}
-            onChange={(e) => updateField("showInstagram", e.target.value === "1")}
-          >
-            <option value="1">بله</option>
-            <option value="0">خیر</option>
-          </select>
-        </label>
-        <label style={{ flex: 1 }}>
-          نمایش گوگل‌مپ
-          <select
-            value={draft.showMaps ? "1" : "0"}
-            onChange={(e) => updateField("showMaps", e.target.value === "1")}
-          >
-            <option value="1">بله</option>
-            <option value="0">خیر</option>
-          </select>
-        </label>
-        <label style={{ flex: 1 }}>
-          نمایش نشان
-          <select
-            value={draft.showNeshan ? "1" : "0"}
-            onChange={(e) => updateField("showNeshan", e.target.value === "1")}
-          >
-            <option value="1">بله</option>
-            <option value="0">خیر</option>
-          </select>
-        </label>
-        <label style={{ flex: 1 }}>
-          نمایش بله
-          <select
-            value={draft.showBale ? "1" : "0"}
-            onChange={(e) => updateField("showBale", e.target.value === "1")}
-          >
-            <option value="1">بله</option>
-            <option value="0">خیر</option>
-          </select>
-        </label>
-        <label style={{ flex: 1 }}>
-          انتشار
-          <select
-            value={draft.published ? "1" : "0"}
-            onChange={(e) => updateField("published", e.target.value === "1")}
-          >
-            <option value="1">منتشر</option>
-            <option value="0">پیش‌نویس</option>
-          </select>
-        </label>
-      </div>
-
-      <div>
-        <div className="admin-actions" style={{ marginBottom: "0.4rem" }}>
-          <span style={{ fontSize: "0.9rem", color: "var(--alma-ink)" }}>متن اصلی صفحه</span>
-          <button type="button" className="admin-btn admin-btn--ghost" onClick={wrapBold}>
-            پررنگ (Bold)
-          </button>
+        <div className="admin-field">
+          <span>متن اصلی</span>
+          <SimpleTextEditor
+            label="متن اصلی"
+            value={draft.bodyHtml}
+            onChange={(html) => updateField("bodyHtml", html)}
+            placeholder="متن خوش‌آمد و توضیحات را اینجا بنویسید…"
+          />
         </div>
-        <textarea
-          ref={bodyRef}
-          value={draft.bodyHtml}
-          onChange={(e) => updateField("bodyHtml", e.target.value)}
-          style={{ minHeight: 180 }}
-          placeholder="<p>متن…</p> — از دکمه پررنگ برای <b>متن</b> استفاده کنید"
-        />
-      </div>
+        <label>
+          نکات مهم (هر خط یک نکته)
+          <textarea
+            value={draft.notesText}
+            onChange={(e) => updateField("notesText", e.target.value)}
+            style={{ minHeight: 110 }}
+          />
+        </label>
+        <label>
+          پیام پایانی
+          <input value={draft.closingMessage} onChange={(e) => updateField("closingMessage", e.target.value)} />
+        </label>
+      </Section>
 
-      <label>
-        پکیج‌های این صفحه
-        <select
-          value={draft.packageFilter}
-          onChange={(e) =>
-            updateField("packageFilter", e.target.value as LinkPageContent["packageFilter"])
-          }
-        >
-          <option value="none">نمایش نده (یا از متن ساده پایین استفاده کن)</option>
-          <option value="all">همه پکیج‌ها</option>
-          <option value="pregnancy">فقط پکیج‌های بارداری</option>
-          <option value="newborn">فقط پکیج‌های نوزاد</option>
-          <option value="kids">فقط پکیج‌های کودک</option>
-        </select>
-        <small className="hero-upload__hint">
-          پکیج‌ها را در «پنل ← پکیج‌ها» تعریف کنید. اگر اینجا پکیجی انتخاب شود، متن ساده پایین نمایش داده
-          نمی‌شود.
-        </small>
-      </label>
-      <label>
-        پکیج‌ها و قیمت — متن ساده قدیمی (هر خط یک مورد — اختیاری)
-        <textarea
-          value={draft.packagesText}
-          onChange={(e) => updateField("packagesText", e.target.value)}
-          style={{ minHeight: 110 }}
+      <Section title="عکس بالای صفحه" hint="عکسی که اول صفحه و در انیمیشن ورود دیده می‌شود">
+        <HeroImageField
+          label="عکس اصلی بالای صفحه"
+          value={draft.heroImageUrl}
+          onChange={(url) => updateField("heroImageUrl", url)}
+          onMessage={setMessage}
+          onError={setError}
         />
-      </label>
-      <label>
-        نکات مهم (هر خط یک نکته — اختیاری)
-        <textarea
-          value={draft.notesText}
-          onChange={(e) => updateField("notesText", e.target.value)}
-          style={{ minHeight: 110 }}
-        />
-      </label>
-      <label>
-        پیام پایانی
-        <input
-          value={draft.closingMessage}
-          onChange={(e) => updateField("closingMessage", e.target.value)}
-        />
-      </label>
-      <label>
-        عنوان آدرس
-        <input
-          value={draft.addressTitle}
-          onChange={(e) => updateField("addressTitle", e.target.value)}
-        />
-      </label>
-      <label>
-        آدرس
-        <textarea
-          value={draft.address}
-          onChange={(e) => updateField("address", e.target.value)}
-        />
-      </label>
+      </Section>
 
-      {error ? <p className="admin-error">{error}</p> : null}
-      {message ? <p className="admin-ok">{message}</p> : null}
+      <Section
+        title="تماس و آدرس"
+        hint="خالی = از «اطلاعات آتلیه»؛ فقط اگر این لینک فرق دارد پر کنید"
+      >
+        <div className="switch-grid">
+          <Switch
+            checked={draft.showAddress}
+            onChange={(v) => updateField("showAddress", v)}
+            label="نمایش کارت آدرس"
+          />
+          <Switch
+            checked={draft.showMaps}
+            onChange={(v) => updateField("showMaps", v)}
+            label="دکمه گوگل‌مپ"
+          />
+          <Switch
+            checked={draft.showNeshan}
+            onChange={(v) => updateField("showNeshan", v)}
+            label="دکمه نشان"
+          />
+          <Switch
+            checked={draft.showInstagram}
+            onChange={(v) => updateField("showInstagram", v)}
+            label="دکمه اینستاگرام"
+          />
+          <Switch checked={draft.showBale} onChange={(v) => updateField("showBale", v)} label="دکمه بله" />
+        </div>
+        <StudioField
+          label="شماره تماس"
+          value={draft.phone}
+          studioValue={studio.phone}
+          onChange={(v) => updateField("phone", v)}
+          ltr
+          inputMode="tel"
+        />
+        {!effective.phone.trim() ? (
+          <p className="hero-upload__hint">بدون شماره، دکمه «تماس با آتلیه» روی این صفحه نمایش داده نمی‌شود.</p>
+        ) : null}
+        {draft.showAddress ? (
+          <>
+            <StudioField
+              label="عنوان آدرس"
+              value={draft.addressTitle}
+              studioValue={studio.addressTitle}
+              onChange={(v) => updateField("addressTitle", v)}
+            />
+            <StudioField
+              label="آدرس"
+              value={draft.address}
+              studioValue={studio.address}
+              onChange={(v) => updateField("address", v)}
+              multiline
+            />
+          </>
+        ) : null}
+        {draft.showMaps ? (
+          <StudioField
+            label="لینک گوگل‌مپ"
+            value={draft.mapsUrl}
+            studioValue={studio.mapsUrl}
+            onChange={(v) => updateField("mapsUrl", v)}
+            ltr
+            inputMode="url"
+          />
+        ) : null}
+        {draft.showNeshan ? (
+          <StudioField
+            label="لینک نشان"
+            value={draft.neshanUrl}
+            studioValue={studio.neshanUrl}
+            onChange={(v) => updateField("neshanUrl", v)}
+            ltr
+            inputMode="url"
+          />
+        ) : null}
+        {draft.showInstagram ? (
+          <StudioField
+            label="لینک اینستاگرام"
+            value={draft.instagramUrl}
+            studioValue={studio.instagramUrl}
+            onChange={(v) => updateField("instagramUrl", v)}
+            ltr
+            inputMode="url"
+          />
+        ) : null}
+        {draft.showBale ? (
+          <StudioField
+            label="لینک بله"
+            value={draft.baleUrl}
+            studioValue={studio.baleUrl}
+            onChange={(v) => updateField("baleUrl", v)}
+            ltr
+            inputMode="url"
+          />
+        ) : null}
+      </Section>
 
-      <div className="admin-actions">
-        <button className="admin-btn" type="submit" disabled={saving}>
-          {saving ? "در حال ذخیره..." : "ذخیره"}
+      <Section title="پکیج‌ها" hint="کارت‌های قیمت این صفحه">
+        <label>
+          کدام پکیج‌ها نمایش داده شوند؟
+          <select
+            value={draft.packageFilter}
+            onChange={(e) => updateField("packageFilter", e.target.value as LinkPageContent["packageFilter"])}
+          >
+            <option value="none">هیچ‌کدام</option>
+            <option value="all">همه پکیج‌ها</option>
+            <option value="pregnancy">فقط بارداری</option>
+            <option value="newborn">فقط نوزاد</option>
+            <option value="kids">فقط کودک</option>
+          </select>
+          <small className="hero-upload__hint">پکیج‌ها را در «پنل ← پکیج‌ها و قیمت» تعریف کنید.</small>
+        </label>
+        {draft.packageFilter === "none" ? (
+          <label>
+            یا یک فهرست ساده (هر خط یک مورد — اختیاری)
+            <textarea
+              value={draft.packagesText}
+              onChange={(e) => updateField("packagesText", e.target.value)}
+              style={{ minHeight: 100 }}
+            />
+          </label>
+        ) : null}
+      </Section>
+
+      <Section title="پیشرفته" hint="معمولاً نیازی به تغییر نیست">
+        <label>
+          متن انیمیشن ورود
+          <input
+            value={draft.introLabel}
+            placeholder="مثلاً: لحظه‌های ماندگار"
+            onChange={(e) => updateField("introLabel", e.target.value)}
+          />
+        </label>
+        <label>
+          نام آتلیه روی عکس
+          <input value={draft.brandLabel} onChange={(e) => updateField("brandLabel", e.target.value)} />
+        </label>
+      </Section>
+
+      <div className="admin-savebar glass-strong edit-form__savebar">
+        <Switch
+          checked={draft.published}
+          onChange={(v) => updateField("published", v)}
+          label={draft.published ? "منتشر" : "پیش‌نویس"}
+        />
+        {error ? <p className="admin-error">{error}</p> : null}
+        {message ? <p className="admin-ok">{message}</p> : null}
+        {!error && !message && dirty ? <p className="admin-dirty">تغییرات ذخیره نشده</p> : null}
+        <button type="button" className="admin-btn admin-btn--ghost" onClick={() => setPreviewOpen(true)}>
+          پیش‌نمایش
         </button>
-        <a
-          className="admin-btn admin-btn--ghost"
-          href={publicPathForSlug(page.slug)}
-          target="_blank"
-          rel="noreferrer"
-        >
-          مشاهده
-        </a>
-        <Link className="admin-btn admin-btn--ghost" href="/admin">
-          بازگشت
-        </Link>
+        <button className="admin-btn" type="submit" disabled={saving || !dirty}>
+          {saving ? "در حال ذخیره..." : dirty ? "ذخیره" : "ذخیره شده"}
+        </button>
       </div>
+
+      <LivePreview
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        page={effective}
+        settings={settings}
+      />
     </form>
   );
 }

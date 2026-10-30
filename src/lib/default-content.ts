@@ -13,6 +13,15 @@ const HERO = {
 };
 
 export const defaultSettings: SiteSettings = {
+  studio: {
+    phone: "",
+    addressTitle: "آدرس آتلیه آلما",
+    address: "",
+    instagramUrl: "",
+    mapsUrl: "",
+    neshanUrl: "",
+    baleUrl: "",
+  },
   hub: {
     title: "آتلیه آلما",
     subtitle: "عکاسی نوزاد، بارداری و فضای باز — لینک‌های اختصاصی مشتریان",
@@ -94,6 +103,7 @@ export const defaultContent: SiteContent = {
       baleUrl: "",
       showInstagram: true,
       showMaps: true,
+      showAddress: true,
       showNeshan: false,
       showBale: false,
       published: true,
@@ -126,6 +136,7 @@ export const defaultContent: SiteContent = {
       baleUrl: "",
       showInstagram: true,
       showMaps: true,
+      showAddress: true,
       showNeshan: false,
       showBale: false,
       published: true,
@@ -157,6 +168,7 @@ export const defaultContent: SiteContent = {
       baleUrl: "",
       showInstagram: true,
       showMaps: false,
+      showAddress: true,
       showNeshan: false,
       showBale: false,
       published: true,
@@ -189,6 +201,7 @@ export const defaultContent: SiteContent = {
       baleUrl: "",
       showInstagram: true,
       showMaps: true,
+      showAddress: true,
       showNeshan: false,
       showBale: false,
       published: true,

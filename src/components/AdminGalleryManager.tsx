@@ -10,6 +10,9 @@ import { uploadImage } from "@/lib/upload-client";
 import { faBytes } from "@/lib/upload-limits";
 import { Switch, saveSettings } from "./AdminSettingsForm";
 import { ImagePicker } from "./ImagePicker";
+import { useUndo } from "./UndoToast";
+import { moveItem, useSortable } from "@/lib/sortable";
+import { useUnsavedGuard } from "@/lib/unsaved";
 
 export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
   const router = useRouter();
@@ -22,6 +25,9 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
 
   const images = s.gallery.images;
   const inCat = images.filter((i) => i.category === cat);
+  const { handleProps, itemProps } = useSortable(inCat.length, moveInCat);
+  const { offer, toast } = useUndo();
+  useUnsavedGuard(dirty);
 
   function setImages(next: GalleryImage[]) {
     setS((p) => ({ ...p, gallery: { ...p.gallery, images: next } }));
@@ -76,17 +82,34 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
     setImages(images.map((img) => (img.id === id ? { ...img, ...patch } : img)));
   }
 
-  function move(id: string, dir: -1 | 1) {
-    const ids = inCat.map((i) => i.id);
-    const idx = ids.indexOf(id);
-    const swapWith = ids[idx + dir];
-    if (!swapWith) return;
-    const a = images.findIndex((i) => i.id === id);
-    const b = images.findIndex((i) => i.id === swapWith);
-    const next = [...images];
-    [next[a], next[b]] = [next[b], next[a]];
-    setImages(next);
+  /** reorder inside the visible category; other categories keep their order */
+  function moveInCat(from: number, to: number) {
+    setS((p) => {
+      const all = p.gallery.images;
+      const ids = all.filter((i) => i.category === cat).map((i) => i.id);
+      const reordered = moveItem(ids, from, to);
+      const byId = new Map(all.map((i) => [i.id, i]));
+      let k = 0;
+      const next = all.map((i) => (i.category === cat ? byId.get(reordered[k++])! : i));
+      return { ...p, gallery: { ...p.gallery, images: next } };
+    });
+    setDirty(true);
+    setMessage("");
   }
+
+  function remove(img: GalleryImage) {
+    const index = images.findIndex((x) => x.id === img.id);
+    setImages(images.filter((x) => x.id !== img.id));
+    offer("عکس از گالری حذف شد", () => {
+      setS((p) => {
+        const list = [...p.gallery.images];
+        list.splice(Math.min(index, list.length), 0, img);
+        return { ...p, gallery: { ...p.gallery, images: list } };
+      });
+      setDirty(true);
+    });
+  }
+
 
   return (
     <div className="admin-gallery">
@@ -95,7 +118,7 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
           <div>
             <h2>نمایش گالری</h2>
             <p>
-              صفحه عمومی:{" "}
+              عکس‌ها را با ⠿ بکشید تا ترتیبشان عوض شود. صفحه عمومی:{" "}
               <a href={GALLERY_PATH} target="_blank" rel="noreferrer" dir="ltr">
                 {GALLERY_PATH}
               </a>{" "}
@@ -140,7 +163,7 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
         {inCat.length ? (
           <div className="admin-gallery__grid">
             {inCat.map((img, i) => (
-              <figure key={img.id} className="admin-gallery__item">
+              <figure key={img.id} className="admin-gallery__item" {...itemProps(i)}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={img.url} alt="" loading="lazy" />
                 <input
@@ -150,18 +173,7 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
                   onChange={(e) => update(img.id, { caption: e.target.value })}
                 />
                 <div className="admin-gallery__tools">
-                  <button type="button" className="admin-icon-btn" onClick={() => move(img.id, -1)} disabled={i === 0} aria-label="جلوتر">
-                    ▶
-                  </button>
-                  <button
-                    type="button"
-                    className="admin-icon-btn"
-                    onClick={() => move(img.id, 1)}
-                    disabled={i === inCat.length - 1}
-                    aria-label="عقب‌تر"
-                  >
-                    ◀
-                  </button>
+                  <button {...handleProps(i)}>⠿</button>
                   <select
                     value={img.category}
                     aria-label="دسته"
@@ -177,11 +189,7 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
                     type="button"
                     className="admin-icon-btn admin-icon-btn--danger"
                     aria-label="حذف"
-                    onClick={() => {
-                      if (window.confirm("این تصویر از گالری حذف شود؟")) {
-                        setImages(images.filter((x) => x.id !== img.id));
-                      }
-                    }}
+                    onClick={() => remove(img)}
                   >
                     ✕
                   </button>
@@ -196,6 +204,7 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
         )}
       </section>
 
+      {toast}
       <div className="admin-savebar glass-strong">
         {error ? <p className="admin-error">{error}</p> : null}
         {message ? <p className="admin-ok">{message}</p> : null}

@@ -10,6 +10,8 @@ import type { Decor, GalleryCategory, SiteSettings } from "@/lib/types";
 import { GALLERY_CATEGORIES } from "@/lib/types";
 import { Switch, saveSettings } from "./AdminSettingsForm";
 import { ImagePicker } from "./ImagePicker";
+import { useUndo } from "./UndoToast";
+import { useUnsavedGuard } from "@/lib/unsaved";
 import { DECOR_PATH } from "./DecorTeaser";
 
 export function AdminDecorManager({ initial }: { initial: SiteSettings }) {
@@ -22,6 +24,8 @@ export function AdminDecorManager({ initial }: { initial: SiteSettings }) {
   const [dirty, setDirty] = useState(false);
 
   const items = s.decors.items;
+  const { offer, toast } = useUndo();
+  useUnsavedGuard(dirty);
   const counts = new Map<number, number>();
   items.forEach((d) => counts.set(d.number, (counts.get(d.number) ?? 0) + 1));
   const duplicates = [...counts.entries()].filter(([, c]) => c > 1).map(([n]) => n);
@@ -192,9 +196,16 @@ export function AdminDecorManager({ initial }: { initial: SiteSettings }) {
                     className="admin-icon-btn admin-icon-btn--danger"
                     aria-label="حذف"
                     onClick={() => {
-                      if (window.confirm(`دکور ${toFaDigits(d.number)} حذف شود؟`)) {
-                        setItems(items.filter((x) => x.id !== d.id));
-                      }
+                      const index = items.findIndex((x) => x.id === d.id);
+                      setItems(items.filter((x) => x.id !== d.id));
+                      offer(`دکور ${toFaDigits(d.number)} حذف شد`, () => {
+                        setS((p) => {
+                          const list = [...p.decors.items];
+                          list.splice(Math.min(index, list.length), 0, d);
+                          return { ...p, decors: { ...p.decors, items: list } };
+                        });
+                        setDirty(true);
+                      });
                     }}
                   >
                     ✕
@@ -210,6 +221,7 @@ export function AdminDecorManager({ initial }: { initial: SiteSettings }) {
         )}
       </section>
 
+      {toast}
       <div className="admin-savebar glass-strong">
         {error ? <p className="admin-error">{error}</p> : null}
         {message ? <p className="admin-ok">{message}</p> : null}

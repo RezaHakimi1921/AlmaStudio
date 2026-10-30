@@ -8,6 +8,9 @@ import type { GalleryCategory, SiteSettings, StudioPackage } from "@/lib/types";
 import { GALLERY_CATEGORIES } from "@/lib/types";
 import { Switch, saveSettings } from "./AdminSettingsForm";
 import { PackagesSection } from "./PackagesSection";
+import { useUndo } from "./UndoToast";
+import { moveItem, useSortable } from "@/lib/sortable";
+import { useUnsavedGuard } from "@/lib/unsaved";
 
 /** Money field: type with Persian or English digits, shows ۴٬۵۰۰٬۰۰۰ */
 function MoneyInput({
@@ -53,13 +56,25 @@ export function AdminPackagesManager({ initial }: { initial: SiteSettings }) {
   }
   const update = (id: string, patch: Partial<StudioPackage>) =>
     setItems(items.map((p) => (p.id === id ? { ...p, ...patch } : p)));
-  const move = (i: number, dir: -1 | 1) => {
-    const j = i + dir;
-    if (j < 0 || j >= items.length) return;
-    const next = [...items];
-    [next[i], next[j]] = [next[j], next[i]];
-    setItems(next);
-  };
+  const { handleProps, itemProps } = useSortable(items.length, (from, to) => {
+    setS((p) => ({ ...p, packages: { items: moveItem(p.packages.items, from, to) } }));
+    setDirty(true);
+    setMessage("");
+  });
+  const { offer, toast } = useUndo();
+  useUnsavedGuard(dirty);
+
+  function remove(pkg: StudioPackage, index: number) {
+    setItems(items.filter((x) => x.id !== pkg.id));
+    offer(`پکیج «${pkg.name || "بدون نام"}» حذف شد`, () => {
+      setS((p) => {
+        const list = [...p.packages.items];
+        list.splice(Math.min(index, list.length), 0, pkg);
+        return { ...p, packages: { items: list } };
+      });
+      setDirty(true);
+    });
+  }
 
   async function save() {
     setSaving(true);
@@ -98,33 +113,24 @@ export function AdminPackagesManager({ initial }: { initial: SiteSettings }) {
             <h2>پکیج‌ها</h2>
             <p>
               برای هر صفحه در ویرایش همان صفحه انتخاب کنید کدام پکیج‌ها نمایش داده شوند. پکیجی که «برچسب»
-              دارد برجسته نمایش داده می‌شود.
+              دارد برجسته نمایش داده می‌شود. ترتیب را با ⠿ بکشید.
             </p>
           </div>
         </div>
 
         <div className="admin-faq">
           {items.map((p, i) => (
-            <div key={p.id} className={`admin-faq__item${p.visible ? "" : " is-hidden"}`}>
+            <div key={p.id} className={`admin-faq__item${p.visible ? "" : " is-hidden"}`} {...itemProps(i)}>
               <div className="admin-faq__bar">
                 <strong>پکیج {toFaDigits(i + 1)}</strong>
                 <div className="admin-faq__tools">
                   <Switch checked={p.visible} onChange={(v) => update(p.id, { visible: v })} label="نمایش" />
-                  <button type="button" className="admin-icon-btn" onClick={() => move(i, -1)} aria-label="بالا">
-                    ▲
-                  </button>
-                  <button type="button" className="admin-icon-btn" onClick={() => move(i, 1)} aria-label="پایین">
-                    ▼
-                  </button>
+                  <button {...handleProps(i)}>⠿</button>
                   <button
                     type="button"
                     className="admin-icon-btn admin-icon-btn--danger"
                     aria-label="حذف"
-                    onClick={() => {
-                      if (window.confirm(`پکیج «${p.name || "بدون نام"}» حذف شود؟`)) {
-                        setItems(items.filter((x) => x.id !== p.id));
-                      }
-                    }}
+                    onClick={() => remove(p, i)}
                   >
                     ✕
                   </button>
@@ -256,6 +262,7 @@ export function AdminPackagesManager({ initial }: { initial: SiteSettings }) {
         </div>
       </section>
 
+      {toast}
       <div className="admin-savebar glass-strong">
         {error ? <p className="admin-error">{error}</p> : null}
         {message ? <p className="admin-ok">{message}</p> : null}

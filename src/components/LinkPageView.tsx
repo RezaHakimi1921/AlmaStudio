@@ -34,10 +34,14 @@ type Props = {
   settings: SiteSettings;
   /** computed on the server: announcement on + inside its date window */
   announcementLive: boolean;
+  /** rendered inside the admin's live preview */
+  preview?: boolean;
 };
 
-export function LinkPageView({ page, settings, announcementLive }: Props) {
-  const skipIntro = useClientValue(shouldSkipIntro);
+export function LinkPageView({ page, settings, announcementLive, preview = false }: Props) {
+  const skipIntroStored = useClientValue(shouldSkipIntro);
+  // admin preview: no intro, no stats
+  const skipIntro = preview ? true : skipIntroStored;
   const [introDone, setIntroDone] = useState(false);
   const entered = skipIntro === true || introDone;
   const shellRef = useRef<HTMLElement>(null);
@@ -51,8 +55,8 @@ export function LinkPageView({ page, settings, announcementLive }: Props) {
 
   // anonymous page-view counter (once per mount)
   useEffect(() => {
-    track(page.slug, "view");
-  }, [page.slug]);
+    if (!preview) track(page.slug, "view");
+  }, [page.slug, preview]);
 
   // Scroll-reveal for cards
   useEffect(() => {

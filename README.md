@@ -24,6 +24,7 @@ npx next dev -p 3000
 | `/admin` | Admin (`admin` / env password) |
 | `/admin/settings` | نوار اطلاعیه، ساعات پذیرش، سوالات متداول |
 | `/admin/gallery` | مدیریت نمونه‌کارها |
+| `/admin/studio` | اطلاعات تماس آتلیه (یک بار؛ هر لینک می‌تواند مقدار خودش را داشته باشد) |
 | `/admin/stats` | آمار بازدید و کلیک + منبع ورود (`?src=insta`) |
 | `/admin/packages` | پکیج‌ها و قیمت با پیش‌نمایش |
 | `/admin/decors` | کاتالوگ دکورها |

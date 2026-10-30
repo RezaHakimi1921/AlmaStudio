@@ -3,6 +3,7 @@ import path from "path";
 import { defaultContent, defaultSettings } from "./default-content";
 import { normalizeMediaUrl } from "./media";
 import { parseFaNumber } from "./tehran";
+import { sanitizeBodyHtml } from "./rich-text";
 import type {
   DayHours,
   Decor,
@@ -14,7 +15,7 @@ import type {
   SiteSettings,
   StudioPackage,
 } from "./types";
-import { GALLERY_CATEGORIES, LINK_SLUGS } from "./types";
+import { GALLERY_CATEGORIES, LINK_SLUGS, STUDIO_FIELDS } from "./types";
 
 const DATA_PATH = path.join(process.cwd(), "data", "content.json");
 
@@ -45,7 +46,7 @@ function migratePage(raw: Record<string, unknown>, fallback: LinkPageContent): L
     introLabel: String(raw.introLabel ?? fallback.introLabel),
     phone: raw.phone != null ? String(raw.phone) : fallback.phone || "",
     bodyHtml: hasNew
-      ? String(raw.bodyHtml)
+      ? sanitizeBodyHtml(String(raw.bodyHtml))
       : raw.greeting
         ? `<p>${String(raw.greeting)}</p>\n${blocksToHtml(raw.blocks)}`
         : fallback.bodyHtml,
@@ -65,6 +66,9 @@ function migratePage(raw: Record<string, unknown>, fallback: LinkPageContent): L
     showInstagram:
       raw.showInstagram != null ? Boolean(raw.showInstagram) : fallback.showInstagram,
     showMaps: raw.showMaps != null ? Boolean(raw.showMaps) : fallback.showMaps,
+    // older data: a page with no address never showed the address card — keep it that way
+    showAddress:
+      raw.showAddress != null ? Boolean(raw.showAddress) : String(raw.address ?? "").trim().length > 0,
     showNeshan: raw.showNeshan != null ? Boolean(raw.showNeshan) : false,
     showBale: raw.showBale != null ? Boolean(raw.showBale) : false,
     published: raw.published != null ? Boolean(raw.published) : true,
@@ -81,6 +85,17 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 export function migrateSettings(raw: unknown): SiteSettings {
   const d = defaultSettings;
   const r = obj(raw);
+
+  const st = obj(r.studio);
+  const studio = {
+    phone: str(st.phone, d.studio.phone).trim().slice(0, 40),
+    addressTitle: str(st.addressTitle, d.studio.addressTitle).trim().slice(0, 80),
+    address: str(st.address, d.studio.address).trim().slice(0, 400),
+    instagramUrl: str(st.instagramUrl, d.studio.instagramUrl).trim(),
+    mapsUrl: str(st.mapsUrl, d.studio.mapsUrl).trim(),
+    neshanUrl: str(st.neshanUrl, d.studio.neshanUrl).trim(),
+    baleUrl: str(st.baleUrl, d.studio.baleUrl).trim(),
+  };
 
   const a = obj(r.announcement);
   const announcement = {
@@ -197,14 +212,15 @@ export function migrateSettings(raw: unknown): SiteSettings {
       normalizeMediaUrl(str(hubRaw.heroImageUrl, d.hub.heroImageUrl)) || d.hub.heroImageUrl,
   };
 
-  return { hub, announcement, hours, faq, gallery, decors, packages };
+  return { studio, hub, announcement, hours, faq, gallery, decors, packages };
 }
 
 function migrateContent(parsed: unknown): SiteContent {
   if (!parsed || typeof parsed !== "object") return structuredClone(defaultContent);
   const pages = (parsed as { pages?: unknown }).pages;
   if (!Array.isArray(pages) || !pages.length) return structuredClone(defaultContent);
-  const settings = migrateSettings((parsed as { settings?: unknown }).settings);
+  const rawSettings = obj((parsed as { settings?: unknown }).settings);
+  const settings = migrateSettings(rawSettings);
 
   const bySlug = new Map(
     pages.map((p) => {
@@ -213,14 +229,33 @@ function migrateContent(parsed: unknown): SiteContent {
     }),
   );
 
-  return {
-    pages: LINK_SLUGS.map((slug) => {
-      const fallback = defaultContent.pages.find((p) => p.slug === slug)!;
-      const raw = bySlug.get(slug);
-      return raw ? migratePage(raw, fallback) : structuredClone(fallback);
-    }),
-    settings,
-  };
+  const migratedPages = LINK_SLUGS.map((slug) => {
+    const fallback = defaultContent.pages.find((p) => p.slug === slug)!;
+    const raw = bySlug.get(slug);
+    return raw ? migratePage(raw, fallback) : structuredClone(fallback);
+  });
+
+  // One-time move to shared studio info: take the most common value of each
+  // contact field across pages; pages keep only values that differ (overrides).
+  if (!rawSettings.studio) {
+    for (const field of STUDIO_FIELDS) {
+      const counts = new Map<string, number>();
+      // studio pages first, so ties pick the studio's details over the garden's
+      const ordered = [...migratedPages].sort(
+        (x, y) => Number(x.slug.startsWith("outdoor")) - Number(y.slug.startsWith("outdoor")),
+      );
+      for (const p of ordered) {
+        const v = p[field].trim();
+        if (v) counts.set(v, (counts.get(v) ?? 0) + 1);
+      }
+      const common = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+      if (!common) continue;
+      settings.studio[field] = common;
+      for (const p of migratedPages) if (p[field].trim() === common) p[field] = "";
+    }
+  }
+
+  return { pages: migratedPages, settings };
 }
 
 export async function readContent(): Promise<SiteContent> {

@@ -6,6 +6,9 @@ import { FA_DAYS, faJalali } from "@/lib/tehran";
 import { normalizeMediaUrl } from "@/lib/media";
 import type { DayHours, FaqItem, SiteSettings } from "@/lib/types";
 import { AnnouncementBar } from "./AnnouncementBar";
+import { useUndo } from "./UndoToast";
+import { moveItem, useSortable } from "@/lib/sortable";
+import { useUnsavedGuard } from "@/lib/unsaved";
 import { HeroImageField } from "./HeroImageField";
 import { JalaliDatePicker, PersianTimeSelect } from "./JalaliDatePicker";
 
@@ -41,6 +44,8 @@ export async function saveSettings(settings: SiteSettings) {
 export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
   const router = useRouter();
   const [s, setS] = useState<SiteSettings>(initial);
+  const dirty = JSON.stringify(s) !== JSON.stringify(initial);
+  useUnsavedGuard(dirty);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -66,13 +71,21 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
     setS((p) => ({ ...p, faq: { ...p.faq, ...patch } }));
   const setItem = (id: string, patch: Partial<FaqItem>) =>
     setFaq({ items: s.faq.items.map((i) => (i.id === id ? { ...i, ...patch } : i)) });
-  const moveItem = (index: number, dir: -1 | 1) => {
-    const items = [...s.faq.items];
-    const j = index + dir;
-    if (j < 0 || j >= items.length) return;
-    [items[index], items[j]] = [items[j], items[index]];
-    setFaq({ items });
-  };
+  const faqSort = useSortable(s.faq.items.length, (from, to) =>
+    setS((p) => ({ ...p, faq: { ...p.faq, items: moveItem(p.faq.items, from, to) } })),
+  );
+  const { offer, toast } = useUndo();
+
+  function removeFaq(item: FaqItem, index: number) {
+    setFaq({ items: s.faq.items.filter((x) => x.id !== item.id) });
+    offer("سوال حذف شد", () =>
+      setS((p) => {
+        const list = [...p.faq.items];
+        list.splice(Math.min(index, list.length), 0, item);
+        return { ...p, faq: { ...p.faq, items: list } };
+      }),
+    );
+  }
 
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
@@ -269,14 +282,18 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
         <div className="admin-section__head">
           <div>
             <h2>سوالات متداول</h2>
-            <p>هر سوال را جدا می‌توانید پنهان کنید. ترتیب با دکمه‌های ▲ ▼.</p>
+            <p>هر سوال را جدا می‌توانید پنهان کنید. ترتیب را با ⠿ بکشید.</p>
           </div>
           <Switch checked={s.faq.enabled} onChange={(v) => setFaq({ enabled: v })} label="نمایش بخش" />
         </div>
 
         <div className="admin-faq">
           {s.faq.items.map((item, i) => (
-            <div key={item.id} className={`admin-faq__item${item.visible ? "" : " is-hidden"}`}>
+            <div
+              key={item.id}
+              className={`admin-faq__item${item.visible ? "" : " is-hidden"}`}
+              {...faqSort.itemProps(i)}
+            >
               <div className="admin-faq__bar">
                 <strong>سوال {(i + 1).toLocaleString("fa-IR")}</strong>
                 <div className="admin-faq__tools">
@@ -285,21 +302,12 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
                     onChange={(v) => setItem(item.id, { visible: v })}
                     label="نمایش"
                   />
-                  <button type="button" className="admin-icon-btn" onClick={() => moveItem(i, -1)} aria-label="بالا">
-                    ▲
-                  </button>
-                  <button type="button" className="admin-icon-btn" onClick={() => moveItem(i, 1)} aria-label="پایین">
-                    ▼
-                  </button>
+                  <button {...faqSort.handleProps(i)}>⠿</button>
                   <button
                     type="button"
                     className="admin-icon-btn admin-icon-btn--danger"
                     aria-label="حذف"
-                    onClick={() => {
-                      if (window.confirm("این سوال حذف شود؟")) {
-                        setFaq({ items: s.faq.items.filter((x) => x.id !== item.id) });
-                      }
-                    }}
+                    onClick={() => removeFaq(item, i)}
                   >
                     ✕
                   </button>
@@ -337,11 +345,13 @@ export function AdminSettingsForm({ initial }: { initial: SiteSettings }) {
         <p className="hero-upload__hint">سوال‌های بدون متن هنگام ذخیره حذف می‌شوند.</p>
       </section>
 
+      {toast}
       <div className="admin-savebar glass-strong">
         {error ? <p className="admin-error">{error}</p> : null}
         {message ? <p className="admin-ok">{message}</p> : null}
-        <button className="admin-btn" type="submit" disabled={saving}>
-          {saving ? "در حال ذخیره..." : "ذخیره تغییرات"}
+        {!message && !error && dirty ? <p className="admin-dirty">تغییرات ذخیره نشده</p> : null}
+        <button className="admin-btn" type="submit" disabled={saving || !dirty}>
+          {saving ? "در حال ذخیره..." : dirty ? "ذخیره تغییرات" : "ذخیره شده"}
         </button>
       </div>
     </form>
