@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { mediaPreviewSrc, normalizeMediaUrl } from "@/lib/media";
-import { toFaDigits } from "@/lib/tehran";
 import { uploadImage } from "@/lib/upload-client";
-import { MAX_UPLOAD_MB, faBytes } from "@/lib/upload-limits";
+import { faBytes } from "@/lib/upload-limits";
+import { ImagePicker } from "./ImagePicker";
 
 type Props = {
   label?: string;
@@ -21,12 +21,11 @@ export function HeroImageField({
   onMessage,
   onError,
 }: Props) {
-  const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [bust, setBust] = useState(0);
   const clean = normalizeMediaUrl(value);
 
-  async function onUpload(file: File | null) {
+  async function onUpload(file: File | undefined) {
     if (!file) return;
     setUploading(true);
     onError?.("");
@@ -43,58 +42,50 @@ export function HeroImageField({
       onError?.((err as Error).message || "خطا در آپلود");
     } finally {
       setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
     }
   }
 
   return (
     <fieldset className="hero-upload">
       <legend>{label}</legend>
-      <label>
-        آپلود از دستگاه
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          disabled={uploading}
-          onChange={(e) => onUpload(e.target.files?.[0] || null)}
-        />
-      </label>
-      <p className="hero-upload__hint">
-        {uploading
-          ? "در حال آپلود و فشرده‌سازی…"
-          : `JPG، PNG یا WebP تا ${toFaDigits(MAX_UPLOAD_MB)} مگابایت — عکس خودکار سبک می‌شود (معمولاً زیر ۶۰۰ کیلوبایت)`}
-      </p>
-      <label>
-        یا URL / مسیر
+
+      {clean ? (
+        <figure className="hero-upload__current">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={`${clean}-${bust}`}
+            src={mediaPreviewSrc(clean, bust || undefined)}
+            alt=""
+            className="hero-upload__preview"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.opacity = "0.35";
+            }}
+            onLoad={(e) => {
+              (e.currentTarget as HTMLImageElement).style.opacity = "1";
+            }}
+          />
+          <figcaption>عکس فعلی</figcaption>
+        </figure>
+      ) : null}
+
+      <ImagePicker
+        compact={Boolean(clean)}
+        title={clean ? "تعویض عکس" : "انتخاب عکس"}
+        busy={uploading ? "در حال آپلود و فشرده‌سازی…" : undefined}
+        onFiles={(files) => onUpload(files[0])}
+      />
+
+      <details className="hero-upload__advanced">
+        <summary>پیشرفته: وارد کردن آدرس عکس به‌صورت دستی</summary>
         <input
           value={value}
           dir="ltr"
           onChange={(e) => onChange(e.target.value)}
           onBlur={(e) => onChange(normalizeMediaUrl(e.target.value))}
           placeholder="/heroes/… یا /uploads/… یا https://…"
+          aria-label="آدرس عکس"
         />
-      </label>
-      {clean ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={`${clean}-${bust}`}
-          src={mediaPreviewSrc(clean, bust || undefined)}
-          alt=""
-          className="hero-upload__preview"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.opacity = "0.35";
-          }}
-          onLoad={(e) => {
-            (e.currentTarget as HTMLImageElement).style.opacity = "1";
-          }}
-        />
-      ) : null}
-      {clean ? (
-        <p className="hero-upload__hint" dir="ltr">
-          {clean}
-        </p>
-      ) : null}
+      </details>
     </fieldset>
   );
 }

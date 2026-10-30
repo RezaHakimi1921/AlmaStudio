@@ -1,19 +1,19 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GALLERY_THEMES } from "@/lib/gallery";
 import { parseFaNumber, toFaDigits } from "@/lib/tehran";
 import { uploadImage } from "@/lib/upload-client";
-import { MAX_UPLOAD_MB, faBytes } from "@/lib/upload-limits";
+import { faBytes } from "@/lib/upload-limits";
 import type { Decor, GalleryCategory, SiteSettings } from "@/lib/types";
 import { GALLERY_CATEGORIES } from "@/lib/types";
 import { Switch, saveSettings } from "./AdminSettingsForm";
+import { ImagePicker } from "./ImagePicker";
 import { DECOR_PATH } from "./DecorTeaser";
 
 export function AdminDecorManager({ initial }: { initial: SiteSettings }) {
   const router = useRouter();
-  const fileRef = useRef<HTMLInputElement>(null);
   const [s, setS] = useState<SiteSettings>(initial);
   const [cat, setCat] = useState<GalleryCategory>("newborn");
   const [busy, setBusy] = useState("");
@@ -45,11 +45,11 @@ export function AdminDecorManager({ initial }: { initial: SiteSettings }) {
     }
   }
 
-  async function onFiles(files: FileList | null) {
-    if (!files?.length) return;
+  async function onFiles(files: File[]) {
+    if (!files.length) return;
     setError("");
     setMessage("");
-    const list = Array.from(files);
+    const list = files;
     let nextNumber = Math.max(0, ...items.map((d) => d.number)) + 1;
     const added: Decor[] = [];
     let before = 0;
@@ -73,7 +73,6 @@ export function AdminDecorManager({ initial }: { initial: SiteSettings }) {
         setError((err as Error).message);
       }
     }
-    if (fileRef.current) fileRef.current.value = "";
     setBusy("");
     if (added.length) {
       const next = { ...s, decors: { ...s.decors, items: [...items, ...added] } };
@@ -130,21 +129,12 @@ export function AdminDecorManager({ initial }: { initial: SiteSettings }) {
           ))}
         </div>
 
-        <label className="admin-dropzone">
-          <input
-            ref={fileRef}
-            type="file"
-            multiple
-            accept="image/jpeg,image/png,image/webp"
-            disabled={Boolean(busy)}
-            onChange={(e) => onFiles(e.target.files)}
-          />
-          <strong>{busy || `+ افزودن دکور به «${GALLERY_THEMES[cat].label}»`}</strong>
-          <span>
-            هر عکس یک دکور با شماره بعدی · JPG، PNG یا WebP تا {toFaDigits(MAX_UPLOAD_MB)} مگابایت · خودکار
-            سبک می‌شود
-          </span>
-        </label>
+        <ImagePicker
+          multiple
+          title={`+ افزودن دکور به «${GALLERY_THEMES[cat].label}»`}
+          busy={busy || undefined}
+          onFiles={onFiles}
+        />
 
         {duplicates.length ? (
           <p className="admin-error">

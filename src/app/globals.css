@@ -4351,3 +4351,131 @@ nextjs-portal,
   overflow-wrap: anywhere;
   font-size: 0.82rem;
 }
+
+/* =========================================================
+   Image picker — one look for every upload in the admin
+   ========================================================= */
+.img-picker {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  padding: 1.4rem 1rem 1.2rem;
+  border-radius: 18px;
+  border: 2px dashed rgba(168, 50, 50, 0.3);
+  background: rgba(255, 255, 255, 0.75);
+  text-align: center;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.img-picker.is-over {
+  border-color: var(--alma-red);
+  background: rgba(168, 50, 50, 0.06);
+  transform: scale(1.01);
+}
+
+.img-picker.is-busy {
+  border-style: solid;
+  border-color: rgba(168, 50, 50, 0.18);
+}
+
+.img-picker.is-compact {
+  padding: 0.9rem 0.8rem;
+  gap: 0.4rem;
+}
+
+.img-picker.is-compact .img-picker__icon {
+  display: none;
+}
+
+.img-picker__icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  color: var(--alma-red);
+  background: rgba(168, 50, 50, 0.1);
+}
+
+.img-picker__spinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid rgba(168, 50, 50, 0.2);
+  border-top-color: var(--alma-red);
+  animation: spin-slow 0.8s linear infinite;
+}
+
+.img-picker__title {
+  color: var(--alma-red-deep);
+  font-size: 1rem;
+}
+
+.img-picker__browse {
+  min-height: 48px;
+  padding-inline: 1.4rem;
+  font-size: 0.95rem;
+}
+
+.img-picker__or {
+  font-size: 0.8rem;
+  color: var(--alma-muted);
+}
+
+.img-picker__limit {
+  font-size: 0.78rem;
+  line-height: 1.8;
+  color: var(--alma-muted);
+}
+
+.img-picker__limit b {
+  color: var(--alma-red-deep);
+}
+
+@media (hover: none) {
+  /* phones/tablets can't drag files */
+  .img-picker__or {
+    display: none;
+  }
+}
+
+.hero-upload__current {
+  margin: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.hero-upload__current figcaption {
+  font-size: 0.78rem;
+  color: var(--alma-muted);
+  text-align: center;
+}
+
+.hero-upload__advanced summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--alma-muted);
+}
+
+.hero-upload__advanced input {
+  width: 100%;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(168, 50, 50, 0.2);
+  border-radius: 12px;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font: inherit;
+}
+
+.img-picker__rejected {
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  line-height: 1.8;
+  color: #9b1c1c;
+  background: rgba(155, 28, 28, 0.08);
+}

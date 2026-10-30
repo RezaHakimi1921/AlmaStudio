@@ -1,18 +1,18 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GALLERY_PATH, GALLERY_THEMES } from "@/lib/gallery";
 import { toFaDigits } from "@/lib/tehran";
 import type { GalleryCategory, GalleryImage, SiteSettings } from "@/lib/types";
 import { GALLERY_CATEGORIES } from "@/lib/types";
 import { uploadImage } from "@/lib/upload-client";
-import { MAX_UPLOAD_MB, faBytes } from "@/lib/upload-limits";
+import { faBytes } from "@/lib/upload-limits";
 import { Switch, saveSettings } from "./AdminSettingsForm";
+import { ImagePicker } from "./ImagePicker";
 
 export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
   const router = useRouter();
-  const fileRef = useRef<HTMLInputElement>(null);
   const [s, setS] = useState<SiteSettings>(initial);
   const [cat, setCat] = useState<GalleryCategory>("newborn");
   const [busy, setBusy] = useState("");
@@ -42,12 +42,12 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
     }
   }
 
-  async function onFiles(files: FileList | null) {
-    if (!files?.length) return;
+  async function onFiles(files: File[]) {
+    if (!files.length) return;
     setError("");
     setMessage("");
     const added: GalleryImage[] = [];
-    const list = Array.from(files);
+    const list = files;
     let before = 0;
     let after = 0;
     for (let i = 0; i < list.length; i++) {
@@ -61,7 +61,6 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
         setError((err as Error).message || `${list[i].name}: خطا در آپلود`);
       }
     }
-    if (fileRef.current) fileRef.current.value = "";
     setBusy("");
     if (added.length) {
       const next = { ...s, gallery: { ...s.gallery, images: [...added, ...s.gallery.images] } };
@@ -131,21 +130,12 @@ export function AdminGalleryManager({ initial }: { initial: SiteSettings }) {
           ))}
         </div>
 
-        <label className="admin-dropzone">
-          <input
-            ref={fileRef}
-            type="file"
-            multiple
-            accept="image/jpeg,image/png,image/webp"
-            disabled={Boolean(busy)}
-            onChange={(e) => onFiles(e.target.files)}
-          />
-          <strong>{busy || `+ افزودن تصویر به «${GALLERY_THEMES[cat].label}»`}</strong>
-          <span>
-            چند تصویر را با هم انتخاب کنید · JPG، PNG یا WebP تا {toFaDigits(MAX_UPLOAD_MB)} مگابایت
-            برای هر عکس · عکس‌ها خودکار سبک و فشرده می‌شوند
-          </span>
-        </label>
+        <ImagePicker
+          multiple
+          title={`+ افزودن تصویر به «${GALLERY_THEMES[cat].label}»`}
+          busy={busy || undefined}
+          onFiles={onFiles}
+        />
 
         {inCat.length ? (
           <div className="admin-gallery__grid">
