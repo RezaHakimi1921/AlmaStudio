@@ -5422,7 +5422,8 @@ button,
 }
 
 /* =========================================================
-   Main-page intro — red apple + «آتلیه آلما» on cream
+   Main-page intro — a grey apple fills with colour like a loader.
+   Palette: ivory + ink; only the apple itself is coloured.
    ========================================================= */
 .hub-intro {
   position: fixed;
@@ -5431,14 +5432,12 @@ button,
   display: grid;
   place-items: center;
   overflow: hidden;
-  color: var(--alma-red-deep);
-  background:
-    radial-gradient(70% 55% at 50% 38%, #fffaf4 0%, transparent 70%),
-    linear-gradient(165deg, #f8f3ed 0%, #f1e4d8 100%);
+  color: var(--alma-ink);
+  background: linear-gradient(170deg, #faf6f0 0%, #f3ece3 100%);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   /* fail-safe: never trap the visitor if JS stalls */
-  animation: intro-failsafe 0.6s 6s forwards;
+  animation: intro-failsafe 0.6s 7s forwards;
 }
 
 .hub-intro--out {
@@ -5457,17 +5456,18 @@ button,
   animation-play-state: paused !important;
 }
 
+/* soft white light behind the apple — no colour */
 .hub-intro__glow {
   position: absolute;
   left: 50%;
   top: 44%;
-  width: min(120vw, 620px);
+  width: min(110vw, 560px);
   aspect-ratio: 1;
-  margin: calc(min(120vw, 620px) / -2) 0 0 calc(min(120vw, 620px) / -2);
+  margin: calc(min(110vw, 560px) / -2) 0 0 calc(min(110vw, 560px) / -2);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(196, 79, 79, 0.2) 0%, rgba(196, 79, 79, 0) 65%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 65%);
   opacity: 0;
-  animation: hub-glow 2.4s 0.1s var(--ease-out) forwards;
+  animation: alma-fade 1.2s 0.1s var(--ease-out) forwards;
 }
 
 .hub-intro__center {
@@ -5479,40 +5479,52 @@ button,
   text-align: center;
 }
 
-.hub-intro__mark {
+.hub-intro__apple {
   position: relative;
-  display: inline-grid;
+  display: grid;
   place-items: center;
+  width: 104px;
+  height: 104px;
   opacity: 0;
-  animation: hub-apple-in 0.9s 0.15s var(--ease-out) forwards;
+  animation:
+    hub-apple-in 0.6s 0.1s var(--ease-out) forwards,
+    hub-apple-pop 0.5s 2.05s var(--ease-out) forwards;
 }
 
-.hub-intro__mark .alma-logo {
-  filter: drop-shadow(0 14px 28px rgba(122, 34, 34, 0.28));
+.hub-intro__apple-art {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hub-intro__layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* the coloured apple is revealed from the bottom up — the "loading" */
+.hub-intro__layer--fill {
+  clip-path: inset(100% 0 0 0);
+  animation: hub-fill 1.7s 0.45s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 .hub-intro__ring {
   position: absolute;
-  width: 120px;
-  height: 120px;
+  inset: -14px;
   border-radius: 50%;
-  border: 1.5px solid rgba(168, 50, 50, 0.45);
+  border: 1px solid rgba(42, 26, 26, 0.18);
   opacity: 0;
-  animation: ring-burst 1.5s 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.hub-intro__ring + .hub-intro__ring {
-  animation-delay: 0.95s;
+  animation: ring-burst 1.3s 2.1s var(--ease-out) forwards;
 }
 
 .hub-intro__name {
-  margin: 1.1rem 0 0;
-  font-size: clamp(2.3rem, 10vw, 3.3rem);
+  margin: 1.5rem 0 0;
+  font-size: clamp(2.1rem, 9vw, 2.9rem);
   font-weight: 800;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   clip-path: inset(0 0 0 100%);
-  animation: text-wipe 0.85s 0.75s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation: text-wipe 0.8s 1.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
 .hub-intro__name-text {
@@ -5520,44 +5532,32 @@ button,
   padding: 0 0.1em;
   background: linear-gradient(
     100deg,
-    #7a2222 0%,
-    #7a2222 40%,
-    #d65a4a 49%,
-    #f08a78 50%,
-    #d65a4a 51%,
-    #7a2222 60%,
-    #7a2222 100%
+    #2a1a1a 0%,
+    #2a1a1a 42%,
+    #7d6b62 50%,
+    #2a1a1a 58%,
+    #2a1a1a 100%
   );
   background-size: 280% 100%;
   background-position: 100% 0;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: text-shine 1.2s 1.4s ease-in-out forwards;
-}
-
-.hub-intro__line {
-  display: block;
-  width: 64px;
-  height: 2px;
-  margin: 1rem auto 0;
-  background: linear-gradient(90deg, transparent, var(--alma-red), transparent);
-  transform: scaleX(0);
-  animation: line-grow 0.8s 1.3s var(--ease-out) forwards;
+  animation: text-shine 1.2s 2.2s ease-in-out forwards;
 }
 
 .hub-intro__skip {
   position: absolute;
-  bottom: calc(2.6rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(2.2rem + env(safe-area-inset-bottom, 0px));
   left: 50%;
   z-index: 3;
   min-height: 44px;
   padding: 0 1.15rem;
-  border: 1px solid rgba(122, 34, 34, 0.3);
+  border: 1px solid rgba(42, 26, 26, 0.2);
   border-radius: 999px;
-  background: rgba(168, 50, 50, 0.05);
+  background: transparent;
   font-size: 0.85rem;
-  color: var(--alma-red-deep);
+  color: var(--alma-muted);
   cursor: pointer;
   opacity: 0;
   transform: translateX(-50%);
@@ -5569,33 +5569,10 @@ button,
   transform: translateX(-50%) scale(0.97);
 }
 
-.hub-intro__progress {
-  position: absolute;
-  bottom: calc(1.4rem + env(safe-area-inset-bottom, 0px));
-  left: 50%;
-  z-index: 3;
-  width: 96px;
-  height: 2px;
-  margin-left: -48px;
-  border-radius: 2px;
-  background: rgba(122, 34, 34, 0.15);
-  overflow: hidden;
-}
-
-.hub-intro__progress::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--alma-red);
-  transform-origin: right;
-  transform: scaleX(0);
-  animation: progress-fill 2.3s 0.1s linear forwards;
-}
-
 @keyframes hub-apple-in {
   from {
     opacity: 0;
-    transform: translateY(16px) scale(0.82);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -5603,16 +5580,19 @@ button,
   }
 }
 
-@keyframes hub-glow {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
+@keyframes hub-fill {
+  to {
+    clip-path: inset(0 0 0 0);
   }
-  40% {
-    opacity: 1;
-  }
+}
+
+/* one soft pop when the apple is full */
+@keyframes hub-apple-pop {
+  0%,
   100% {
-    opacity: 0.7;
-    transform: scale(1.05);
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.07);
   }
 }

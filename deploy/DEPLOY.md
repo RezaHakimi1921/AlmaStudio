@@ -65,8 +65,9 @@ The running version is shown at the bottom of the admin panel («نسخه abc123
 
 ## Deploy with approval (GitHub) — recommended when every release needs a human «yes»
 
-Every push to `main` creates a **"Deploy (needs approval)"** run in the repo's *Actions* tab.
-It stops at the `production` environment and waits. You open it → **Review deployments** →
+Every push to `main` creates a **"CI/CD"** run in the repo's *Actions* tab. First **CI** runs on GitHub
+(types, lint, tests, production build — pull requests get CI too). If it is green, the **deploy** job
+stops at the `production` environment and waits. You open it → **Review deployments** →
 tick *production* → **Approve and deploy**; only then the server builds and restarts
 (same backup / health check / automatic rollback as `auto-deploy.sh`). Nothing deploys without the click.
 The *Run workflow* button redeploys any time (also needs approval).
@@ -94,7 +95,7 @@ The runner only makes an **outbound** connection to GitHub — no open port, no 
 Runs triggered by pull requests from forks are not part of this workflow (it only reacts to pushes to `main`
 and the manual button), so strangers cannot execute anything on the server. Keep the repo private if possible.
 
-Check: push something → Actions → the run shows **Waiting** → approve → green ✓ in ~2–3 minutes
+Check: push something → Actions → CI turns green, the deploy job shows **Waiting** → approve → green ✓ in ~2–3 minutes
 (`sudo bash deploy/auto-deploy.sh --status` on the server shows the same).
 
 ## 2. HTTPS (one time)

@@ -1,0 +1,77 @@
+# CI + CD for AlmaStudio
+#
+#  CI  (every push and pull request): types, lint, tests, production build.
+#  CD  (push to `main` only): after CI is green, the run waits for a human to approve the
+#      «production» environment on GitHub; then the self-hosted runner on the server runs
+#      deploy/auto-deploy.sh (backup → build → health check → automatic rollback).
+#
+# One-time setup (environment reviewer + runner): see deploy/DEPLOY.md → "Deploy with approval".
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - ".claude/**"
+      - ".cursor/**"
+      - "demo-screenshots*/**"
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # «Run workflow» button — CI + redeploy (still needs approval)
+
+concurrency:
+  group: alma-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI — types, lint, tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Types
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npx eslint src
+      - name: Tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  deploy:
+    name: Deploy to alma.artepersia.com (needs approval)
+    needs: ci
+    if: github.event_name != 'pull_request'
+    runs-on: [self-hosted, alma]
+    timeout-minutes: 25
+    # ⏸ required reviewers are configured on this environment (Settings → Environments)
+    environment:
+      name: production
+      url: https://alma.artepersia.com
+    # one deploy at a time; a newer waiting run replaces an older unapproved one
+    concurrency:
+      group: alma-production-deploy
+      cancel-in-progress: false
+    env:
+      APP_DIR: /home/cluadai/alma-studio
+      FORCE_RETRY: "1" # an approved re-run also retries a commit that was rolled back before
+    steps:
+      - name: Deploy latest main (backup → build → health check → auto rollback)
+        run: sudo -n --preserve-env=FORCE_RETRY bash "$APP_DIR/deploy/auto-deploy.sh"
+
+      - name: Show deployed version and last log lines
+        if: always()
+        run: sudo -n bash "$APP_DIR/deploy/auto-deploy.sh" --status
