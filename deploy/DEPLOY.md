@@ -63,6 +63,40 @@ The running version is shown at the bottom of the admin panel («نسخه abc123
 > Don't edit tracked files directly on the server — the next deploy parks such edits in `git stash`
 > (logged as a warning). Change them in the repo instead.
 
+## Deploy with approval (GitHub) — recommended when every release needs a human «yes»
+
+Every push to `main` creates a **"Deploy (needs approval)"** run in the repo's *Actions* tab.
+It stops at the `production` environment and waits. You open it → **Review deployments** →
+tick *production* → **Approve and deploy**; only then the server builds and restarts
+(same backup / health check / automatic rollback as `auto-deploy.sh`). Nothing deploys without the click.
+The *Run workflow* button redeploys any time (also needs approval).
+
+> Use this **or** the 2-minute timer above — never both, the timer deploys without asking.
+> If the timer is installed: `sudo bash deploy/auto-deploy.sh --uninstall`.
+
+**One time on GitHub** (repo → Settings):
+1. *Environments → New environment* → name it exactly `production` → tick **Required reviewers**
+   → add yourself → Save. (Optional: *Deployment branches* → only `main`.)
+2. *Actions → Runners → New self-hosted runner* → Linux x64. It shows a token and the commands.
+
+**One time on the server** (as the user that owns `~/alma-studio`, here `cluadai`):
+```bash
+mkdir -p ~/actions-runner && cd ~/actions-runner
+# paste the download + extract commands GitHub shows, then:
+./config.sh --url https://github.com/RezaHakimi1921/almastudio --token <TOKEN_FROM_GITHUB> --labels alma --unattended
+sudo ./svc.sh install cluadai && sudo ./svc.sh start      # runs in the background, survives reboots
+
+# let the runner run ONLY the deploy script as root, without a password
+echo 'cluadai ALL=(root) NOPASSWD:SETENV: /usr/bin/bash /home/cluadai/alma-studio/deploy/auto-deploy.sh, /usr/bin/bash /home/cluadai/alma-studio/deploy/auto-deploy.sh --status' \
+  | sudo tee /etc/sudoers.d/alma-deploy && sudo chmod 440 /etc/sudoers.d/alma-deploy
+```
+The runner only makes an **outbound** connection to GitHub — no open port, no SSH key or secret stored on GitHub.
+Runs triggered by pull requests from forks are not part of this workflow (it only reacts to pushes to `main`
+and the manual button), so strangers cannot execute anything on the server. Keep the repo private if possible.
+
+Check: push something → Actions → the run shows **Waiting** → approve → green ✓ in ~2–3 minutes
+(`sudo bash deploy/auto-deploy.sh --status` on the server shows the same).
+
 ## 2. HTTPS (one time)
 
 DNS A record `alma.artepersia.com → 78.39.51.105` must exist and port 80/443 must be open.

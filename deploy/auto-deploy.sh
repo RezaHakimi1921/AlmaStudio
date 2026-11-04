@@ -86,6 +86,8 @@ fi
 CURRENT="$(git rev-parse HEAD)"
 TARGET="$(git rev-parse "origin/${BRANCH}")"
 [[ "$CURRENT" == "$TARGET" ]] && exit 0
+# an approved manual deploy (GitHub Actions sets FORCE_RETRY=1) retries a commit that failed before
+[[ "${FORCE_RETRY:-0}" == "1" ]] && { git update-ref -d refs/alma/bad 2>/dev/null || true; }
 # a commit that already failed is skipped until a newer one is pushed
 [[ "$(git rev-parse -q --verify refs/alma/bad || true)" == "$TARGET" ]] && exit 0
 
