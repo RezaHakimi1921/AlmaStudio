@@ -4,36 +4,50 @@ import { useCallback, useEffect, useState } from "react";
 import { useClientValue } from "@/lib/client";
 import { markIntroSeen, shouldSkipIntro } from "@/lib/intro";
 
-/** shortest time the loader is shown (the apple needs ~2.3 s to fill) */
+/** shortest time the loader is shown (the apple turn + name need ~2.3 s) */
 const MIN_MS = 3400;
 /** never wait longer than this for the page photo */
 const PHOTO_MAX_MS = 4500;
 const EXIT_MS = 700;
 
-/** Same apple as the brand mark, drawn once per layer (neutral base + coloured fill). */
-function Apple({ coloured }: { coloured: boolean }) {
-  const ink = coloured ? "#A83232" : "rgba(42, 26, 26, 0.1)";
-  const stem = coloured ? "#5B3A29" : "rgba(42, 26, 26, 0.16)";
-  const leaf = coloured ? "#58745A" : "rgba(42, 26, 26, 0.12)";
+/** The brand apple with baked-in lighting (radial shading + highlight) so it reads as a solid 3D object. */
+function Apple() {
   return (
     <svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <radialGradient id="hub-apple-body" cx="36%" cy="34%" r="78%">
+          <stop offset="0" stopColor="#E0605A" />
+          <stop offset="0.45" stopColor="#B83A38" />
+          <stop offset="1" stopColor="#6E1A1E" />
+        </radialGradient>
+        <radialGradient id="hub-apple-rim" cx="72%" cy="82%" r="55%">
+          <stop offset="0" stopColor="#FF8C7A" stopOpacity="0.35" />
+          <stop offset="1" stopColor="#FF8C7A" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="hub-apple-leaf" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#7FA07F" />
+          <stop offset="1" stopColor="#3E5A42" />
+        </linearGradient>
+      </defs>
       <path
         d="M32 21C27 14 11 15 7.5 32 4.5 47 15.5 61 25.5 60.5 29 60.3 30.5 58.8 32 58.8S35 60.3 38.5 60.5C48.5 61 59.5 47 56.5 32 53 15 37 14 32 21Z"
-        fill={ink}
+        fill="url(#hub-apple-body)"
       />
-      {coloured ? (
-        <path d="M16 31C16.5 25 20 21.5 24.5 20.5" fill="none" stroke="#F8F3ED" strokeWidth="3" strokeLinecap="round" opacity="0.55" />
-      ) : null}
-      <path d="M32 22C32.5 15 34.5 10 38 6" fill="none" stroke={stem} strokeWidth="3.2" strokeLinecap="round" />
-      <path d="M35.5 14.5C37 8 44 5 51 6.5 49.5 13 43 17 35.5 14.5Z" fill={leaf} />
+      <path
+        d="M32 21C27 14 11 15 7.5 32 4.5 47 15.5 61 25.5 60.5 29 60.3 30.5 58.8 32 58.8S35 60.3 38.5 60.5C48.5 61 59.5 47 56.5 32 53 15 37 14 32 21Z"
+        fill="url(#hub-apple-rim)"
+      />
+      <path d="M15 31C15.5 25 19 21 24 20" fill="none" stroke="#FFF4EE" strokeWidth="3.4" strokeLinecap="round" opacity="0.6" />
+      <ellipse cx="21" cy="25" rx="2.2" ry="1.3" fill="#fff" opacity="0.5" transform="rotate(-35 21 25)" />
+      <path d="M32 22C32.5 15 34.5 10 38 6" fill="none" stroke="#4A2E20" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M35.5 14.5C37 8 44 5 51 6.5 49.5 13 43 17 35.5 14.5Z" fill="url(#hub-apple-leaf)" />
     </svg>
   );
 }
 
 /**
- * Opening of the main page (`/`) — a calm apple loader:
- * a grey apple fills with colour from the bottom up (like a progress bar), pops once,
- * «آتلیه آلما» is revealed, and the frame lifts as soon as the page photo is ready.
+ * Opening of the main page (`/`) — a 3D apple loader:
+ * a red apple turns into view out of the depth and sways, «آتلیه آلما» rises with thickness, and the frame lifts as soon as the page photo is ready.
  * Only the apple carries colour; everything else is neutral.
  * Plays once per visitor (24 h), never for reduced-motion, skippable by tap, the
  * «ورود» button, Enter or Escape. `?intro=1` forces it for testing.
@@ -107,14 +121,10 @@ export function HubIntro() {
         <div className="hub-intro__apple">
           <span className="hub-intro__ring" />
           <div className="hub-intro__apple-art">
-            <div className="hub-intro__layer hub-intro__layer--base">
-              <Apple coloured={false} />
-            </div>
-            <div className="hub-intro__layer hub-intro__layer--fill">
-              <Apple coloured />
-            </div>
+            <Apple />
           </div>
         </div>
+        <span className="hub-intro__floor" />
         <p className="hub-intro__name">
           <span className="hub-intro__name-text">آتلیه آلما</span>
         </p>
