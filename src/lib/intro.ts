@@ -18,9 +18,10 @@ let playedInMemory = false;
  * is never cut short halfway through its own playback.
  */
 export function shouldSkipIntro(): boolean {
-  if (playedInMemory) return true;
   if (hasShotParam()) return true;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
+  if (/[?&]intro=1\b/.test(window.location.search)) return false; // force: ?intro=1
+  if (playedInMemory) return true;
   try {
     const at = Number(localStorage.getItem(KEY) || 0);
     return at > 0 && Date.now() - at < REPLAY_AFTER_MS;

@@ -27,8 +27,6 @@ export function LinkPageSkeleton() {
   );
 }
 
-const RATIOS = ["4 / 5", "1 / 1", "3 / 4", "4 / 5", "5 / 6", "1 / 1"];
-
 export function GallerySkeleton() {
   return (
     <main className="gallery-shell" aria-busy="true" aria-label="در حال بارگذاری">
@@ -39,8 +37,8 @@ export function GallerySkeleton() {
       </div>
       <div className="sk-block sk-tabs" />
       <div className="sk-grid">
-        {RATIOS.map((r, i) => (
-          <div key={i} className="sk-block" style={{ aspectRatio: r }} />
+        {Array.from({ length: 6 }, (_, i) => (
+          <div key={i} className="sk-block" style={{ aspectRatio: "4 / 5" }} />
         ))}
       </div>
     </main>

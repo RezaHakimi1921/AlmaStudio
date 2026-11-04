@@ -134,6 +134,7 @@ export function LinkPageView({ page, settings, announcementLive, preview = false
           moodTag={page.moodTag || theme.mood}
           heroImageUrl={page.heroImageUrl}
           overlay={theme.heroOverlay}
+          showHome={!preview}
         />
 
         <div

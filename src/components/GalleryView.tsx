@@ -15,7 +15,7 @@ import { GALLERY_CATEGORIES } from "@/lib/types";
 import { AlmaAppleLogo } from "./AlmaAppleLogo";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { ContactBar } from "./ContactBar";
-import { SkeletonImage } from "./SkeletonImage";
+import { SkeletonImage, useImageGroup } from "./SkeletonImage";
 import { ArrowLeftIcon, ArrowRightIcon, CloseIcon, ImagesIcon } from "./Icons";
 
 type Props = {
@@ -110,11 +110,7 @@ export function GalleryView({
         </div>
 
         {list.length ? (
-          <div key={cat} className="gallery-grid">
-            {list.map((img, i) => (
-              <GalleryTile key={img.id} img={img} index={i} onOpen={() => setOpen(i)} />
-            ))}
-          </div>
+          <GalleryGrid key={cat} list={list} onOpen={setOpen} />
         ) : (
           <div key={cat} className="gallery-empty">
             <span className="gallery-empty__icon">
@@ -137,32 +133,33 @@ export function GalleryView({
   );
 }
 
-/** placeholder shapes while photos load — varied so the grid looks like a real masonry */
-const TILE_RATIOS = ["4 / 5", "1 / 1", "3 / 4", "4 / 5", "5 / 6", "1 / 1"];
+/** the first screens load as one group; the rest load lazily while scrolling */
+const GROUP = 8;
 
-function GalleryTile({
-  img,
-  index,
-  onOpen,
-}: {
-  img: GalleryImage;
-  index: number;
-  onOpen: () => void;
-}) {
+/** Equal-size tiles. Every tile shows a skeleton and the first group fades in all at once. */
+function GalleryGrid({ list, onOpen }: { list: GalleryImage[]; onOpen: (i: number) => void }) {
+  const { ready, onSettled } = useImageGroup(Math.min(list.length, GROUP));
   return (
-    <button
-      type="button"
-      className="gallery-tile skel"
-      style={{
-        ["--n" as string]: Math.min(index, 10),
-        ["--ar" as string]: TILE_RATIOS[index % TILE_RATIOS.length],
-      }}
-      onClick={onOpen}
-      aria-label={img.caption || "نمایش تصویر"}
-    >
-      <SkeletonImage src={img.url} alt={img.caption} loading={index < 4 ? "eager" : "lazy"} />
-      {img.caption ? <span className="gallery-tile__cap">{img.caption}</span> : null}
-    </button>
+    <div className={`gallery-grid${ready ? " is-ready" : ""}`} aria-busy={!ready}>
+      {list.map((img, i) => (
+        <button
+          key={img.id}
+          type="button"
+          className="gallery-tile skel"
+          onClick={() => onOpen(i)}
+          aria-label={img.caption || "نمایش تصویر"}
+        >
+          <SkeletonImage
+            src={img.url}
+            alt={img.caption}
+            loading={i < GROUP ? "eager" : "lazy"}
+            hold={i < GROUP && !ready}
+            onSettled={i < GROUP ? onSettled : undefined}
+          />
+          {img.caption ? <span className="gallery-tile__cap">{img.caption}</span> : null}
+        </button>
+      ))}
+    </div>
   );
 }
 

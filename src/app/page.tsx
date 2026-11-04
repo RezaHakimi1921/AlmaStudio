@@ -4,6 +4,7 @@ import { publicPathForSlug } from "@/lib/routes";
 import { normalizeMediaUrl } from "@/lib/media";
 import { AlmaAppleLogo } from "@/components/AlmaAppleLogo";
 import { HubLinkIcon } from "@/components/HubLinkIcon";
+import { HubIntro } from "@/components/HubIntro";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,7 @@ export default async function HomePage() {
 
   return (
     <main className="hub-page">
+      <HubIntro />
       <section className="hub-hero" aria-label="معرفی آتلیه آلما">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

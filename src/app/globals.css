@@ -93,7 +93,8 @@ nextjs-portal,
     scroll-behavior: auto !important;
   }
 
-  .cinema-intro {
+  .cinema-intro,
+  .hub-intro {
     display: none !important;
   }
 
@@ -246,7 +247,8 @@ nextjs-portal,
 }
 
 /* set by the inline script in layout.tsx before first paint */
-html[data-intro="skip"] .cinema-intro {
+html[data-intro="skip"] .cinema-intro,
+html[data-intro="skip"] .hub-intro {
   display: none !important;
 }
 
@@ -2818,8 +2820,9 @@ html[data-intro="skip"] .cinema-intro {
 }
 
 .gallery-grid {
-  columns: 2;
-  column-gap: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
   padding: 0 0.8rem;
 }
 
@@ -2827,23 +2830,23 @@ html[data-intro="skip"] .cinema-intro {
   display: block;
   position: relative;
   width: 100%;
-  margin: 0 0 0.6rem;
+  aspect-ratio: 4 / 5; /* every tile is the same size */
+  margin: 0;
   padding: 0;
   border: none;
   border-radius: 16px;
   overflow: hidden;
-  break-inside: avoid;
   cursor: zoom-in;
   background: color-mix(in srgb, var(--g-tint) 70%, var(--g-accent) 12%);
   box-shadow: 0 8px 22px rgba(42, 26, 26, 0.1);
-  animation: tile-in 0.6s calc(var(--n) * 60ms) cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .gallery-tile img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  height: auto;
-  min-height: 120px;
+  height: 100%;
   object-fit: cover;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -2904,7 +2907,7 @@ html[data-intro="skip"] .cinema-intro {
 
 @media (min-width: 768px) {
   .gallery-grid {
-    columns: 3;
+    grid-template-columns: repeat(3, 1fr);
     padding: 0 1.2rem;
   }
 }
@@ -4089,7 +4092,7 @@ html[data-intro="skip"] .cinema-intro {
   box-shadow: 0 8px 22px rgba(42, 26, 26, 0.09);
   outline: 2px solid transparent;
   transition: outline-color 0.25s ease, transform 0.25s ease;
-  animation: tile-in 0.55s calc(var(--n) * 55ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: tile-in 0.45s var(--ease-out) both;
 }
 
 .decor-card.is-picked {
@@ -5219,11 +5222,6 @@ button,
   z-index: 2;
 }
 
-/* gallery tiles hold their shape while the photo loads — no jumping grid */
-.gallery-tile:has(> .skel-img:not([data-state="loaded"])) {
-  aspect-ratio: var(--ar, 4 / 5);
-}
-
 /* lightbox: the frame wraps the photo, with a placeholder card until it arrives */
 .lightbox__frame {
   display: grid;
@@ -5376,5 +5374,245 @@ button,
 @keyframes page-fade-in {
   from {
     opacity: 0;
+  }
+}
+
+/* =========================================================
+   «صفحه اصلی» pill on the link pages
+   ========================================================= */
+.hero-home {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0 0.95rem 0 0.8rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #f8f3ed;
+  background: rgba(248, 243, 237, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  transition: transform 0.15s var(--ease-out), background-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero-home:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) {
+  .hero-home:hover {
+    background: rgba(248, 243, 237, 0.32);
+  }
+}
+
+.link-shell:not(.is-entered) .hero-home {
+  opacity: 0;
+}
+
+.link-shell.is-entered .hero-home {
+  animation: alma-fade 0.6s 0.5s var(--ease-out) both;
+}
+
+/* =========================================================
+   Main-page intro — red apple + «آتلیه آلما» on cream
+   ========================================================= */
+.hub-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--alma-red-deep);
+  background:
+    radial-gradient(70% 55% at 50% 38%, #fffaf4 0%, transparent 70%),
+    linear-gradient(165deg, #f8f3ed 0%, #f1e4d8 100%);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  /* fail-safe: never trap the visitor if JS stalls */
+  animation: intro-failsafe 0.6s 6s forwards;
+}
+
+.hub-intro--out {
+  pointer-events: none;
+  animation: intro-lift 0.7s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+.hub-intro--out .hub-intro__center {
+  animation: intro-copy-out 0.45s ease forwards;
+}
+
+/* the timeline starts once the page is interactive (root keeps its fail-safe) */
+.hub-intro:not(.is-ready) *,
+.hub-intro:not(.is-ready) *::before,
+.hub-intro:not(.is-ready) *::after {
+  animation-play-state: paused !important;
+}
+
+.hub-intro__glow {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: min(120vw, 620px);
+  aspect-ratio: 1;
+  margin: calc(min(120vw, 620px) / -2) 0 0 calc(min(120vw, 620px) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(196, 79, 79, 0.2) 0%, rgba(196, 79, 79, 0) 65%);
+  opacity: 0;
+  animation: hub-glow 2.4s 0.1s var(--ease-out) forwards;
+}
+
+.hub-intro__center {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.hub-intro__mark {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  opacity: 0;
+  animation: hub-apple-in 0.9s 0.15s var(--ease-out) forwards;
+}
+
+.hub-intro__mark .alma-logo {
+  filter: drop-shadow(0 14px 28px rgba(122, 34, 34, 0.28));
+}
+
+.hub-intro__ring {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(168, 50, 50, 0.45);
+  opacity: 0;
+  animation: ring-burst 1.5s 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hub-intro__ring + .hub-intro__ring {
+  animation-delay: 0.95s;
+}
+
+.hub-intro__name {
+  margin: 1.1rem 0 0;
+  font-size: clamp(2.3rem, 10vw, 3.3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  clip-path: inset(0 0 0 100%);
+  animation: text-wipe 0.85s 0.75s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.hub-intro__name-text {
+  display: inline-block;
+  padding: 0 0.1em;
+  background: linear-gradient(
+    100deg,
+    #7a2222 0%,
+    #7a2222 40%,
+    #d65a4a 49%,
+    #f08a78 50%,
+    #d65a4a 51%,
+    #7a2222 60%,
+    #7a2222 100%
+  );
+  background-size: 280% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-shine 1.2s 1.4s ease-in-out forwards;
+}
+
+.hub-intro__line {
+  display: block;
+  width: 64px;
+  height: 2px;
+  margin: 1rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--alma-red), transparent);
+  transform: scaleX(0);
+  animation: line-grow 0.8s 1.3s var(--ease-out) forwards;
+}
+
+.hub-intro__skip {
+  position: absolute;
+  bottom: calc(2.6rem + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  z-index: 3;
+  min-height: 44px;
+  padding: 0 1.15rem;
+  border: 1px solid rgba(122, 34, 34, 0.3);
+  border-radius: 999px;
+  background: rgba(168, 50, 50, 0.05);
+  font-size: 0.85rem;
+  color: var(--alma-red-deep);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: transform 0.15s var(--ease-out);
+  animation: intro-skip-in 0.5s 0.8s var(--ease-out) forwards;
+}
+
+.hub-intro__skip:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.hub-intro__progress {
+  position: absolute;
+  bottom: calc(1.4rem + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  z-index: 3;
+  width: 96px;
+  height: 2px;
+  margin-left: -48px;
+  border-radius: 2px;
+  background: rgba(122, 34, 34, 0.15);
+  overflow: hidden;
+}
+
+.hub-intro__progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--alma-red);
+  transform-origin: right;
+  transform: scaleX(0);
+  animation: progress-fill 2.3s 0.1s linear forwards;
+}
+
+@keyframes hub-apple-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hub-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(1.05);
   }
 }

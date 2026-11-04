@@ -6,7 +6,7 @@ import { withFromParam } from "@/lib/routes";
 import { toFaDigits } from "@/lib/tehran";
 import type { Decor } from "@/lib/types";
 import { ArrowLeftIcon } from "./Icons";
-import { SkeletonImage } from "./SkeletonImage";
+import { SkeletonImage, useImageGroup } from "./SkeletonImage";
 
 export const DECOR_PATH = "/dekor";
 
@@ -14,6 +14,7 @@ export const DECOR_PATH = "/dekor";
 export function DecorTeaser({ items, from }: { items: Decor[]; from: string }) {
   const trackEvent = useTrack();
   const shown = items.slice(0, 4);
+  const { ready, onSettled } = useImageGroup(shown.length);
   if (!shown.length) return null;
 
   return (
@@ -26,7 +27,7 @@ export function DecorTeaser({ items, from }: { items: Decor[]; from: string }) {
       <div className="decor-teaser__thumbs" aria-hidden="true">
         {shown.map((d) => (
           <span key={d.id} className="skel">
-            <SkeletonImage src={d.imageUrl} loading="lazy" />
+            <SkeletonImage src={d.imageUrl} loading="lazy" hold={!ready} onSettled={onSettled} />
             <i>{toFaDigits(d.number)}</i>
           </span>
         ))}

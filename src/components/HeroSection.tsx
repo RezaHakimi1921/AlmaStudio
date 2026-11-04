@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { AlmaAppleLogo } from "./AlmaAppleLogo";
-import { ChevronDownIcon } from "./Icons";
+import { ChevronDownIcon, HomeIcon } from "./Icons";
 import { SkeletonImage } from "./SkeletonImage";
 
 type Props = {
@@ -11,6 +12,8 @@ type Props = {
   moodTag: string;
   heroImageUrl: string;
   overlay: string;
+  /** «صفحه اصلی» pill (hidden inside the admin live preview) */
+  showHome?: boolean;
 };
 
 export function HeroSection({
@@ -20,10 +23,17 @@ export function HeroSection({
   moodTag,
   heroImageUrl,
   overlay,
+  showHome = true,
 }: Props) {
   return (
     <header className="hero skel">
       <SkeletonImage className="hero-photo" src={heroImageUrl} fetchPriority="high" />
+      {showHome ? (
+        <Link href="/" className="hero-home" aria-label="رفتن به صفحه اصلی آتلیه آلما">
+          <HomeIcon size={16} />
+          <span>صفحه اصلی</span>
+        </Link>
+      ) : null}
       <div className="hero-veil" style={{ background: overlay }} aria-hidden="true" />
       <div className="hero-shine" aria-hidden="true" />
       <div className="hero-copy">

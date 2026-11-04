@@ -15,7 +15,7 @@ import { GALLERY_CATEGORIES } from "@/lib/types";
 import { AlmaAppleLogo } from "./AlmaAppleLogo";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { ContactBar } from "./ContactBar";
-import { SkeletonImage } from "./SkeletonImage";
+import { SkeletonImage, useImageGroup } from "./SkeletonImage";
 import { ArrowRightIcon, CheckIcon, CloseIcon, CopyIcon, ShareIcon } from "./Icons";
 
 type Props = {
@@ -118,43 +118,7 @@ export function DecorCatalog({ items, phone, maps, announcement, backHref = "/" 
         ) : null}
 
         {list.length ? (
-          <div key={filter} className="decor-grid">
-            {list.map((d, i) => {
-              const picked = picks.includes(d.number);
-              return (
-                <article
-                  key={d.id}
-                  className={`decor-card${picked ? " is-picked" : ""}`}
-                  style={{ ["--n" as string]: Math.min(i, 10) }}
-                >
-                  <button
-                    type="button"
-                    className="decor-card__img skel"
-                    onClick={() => setOpen(d)}
-                    aria-label={`نمایش بزرگ دکور ${toFaDigits(d.number)}`}
-                  >
-                    <SkeletonImage src={d.imageUrl} alt={d.name} loading={i < 4 ? "eager" : "lazy"} />
-                    <span className="decor-card__num">{toFaDigits(d.number)}</span>
-                  </button>
-                  <div className="decor-card__body">
-                    <div>
-                      <strong>{d.name || `دکور ${toFaDigits(d.number)}`}</strong>
-                      <span>{GALLERY_THEMES[d.category].label}</span>
-                    </div>
-                    <button
-                      type="button"
-                      className="decor-pick"
-                      aria-pressed={picked}
-                      aria-label={picked ? `حذف دکور ${toFaDigits(d.number)} از انتخاب‌ها` : `انتخاب دکور ${toFaDigits(d.number)}`}
-                      onClick={() => toggle(d.number)}
-                    >
-                      {picked ? "♥" : "♡"}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <DecorGrid key={filter} list={list} picks={picks} onOpen={setOpen} onToggle={toggle} />
         ) : (
           <div className="gallery-empty">
             <p>به‌زودی دکورهای آتلیه را اینجا می‌بینید</p>
@@ -226,5 +190,64 @@ export function DecorCatalog({ items, phone, maps, announcement, backHref = "/" 
           )
         : null}
     </TrackProvider>
+  );
+}
+
+const DECOR_GROUP = 8;
+
+/** Same-size cards; the first screens fade in together, the rest load while scrolling. */
+function DecorGrid({
+  list,
+  picks,
+  onOpen,
+  onToggle,
+}: {
+  list: Decor[];
+  picks: number[];
+  onOpen: (d: Decor) => void;
+  onToggle: (n: number) => void;
+}) {
+  const { ready, onSettled } = useImageGroup(Math.min(list.length, DECOR_GROUP));
+  return (
+    <div className={`decor-grid${ready ? " is-ready" : ""}`} aria-busy={!ready}>
+      {list.map((d, i) => {
+        const picked = picks.includes(d.number);
+        const inGroup = i < DECOR_GROUP;
+        return (
+          <article key={d.id} className={`decor-card${picked ? " is-picked" : ""}`}>
+            <button
+              type="button"
+              className="decor-card__img skel"
+              onClick={() => onOpen(d)}
+              aria-label={`نمایش بزرگ دکور ${toFaDigits(d.number)}`}
+            >
+              <SkeletonImage
+                src={d.imageUrl}
+                alt={d.name}
+                loading={inGroup ? "eager" : "lazy"}
+                hold={inGroup && !ready}
+                onSettled={inGroup ? onSettled : undefined}
+              />
+              <span className="decor-card__num">{toFaDigits(d.number)}</span>
+            </button>
+            <div className="decor-card__body">
+              <div>
+                <strong>{d.name || `دکور ${toFaDigits(d.number)}`}</strong>
+                <span>{GALLERY_THEMES[d.category].label}</span>
+              </div>
+              <button
+                type="button"
+                className="decor-pick"
+                aria-pressed={picked}
+                aria-label={picked ? `حذف دکور ${toFaDigits(d.number)} از انتخاب‌ها` : `انتخاب دکور ${toFaDigits(d.number)}`}
+                onClick={() => onToggle(d.number)}
+              >
+                {picked ? "♥" : "♡"}
+              </button>
+            </div>
+          </article>
+        );
+      })}
+    </div>
   );
 }

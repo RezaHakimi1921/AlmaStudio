@@ -7,7 +7,7 @@ import { withFromParam } from "@/lib/routes";
 import type { GalleryImage } from "@/lib/types";
 import { GALLERY_CATEGORIES } from "@/lib/types";
 import { ArrowLeftIcon, ImagesIcon } from "./Icons";
-import { SkeletonImage } from "./SkeletonImage";
+import { SkeletonImage, useImageGroup } from "./SkeletonImage";
 
 /** Inviting card that leads to the full gallery ("نمونه‌کارها"). */
 export function GalleryTeaser({ images, from }: { images: GalleryImage[]; from: string }) {
@@ -16,6 +16,7 @@ export function GalleryTeaser({ images, from }: { images: GalleryImage[]; from: 
     (i): i is GalleryImage => Boolean(i),
   );
   const thumbs = covers.length >= 3 ? covers : images.slice(0, 3);
+  const { ready, onSettled } = useImageGroup(thumbs.length);
   if (!thumbs.length) return null;
 
   return (
@@ -28,7 +29,7 @@ export function GalleryTeaser({ images, from }: { images: GalleryImage[]; from: 
       <div className="gallery-teaser__stack" aria-hidden="true">
         {thumbs.map((img, i) => (
           <span key={img.id} className="gallery-teaser__thumb skel" style={{ ["--i" as string]: i }}>
-            <SkeletonImage src={img.url} loading="lazy" />
+            <SkeletonImage src={img.url} loading="lazy" hold={!ready} onSettled={onSettled} />
           </span>
         ))}
       </div>
