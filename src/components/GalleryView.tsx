@@ -15,6 +15,7 @@ import { GALLERY_CATEGORIES } from "@/lib/types";
 import { AlmaAppleLogo } from "./AlmaAppleLogo";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { ContactBar } from "./ContactBar";
+import { SkeletonImage } from "./SkeletonImage";
 import { ArrowLeftIcon, ArrowRightIcon, CloseIcon, ImagesIcon } from "./Icons";
 
 type Props = {
@@ -136,6 +137,9 @@ export function GalleryView({
   );
 }
 
+/** placeholder shapes while photos load — varied so the grid looks like a real masonry */
+const TILE_RATIOS = ["4 / 5", "1 / 1", "3 / 4", "4 / 5", "5 / 6", "1 / 1"];
+
 function GalleryTile({
   img,
   index,
@@ -148,18 +152,15 @@ function GalleryTile({
   return (
     <button
       type="button"
-      className="gallery-tile"
-      style={{ ["--n" as string]: Math.min(index, 10) }}
+      className="gallery-tile skel"
+      style={{
+        ["--n" as string]: Math.min(index, 10),
+        ["--ar" as string]: TILE_RATIOS[index % TILE_RATIOS.length],
+      }}
       onClick={onOpen}
       aria-label={img.caption || "نمایش تصویر"}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={img.url}
-        alt={img.caption}
-        loading={index < 4 ? "eager" : "lazy"}
-        decoding="async"
-      />
+      <SkeletonImage src={img.url} alt={img.caption} loading={index < 4 ? "eager" : "lazy"} />
       {img.caption ? <span className="gallery-tile__cap">{img.caption}</span> : null}
     </button>
   );
@@ -243,14 +244,15 @@ function Lightbox({
           setDx(0);
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          key={img.id}
-          src={img.url}
-          alt={img.caption}
-          draggable={false}
-          style={{ transform: dx ? `translateX(${dx}px)` : undefined }}
-        />
+        <div className="lightbox__frame skel">
+          <SkeletonImage
+            key={img.id}
+            src={img.url}
+            alt={img.caption}
+            draggable={false}
+            style={{ transform: dx ? `translateX(${dx}px)` : undefined }}
+          />
+        </div>
       </div>
 
       {list.length > 1 ? (

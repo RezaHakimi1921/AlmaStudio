@@ -7,8 +7,11 @@ const vazirmatn = localFont({
   src: "./fonts/Vazirmatn-Variable.woff2",
   variable: "--font-vazirmatn",
   weight: "100 900",
-  display: "swap",
+  display: "swap", // text shows at once in a system font, then swaps
+  fallback: ["Tahoma", "Arial", "sans-serif"],
 });
+
+const INTRO_GATE = `try{var t=+localStorage.getItem("alma-intro-seen-at")||0;if((t&&Date.now()-t<864e5)||/[?&]shot\\b/.test(location.search)||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.setAttribute("data-intro","skip")}catch(e){}`;
 
 const SITE_URL = process.env.SITE_URL || "https://alma.artepersia.com";
 
@@ -34,7 +37,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl" className={`${vazirmatn.variable} h-full antialiased`}>
+    <html
+      lang="fa"
+      dir="rtl"
+      className={`${vazirmatn.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Runs before the first paint: returning visitors (intro seen < 24h ago),
+            reduced-motion users and ?shot never see the intro overlay — not even for a frame.
+            Keep the key / window in sync with src/lib/intro.ts */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: INTRO_GATE,
+          }}
+        />
+      </head>
       <body className="min-h-full font-sans">{children}</body>
     </html>
   );

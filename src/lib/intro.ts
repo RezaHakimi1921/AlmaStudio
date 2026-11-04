@@ -5,30 +5,33 @@ import { hasShotParam } from "./client";
 const KEY = "alma-intro-seen-at";
 const REPLAY_AFTER_MS = 24 * 60 * 60 * 1000; // once per day
 
-let decided: boolean | null = null;
+/**
+ * Remembered in memory too: in-app browsers (Instagram, Bale…) sometimes block
+ * storage, and client-side navigation (back → forward) must still skip the intro.
+ */
+let playedInMemory = false;
 
 /**
  * Should the cinematic intro be skipped?
- * Decided once per page load (stable for useSyncExternalStore):
- * skip for ?shot, reduced motion, or if it already played in the last 24h.
+ * Skip for ?shot, reduced motion, or if it already played in the last 24h.
+ * Read fresh on every mount — the caller latches the first answer so the intro
+ * is never cut short halfway through its own playback.
  */
 export function shouldSkipIntro(): boolean {
-  if (decided !== null) return decided;
-  let seenRecently = false;
+  if (playedInMemory) return true;
+  if (hasShotParam()) return true;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
   try {
     const at = Number(localStorage.getItem(KEY) || 0);
-    seenRecently = at > 0 && Date.now() - at < REPLAY_AFTER_MS;
+    return at > 0 && Date.now() - at < REPLAY_AFTER_MS;
   } catch {
-    /* storage blocked → just play it */
+    return false; // storage blocked → just play it (once, thanks to playedInMemory)
   }
-  decided =
-    hasShotParam() ||
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-    seenRecently;
-  return decided;
 }
 
+/** Call the moment the intro starts — not when it ends — so leaving early still counts. */
 export function markIntroSeen() {
+  playedInMemory = true;
   try {
     localStorage.setItem(KEY, String(Date.now()));
   } catch {

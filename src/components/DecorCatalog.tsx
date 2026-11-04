@@ -15,6 +15,7 @@ import { GALLERY_CATEGORIES } from "@/lib/types";
 import { AlmaAppleLogo } from "./AlmaAppleLogo";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { ContactBar } from "./ContactBar";
+import { SkeletonImage } from "./SkeletonImage";
 import { ArrowRightIcon, CheckIcon, CloseIcon, CopyIcon, ShareIcon } from "./Icons";
 
 type Props = {
@@ -128,12 +129,11 @@ export function DecorCatalog({ items, phone, maps, announcement, backHref = "/" 
                 >
                   <button
                     type="button"
-                    className="decor-card__img"
+                    className="decor-card__img skel"
                     onClick={() => setOpen(d)}
                     aria-label={`نمایش بزرگ دکور ${toFaDigits(d.number)}`}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={d.imageUrl} alt={d.name} loading={i < 4 ? "eager" : "lazy"} />
+                    <SkeletonImage src={d.imageUrl} alt={d.name} loading={i < 4 ? "eager" : "lazy"} />
                     <span className="decor-card__num">{toFaDigits(d.number)}</span>
                   </button>
                   <div className="decor-card__body">
@@ -198,8 +198,14 @@ export function DecorCatalog({ items, phone, maps, announcement, backHref = "/" 
                 <CloseIcon />
               </button>
               <div className="lightbox__stage">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={open.imageUrl} alt={open.name} onClick={(e) => e.stopPropagation()} />
+                <div className="lightbox__frame skel">
+                  <SkeletonImage
+                    key={open.id}
+                    src={open.imageUrl}
+                    alt={open.name}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
               </div>
               <div className="lightbox__meta decor-lightbox__meta" onClick={(e) => e.stopPropagation()}>
                 <p>

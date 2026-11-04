@@ -97,9 +97,12 @@ nextjs-portal,
     display: none !important;
   }
 
+  .page-fade {
+    animation: none !important;
+  }
+
   .map-sheet__panel,
   .link-shell,
-  .hero-photo,
   .hero-copy,
   .hero-stagger,
   [data-reveal] {
@@ -242,6 +245,11 @@ nextjs-portal,
   animation: intro-failsafe 0.6s 6s forwards;
 }
 
+/* set by the inline script in layout.tsx before first paint */
+html[data-intro="skip"] .cinema-intro {
+  display: none !important;
+}
+
 .cinema-intro--out {
   pointer-events: none;
   animation: intro-lift 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards;
@@ -249,6 +257,14 @@ nextjs-portal,
 
 .cinema-intro--out .cinema-intro__copy {
   animation: intro-copy-out 0.5s ease forwards;
+}
+
+/* the timeline starts only once the photo is decoded (see IntroAnimation) —
+   the iris never opens on a blank frame. The root keeps running: it owns the fail-safe. */
+.cinema-intro:not(.is-ready) *,
+.cinema-intro:not(.is-ready) *::before,
+.cinema-intro:not(.is-ready) *::after {
+  animation-play-state: paused !important;
 }
 
 .cinema-intro__photo-wrap {
@@ -265,7 +281,7 @@ nextjs-portal,
   object-fit: cover;
   object-position: center;
   transform: scale(1.22);
-  filter: saturate(1.05) contrast(1.04) blur(6px);
+  filter: saturate(1.05) contrast(1.04);
   animation: intro-kenburns 3.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
@@ -448,15 +464,37 @@ nextjs-portal,
 
 .cinema-intro__skip {
   position: absolute;
-  bottom: calc(2.2rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(2.6rem + env(safe-area-inset-bottom, 0px));
   left: 50%;
-  transform: translateX(-50%);
   z-index: 3;
-  font-size: 0.8rem;
-  color: rgba(248, 243, 237, 0.75);
-  letter-spacing: 0.04em;
+  min-height: 44px;
+  padding: 0 1.15rem;
+  border: 1px solid rgba(248, 243, 237, 0.32);
+  border-radius: 999px;
+  background: rgba(248, 243, 237, 0.08);
+  font-size: 0.85rem;
+  color: rgba(248, 243, 237, 0.88);
+  letter-spacing: 0.02em;
+  cursor: pointer;
   opacity: 0;
-  animation: alma-fade 0.6s 1.6s ease forwards;
+  transform: translateX(-50%);
+  transition: transform 0.15s var(--ease-out), background-color 0.2s ease;
+  animation: intro-skip-in 0.5s 0.9s var(--ease-out) forwards;
+}
+
+.cinema-intro__skip:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+@keyframes intro-skip-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
 }
 
 .cinema-intro__progress {
@@ -506,14 +544,9 @@ nextjs-portal,
 @keyframes intro-kenburns {
   0% {
     transform: scale(1.22) translate3d(0, 1.5%, 0);
-    filter: saturate(1.05) contrast(1.04) blur(6px);
-  }
-  45% {
-    filter: saturate(1.05) contrast(1.04) blur(0);
   }
   100% {
     transform: scale(1.04) translate3d(0, -1%, 0);
-    filter: saturate(1.05) contrast(1.04) blur(0);
   }
 }
 
@@ -648,7 +681,7 @@ nextjs-portal,
 }
 
 .link-shell.is-entered .hero-photo {
-  animation: hero-settle 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: hero-settle 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .hero-veil {
@@ -772,12 +805,10 @@ nextjs-portal,
 
 @keyframes hero-settle {
   from {
-    transform: scale(1.16);
-    filter: blur(8px) saturate(1.1);
+    transform: scale(1.12);
   }
   to {
     transform: scale(1.02);
-    filter: blur(0) saturate(1);
   }
 }
 
@@ -2587,12 +2618,11 @@ nextjs-portal,
   height: 92px;
 }
 
-.gallery-teaser__stack img {
+.gallery-teaser__thumb {
   position: absolute;
   inset: 0;
   width: 70px;
   height: 84px;
-  object-fit: cover;
   border-radius: 12px;
   border: 2px solid rgba(255, 255, 255, 0.85);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
@@ -2600,8 +2630,15 @@ nextjs-portal,
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.gallery-teaser:hover .gallery-teaser__stack img,
-.gallery-teaser.is-visible .gallery-teaser__stack img {
+.gallery-teaser__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-teaser:hover .gallery-teaser__thumb,
+.gallery-teaser.is-visible .gallery-teaser__thumb {
   transform: translateX(calc(var(--i) * -12px)) rotate(calc(var(--i) * 9deg - 9deg));
 }
 
@@ -5117,4 +5154,227 @@ a,
 button,
 [role="button"] {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================================
+   Image skeletons — a soft shimmer until the photo has really loaded
+   (SkeletonImage sets data-state on the <img>; the wrapper is `.skel`)
+   ========================================================= */
+:where(.skel) {
+  position: relative;
+  overflow: hidden;
+  --skel-base: #efe3d8;
+  --skel-hi: rgba(255, 255, 255, 0.7);
+}
+
+.hero.skel {
+  --skel-base: #3a1818;
+  --skel-hi: rgba(255, 232, 214, 0.16);
+}
+
+.gallery-teaser .skel {
+  --skel-base: rgba(255, 255, 255, 0.16);
+  --skel-hi: rgba(255, 255, 255, 0.3);
+}
+
+.skel .skel-img {
+  transition:
+    opacity 0.45s var(--ease-out),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.skel .skel-img:not([data-state="loaded"]) {
+  opacity: 0;
+}
+
+/* placeholder tint while loading (and if the photo fails) */
+.skel:has(> .skel-img:not([data-state="loaded"]))::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--skel-base);
+}
+
+/* moving highlight — transform only, so it stays on the GPU */
+.skel:has(> .skel-img[data-state="loading"])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, var(--skel-hi) 50%, transparent 80%);
+  transform: translateX(100%);
+  animation: skel-sweep 1.5s var(--ease-in-out) infinite;
+  pointer-events: none;
+}
+
+@keyframes skel-sweep {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* keep badges / captions crisp above the shimmer */
+.gallery-tile__cap,
+.decor-card__num,
+.decor-teaser__thumbs i {
+  z-index: 2;
+}
+
+/* gallery tiles hold their shape while the photo loads — no jumping grid */
+.gallery-tile:has(> .skel-img:not([data-state="loaded"])) {
+  aspect-ratio: var(--ar, 4 / 5);
+}
+
+/* lightbox: the frame wraps the photo, with a placeholder card until it arrives */
+.lightbox__frame {
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+  max-height: 100%;
+  --skel-base: rgba(255, 255, 255, 0.08);
+  --skel-hi: rgba(255, 255, 255, 0.14);
+}
+
+:where(.lightbox__frame.skel) {
+  overflow: visible; /* keep the photo's soft shadow */
+}
+
+.lightbox__frame img {
+  max-width: 100%;
+  max-height: calc(100dvh - 8.5rem);
+  animation: none; /* the fade-in is handled by .skel-img */
+}
+
+.lightbox__frame:has(> .skel-img:not([data-state="loaded"])) {
+  width: min(78vw, 360px);
+  aspect-ratio: 4 / 5;
+  border-radius: 10px;
+}
+
+.lightbox__frame:has(> .skel-img[data-state="loading"])::after {
+  display: none; /* no sweep on the dark stage — a calm pulse instead */
+}
+
+.lightbox__frame:has(> .skel-img[data-state="loading"])::before {
+  animation: skel-pulse 1.4s ease-in-out infinite;
+  border-radius: 10px;
+}
+
+@keyframes skel-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* route-level loading skeletons (loading.tsx) */
+.sk-block {
+  position: relative;
+  overflow: hidden;
+  background: #efe3d8;
+  --skel-hi: rgba(255, 255, 255, 0.7);
+}
+
+.sk-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, var(--skel-hi) 50%, transparent 80%);
+  transform: translateX(100%);
+  animation: skel-sweep 1.5s var(--ease-in-out) infinite;
+}
+
+.sk-line {
+  height: 0.85rem;
+  border-radius: 999px;
+}
+
+.sk-hero {
+  position: relative;
+  min-height: min(78vh, 640px);
+  display: flex;
+  align-items: flex-end;
+  background: #3a1818;
+  --skel-hi: rgba(255, 232, 214, 0.14);
+  animation: alma-fade 0.3s var(--ease-out) both;
+}
+
+.sk-hero__glass {
+  width: 100%;
+  margin: 0 1.15rem 2.4rem;
+  padding: 1.05rem 1.1rem 1.2rem;
+  display: grid;
+  gap: 0.7rem;
+  border-radius: 22px;
+  background: rgba(248, 243, 237, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.sk-hero__glass .sk-block {
+  background: rgba(255, 255, 255, 0.18);
+  --skel-hi: rgba(255, 255, 255, 0.22);
+}
+
+.sk-body {
+  position: relative;
+  margin-top: -1.25rem;
+  padding: 1.75rem 1.1rem 0;
+  display: grid;
+  gap: 0.95rem;
+  border-radius: 24px 24px 0 0;
+  background: var(--alma-cream);
+}
+
+.sk-card {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1.05rem 1.1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(168, 50, 50, 0.1);
+}
+
+.sk-head {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 2rem 1rem 1rem;
+}
+
+.sk-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.sk-tabs {
+  height: 46px;
+  margin: 0.4rem 0.8rem 1rem;
+  border-radius: 999px;
+}
+
+.sk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  padding: 0 0.8rem;
+}
+
+.sk-grid .sk-block {
+  border-radius: 16px;
+}
+
+@media (min-width: 768px) {
+  .sk-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* soft route-to-route fade (template.tsx) — opacity only, so fixed bars stay put */
+.page-fade {
+  animation: page-fade-in 0.22s var(--ease-out) backwards;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
 }

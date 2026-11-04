@@ -2,6 +2,7 @@
 
 import { AlmaAppleLogo } from "./AlmaAppleLogo";
 import { ChevronDownIcon } from "./Icons";
+import { SkeletonImage } from "./SkeletonImage";
 
 type Props = {
   title: string;
@@ -21,15 +22,8 @@ export function HeroSection({
   overlay,
 }: Props) {
   return (
-    <header className="hero">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="hero-photo"
-        src={heroImageUrl}
-        alt=""
-        decoding="async"
-        fetchPriority="high"
-      />
+    <header className="hero skel">
+      <SkeletonImage className="hero-photo" src={heroImageUrl} fetchPriority="high" />
       <div className="hero-veil" style={{ background: overlay }} aria-hidden="true" />
       <div className="hero-shine" aria-hidden="true" />
       <div className="hero-copy">

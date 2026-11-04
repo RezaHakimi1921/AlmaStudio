@@ -41,16 +41,24 @@ type Props = {
 
 export function LinkPageView({ page, settings, announcementLive, preview = false }: Props) {
   const skipIntroStored = useClientValue(shouldSkipIntro);
+  // Latch the first real answer: the intro marks itself "seen" when it starts,
+  // which flips the live value — without the latch it would vanish mid-playback.
+  const [latchedSkip, setLatchedSkip] = useState<boolean | null>(null);
+  if (latchedSkip === null && skipIntroStored !== null) setLatchedSkip(skipIntroStored);
   // admin preview: no intro, no stats
-  const skipIntro = preview ? true : skipIntroStored;
+  const skipIntro = preview ? true : latchedSkip;
   const [introDone, setIntroDone] = useState(false);
   const entered = skipIntro === true || introDone;
   const shellRef = useRef<HTMLElement>(null);
   const theme = PAGE_THEMES[page.introTheme];
   const garden = page.introTheme.startsWith("outdoor");
 
+  // once is enough: remember right away, so going back and returning never replays it
+  useEffect(() => {
+    if (skipIntro === false) markIntroSeen();
+  }, [skipIntro]);
+
   const onIntroDone = useCallback(() => {
-    markIntroSeen();
     setIntroDone(true);
   }, []);
 

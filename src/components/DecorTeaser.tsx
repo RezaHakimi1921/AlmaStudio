@@ -6,6 +6,7 @@ import { withFromParam } from "@/lib/routes";
 import { toFaDigits } from "@/lib/tehran";
 import type { Decor } from "@/lib/types";
 import { ArrowLeftIcon } from "./Icons";
+import { SkeletonImage } from "./SkeletonImage";
 
 export const DECOR_PATH = "/dekor";
 
@@ -24,9 +25,8 @@ export function DecorTeaser({ items, from }: { items: Decor[]; from: string }) {
     >
       <div className="decor-teaser__thumbs" aria-hidden="true">
         {shown.map((d) => (
-          <span key={d.id}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={d.imageUrl} alt="" loading="lazy" />
+          <span key={d.id} className="skel">
+            <SkeletonImage src={d.imageUrl} loading="lazy" />
             <i>{toFaDigits(d.number)}</i>
           </span>
         ))}
