@@ -5617,3 +5617,55 @@ button,
     animation: hub-apple-in 0.01s forwards;
   }
 }
+
+/* admin: reorder links */
+.dash-order-hint {
+  margin: -0.3rem 0 0.6rem;
+  font-size: 0.8rem;
+  color: var(--alma-muted);
+}
+
+.dash-order-error {
+  margin: 0 0 0.6rem;
+  font-size: 0.82rem;
+  color: #a83232;
+}
+
+.dash-link-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.4rem;
+}
+
+.dash-link-row .dash-link {
+  flex: 1;
+  min-width: 0;
+}
+
+.dash-order {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.dash-order__btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid rgba(168, 50, 50, 0.12);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--alma-ink);
+  cursor: pointer;
+  transition: transform 0.15s var(--ease-out), opacity 0.15s;
+}
+
+.dash-order__btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.dash-order__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}

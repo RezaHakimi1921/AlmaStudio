@@ -237,7 +237,11 @@ function migrateContent(parsed: unknown): SiteContent {
     }),
   );
 
-  const migratedPages = LINK_SLUGS.map((slug) => {
+  // keep the saved order (that is what the main page shows); unknown/missing slugs go last
+  const savedOrder = [...bySlug.keys()].filter((k): k is LinkSlug => isLinkSlug(k));
+  const orderedSlugs = [...savedOrder, ...LINK_SLUGS.filter((slug) => !savedOrder.includes(slug))];
+
+  const migratedPages = orderedSlugs.map((slug) => {
     const fallback = defaultContent.pages.find((p) => p.slug === slug)!;
     const raw = bySlug.get(slug);
     return raw ? migratePage(raw, fallback) : structuredClone(fallback);
@@ -313,6 +317,18 @@ export async function updatePage(
     { ...page, slug } as unknown as Record<string, unknown>,
     fallback,
   );
+  await writeContent(content);
+  return content;
+}
+
+/** Save the display order of the links (main page + admin list). */
+export async function reorderPages(slugs: string[]): Promise<SiteContent> {
+  const content = await readContent();
+  const wanted = slugs.filter(isLinkSlug);
+  const byslug = new Map(content.pages.map((p) => [p.slug, p] as const));
+  const first = wanted.map((slug) => byslug.get(slug)).filter((p): p is LinkPageContent => !!p);
+  const rest = content.pages.filter((p) => !(wanted as string[]).includes(p.slug));
+  content.pages = [...first, ...rest];
   await writeContent(content);
   return content;
 }

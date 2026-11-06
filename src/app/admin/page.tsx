@@ -10,6 +10,7 @@ import { faJalali, tehranDateKey, toFaDigits } from "@/lib/tehran";
 import { AnnouncementQuickToggle } from "@/components/AnnouncementQuickToggle";
 import { AdminLoginForm } from "@/components/AdminLoginForm";
 import { AdminLogoutButton } from "@/components/AdminLogoutButton";
+import { AdminLinkOrder } from "@/components/AdminLinkOrder";
 import { AlmaAppleLogo } from "@/components/AlmaAppleLogo";
 
 export const dynamic = "force-dynamic";
@@ -109,29 +110,15 @@ export default async function AdminPage() {
       </nav>
 
       <h2 className="admin-section-title">لینک‌های مشتریان</h2>
-      <ul className="dash-links">
-        {content.pages.map((page) => {
-          const eff = withStudio(page, settings.studio);
-          return (
-            <li key={page.slug}>
-              <Link href={`/admin/${page.slug}`} className="dash-link">
-                <span>
-                  <strong>{page.title}</strong>
-                  <small dir="ltr">{publicPathForSlug(page.slug)}</small>
-                </span>
-                <span className="dash-link__meta">
-                  {page.published ? (
-                    <em className="chip chip--ok">منتشر</em>
-                  ) : (
-                    <em className="chip">پیش‌نویس</em>
-                  )}
-                  {!eff.phone.trim() ? <em className="chip chip--warn">بدون شماره</em> : null}
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <AdminLinkOrder
+        items={content.pages.map((page) => ({
+          slug: page.slug,
+          title: page.title,
+          path: publicPathForSlug(page.slug),
+          published: page.published,
+          noPhone: !withStudio(page, settings.studio).phone.trim(),
+        }))}
+      />
 
       <div className="admin-backup glass">
         <div>
