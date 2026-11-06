@@ -5,7 +5,7 @@ import { useClientValue } from "@/lib/client";
 import { markIntroSeen, shouldSkipIntro } from "@/lib/intro";
 
 /** shortest time the loader is shown (the apple turn + name need ~2.3 s) */
-const MIN_MS = 3400;
+const MIN_MS = 2800;
 /** never wait longer than this for the page photo */
 const PHOTO_MAX_MS = 4500;
 const EXIT_MS = 700;
