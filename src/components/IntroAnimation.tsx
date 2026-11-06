@@ -17,12 +17,12 @@ const READY_TIMEOUT_MS = 1400;
 /** timeline length, counted from the moment the photo is ready */
 const DURATION_MS = 3600;
 const EXIT_MS = 800;
-const PARTICLES = 14;
+const PARTICLES = 6;
 
 /**
  * Cinematic opening — shown once per visitor (see lib/intro.ts):
  * 1. dark frame → waits until the hero photo is decoded (never opens on a blank frame)
- * 2. camera iris opens on the photo
+ * 2. the photo fades in with a slow push
  * 3. apple mark blooms with light rings
  * 4. brand + label wipe in, a light sweep crosses the type
  * 5. floating petals (studio) / leaves (garden) drift up
@@ -103,14 +103,6 @@ export function IntroAnimation({ theme, brand, label, heroImageUrl, onDone }: Pr
           fetchPriority="high"
         />
         <div className="cinema-intro__veil" />
-        <div className="cinema-intro__leak" />
-        <div className="cinema-intro__grain" />
-      </div>
-
-      <div className="cinema-intro__blades" aria-hidden="true">
-        {Array.from({ length: 6 }, (_, i) => (
-          <span key={i} style={{ ["--i" as string]: i }} />
-        ))}
       </div>
 
       <div className="cinema-intro__particles" aria-hidden="true">

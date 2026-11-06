@@ -189,8 +189,8 @@ nextjs-portal,
 /* Liquid glass — photos, cards, floating CTAs */
 .glass {
   background: rgba(248, 243, 237, 0.58);
-  backdrop-filter: blur(22px) saturate(1.35);
-  -webkit-backdrop-filter: blur(22px) saturate(1.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.55);
   box-shadow:
     0 10px 36px rgba(42, 26, 26, 0.1),
@@ -199,8 +199,8 @@ nextjs-portal,
 
 .glass-strong {
   background: rgba(248, 243, 237, 0.78);
-  backdrop-filter: blur(26px) saturate(1.4);
-  -webkit-backdrop-filter: blur(26px) saturate(1.4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.62);
   box-shadow:
     0 14px 44px rgba(42, 26, 26, 0.14),
@@ -273,8 +273,8 @@ html[data-intro="skip"] .hub-intro {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  clip-path: circle(0% at 50% 46%);
-  animation: iris-open 1.5s 0.2s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  opacity: 0;
+  animation: intro-photo-in 1s 0.1s var(--ease-out) forwards;
 }
 
 .cinema-intro__photo {
@@ -282,8 +282,8 @@ html[data-intro="skip"] .hub-intro {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transform: scale(1.22);
-  filter: saturate(1.05) contrast(1.04);
+  transform: scale(1.14);
+  will-change: transform;
   animation: intro-kenburns 3.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
@@ -299,59 +299,6 @@ html[data-intro="skip"] .hub-intro {
   background:
     radial-gradient(ellipse at center, rgba(18, 28, 18, 0.12) 15%, rgba(18, 28, 18, 0.62) 100%),
     linear-gradient(180deg, rgba(18, 28, 18, 0.2) 0%, rgba(40, 18, 16, 0.58) 100%);
-}
-
-/* warm light leak sweeping across the frame */
-.cinema-intro__leak {
-  position: absolute;
-  inset: -20%;
-  background:
-    radial-gradient(40% 35% at 30% 40%, rgba(255, 190, 140, 0.55), transparent 70%),
-    radial-gradient(30% 30% at 70% 60%, rgba(255, 120, 110, 0.35), transparent 70%);
-  mix-blend-mode: screen;
-  opacity: 0;
-  animation: light-leak 2.6s 0.9s ease-in-out forwards;
-}
-
-.cinema-intro--garden .cinema-intro__leak {
-  background:
-    radial-gradient(40% 35% at 30% 40%, rgba(255, 226, 160, 0.55), transparent 70%),
-    radial-gradient(30% 30% at 70% 60%, rgba(170, 220, 160, 0.35), transparent 70%);
-}
-
-.cinema-intro__grain {
-  position: absolute;
-  inset: 0;
-  opacity: 0.12;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-  mix-blend-mode: soft-light;
-}
-
-/* aperture blades */
-.cinema-intro__blades {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  animation: blades-fade 0.4s 1.55s forwards;
-}
-
-.cinema-intro__blades span {
-  --rot: calc(var(--i) * 60deg);
-  position: absolute;
-  left: 50%;
-  top: 46%;
-  width: 160vmax;
-  height: 160vmax;
-  transform-origin: 0 0;
-  transform: rotate(var(--rot)) skewX(-28deg);
-  background: linear-gradient(135deg, #2a1010 0%, #140808 40%, #0c0404 100%);
-  box-shadow: inset 1px 1px 0 rgba(255, 210, 190, 0.18);
-  animation: blade-open 1.45s 0.15s cubic-bezier(0.7, 0, 0.2, 1) forwards;
-}
-
-.cinema-intro--garden .cinema-intro__blades span {
-  background: linear-gradient(135deg, #1c2a1d 0%, #0f170f 40%, #080c08 100%);
 }
 
 /* floating petals / leaves */
@@ -373,7 +320,6 @@ html[data-intro="skip"] .hub-intro {
   opacity: 0;
   transform: scale(var(--s)) rotate(var(--r));
   animation: petal-rise 3s var(--d) cubic-bezier(0.3, 0.1, 0.4, 1) forwards;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
 }
 
 .cinema-intro--garden .cinema-intro__particles span {
@@ -396,10 +342,6 @@ html[data-intro="skip"] .hub-intro {
   animation: apple-bloom 0.9s 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-.cinema-intro__mark .alma-logo {
-  filter: drop-shadow(0 6px 24px rgba(255, 200, 180, 0.45));
-}
-
 .cinema-intro__ring {
   position: absolute;
   width: 74px;
@@ -420,8 +362,8 @@ html[data-intro="skip"] .hub-intro {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.15;
-  clip-path: inset(0 0 0 100%);
-  animation: text-wipe 0.9s 1.25s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  opacity: 0;
+  animation: alma-rise-soft 0.9s 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .cinema-intro__brand-text {
@@ -442,7 +384,6 @@ html[data-intro="skip"] .hub-intro {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.45));
   animation: text-shine 1.3s 1.9s ease-in-out forwards;
 }
 
@@ -522,47 +463,12 @@ html[data-intro="skip"] .hub-intro {
   animation: progress-fill 2.8s 0.1s linear forwards;
 }
 
-@keyframes iris-open {
-  0% {
-    clip-path: circle(0% at 50% 46%);
-  }
-  100% {
-    clip-path: circle(85% at 50% 46%);
-  }
-}
-
-@keyframes blade-open {
-  to {
-    transform: rotate(calc(var(--rot) + 38deg)) skewX(-28deg) translate(22vmax, 22vmax);
-  }
-}
-
-@keyframes blades-fade {
-  to {
-    opacity: 0;
-  }
-}
-
 @keyframes intro-kenburns {
   0% {
-    transform: scale(1.22) translate3d(0, 1.5%, 0);
+    transform: scale(1.14);
   }
   100% {
-    transform: scale(1.04) translate3d(0, -1%, 0);
-  }
-}
-
-@keyframes light-leak {
-  0% {
-    opacity: 0;
-    transform: translate3d(-12%, 4%, 0);
-  }
-  40% {
-    opacity: 0.85;
-  }
-  100% {
-    opacity: 0.25;
-    transform: translate3d(12%, -4%, 0);
+    transform: scale(1.02);
   }
 }
 
@@ -627,11 +533,15 @@ html[data-intro="skip"] .hub-intro {
 }
 
 @keyframes intro-lift {
-  0% {
-    clip-path: inset(0 0 0 0);
+  to {
+    opacity: 0;
+    transform: translate3d(0, -8%, 0);
   }
-  100% {
-    clip-path: inset(0 0 100% 0);
+}
+
+@keyframes intro-photo-in {
+  to {
+    opacity: 1;
   }
 }
 
@@ -639,7 +549,6 @@ html[data-intro="skip"] .hub-intro {
   to {
     opacity: 0;
     transform: translateY(-28px) scale(0.96);
-    filter: blur(4px);
   }
 }
 
@@ -709,7 +618,7 @@ html[data-intro="skip"] .hub-intro {
 }
 
 .link-shell.is-entered .hero-shine {
-  animation: hero-shine 2.2s 0.5s ease-in-out both;
+  display: none;
 }
 
 .hero-copy {
@@ -724,8 +633,8 @@ html[data-intro="skip"] .hub-intro {
   padding: 1.05rem 1.1rem 1.2rem;
   border-radius: 22px;
   background: rgba(248, 243, 237, 0.24);
-  backdrop-filter: blur(20px) saturate(1.35);
-  -webkit-backdrop-filter: blur(20px) saturate(1.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.42);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.22),
@@ -5497,7 +5406,6 @@ button,
 .hub-intro__apple-art {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 14px 14px rgba(70, 20, 20, 0.28));
 }
 
 /* soft contact shadow on the "floor" under the apple */
@@ -5668,4 +5576,16 @@ button,
 .dash-order__btn:disabled {
   opacity: 0.35;
   cursor: default;
+}
+
+/* the page below the intro is not painted until the intro hands over (a failsafe shows it anyway) */
+html:not([data-intro="skip"]) .link-shell:not(.is-entered) {
+  visibility: hidden;
+  animation: shell-failsafe 0.01s 8s forwards;
+}
+
+@keyframes shell-failsafe {
+  to {
+    visibility: visible;
+  }
 }
