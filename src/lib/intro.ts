@@ -2,14 +2,18 @@
 
 import { hasShotParam } from "./client";
 
-const KEY = "alma-intro-seen-at";
+/** each page has its own intro, so each remembers on its own: the main page's intro never hides a link's */
+function keyFor(): string {
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  return `alma-intro:${path}`;
+}
 const REPLAY_AFTER_MS = 24 * 60 * 60 * 1000; // once per day
 
 /**
  * Remembered in memory too: in-app browsers (Instagram, Bale…) sometimes block
  * storage, and client-side navigation (back → forward) must still skip the intro.
  */
-let playedInMemory = false;
+const playedInMemory = new Set<string>();
 
 /**
  * Should the cinematic intro be skipped?
@@ -21,9 +25,9 @@ export function shouldSkipIntro(): boolean {
   if (hasShotParam()) return true;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
   if (/[?&]intro=1\b/.test(window.location.search)) return false; // force: ?intro=1
-  if (playedInMemory) return true;
+  if (playedInMemory.has(keyFor())) return true;
   try {
-    const at = Number(localStorage.getItem(KEY) || 0);
+    const at = Number(localStorage.getItem(keyFor()) || 0);
     return at > 0 && Date.now() - at < REPLAY_AFTER_MS;
   } catch {
     return false; // storage blocked → just play it (once, thanks to playedInMemory)
@@ -32,9 +36,9 @@ export function shouldSkipIntro(): boolean {
 
 /** Call the moment the intro starts — not when it ends — so leaving early still counts. */
 export function markIntroSeen() {
-  playedInMemory = true;
+  playedInMemory.add(keyFor());
   try {
-    localStorage.setItem(KEY, String(Date.now()));
+    localStorage.setItem(keyFor(), String(Date.now()));
   } catch {
     /* ignore */
   }
