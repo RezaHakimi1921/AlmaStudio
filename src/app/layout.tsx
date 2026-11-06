@@ -11,7 +11,7 @@ const vazirmatn = localFont({
   fallback: ["Tahoma", "Arial", "sans-serif"],
 });
 
-const INTRO_GATE = `try{var s=location.search,t=+localStorage.getItem("alma-intro-seen-at")||0;if(matchMedia("(prefers-reduced-motion: reduce)").matches||/[?&]shot\\b/.test(s)||(!/[?&]intro=1\\b/.test(s)&&t&&Date.now()-t<864e5))document.documentElement.setAttribute("data-intro","skip")}catch(e){}`;
+const INTRO_GATE = `try{var s=location.search,k="alma-intro:"+(location.pathname.replace(/\\/+$/,"")||"/"),t=+localStorage.getItem(k)||0;if(matchMedia("(prefers-reduced-motion: reduce)").matches||/[?&]shot\\b/.test(s)||(!/[?&]intro=1\\b/.test(s)&&t&&Date.now()-t<864e5))document.documentElement.setAttribute("data-intro","skip")}catch(e){}`;
 
 const SITE_URL = process.env.SITE_URL || "https://alma.artepersia.com";
 
