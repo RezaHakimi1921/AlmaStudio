@@ -16,4 +16,4 @@ The owner (Reza) approves every change himself on GitHub. He does not want to ru
 7. After he merges, the CI/CD workflow runs; the deploy job waits for his approval in the GitHub `production` environment. Only if that is not set up yet, give him the manual deploy command:
    `cd /home/cluadai/alma-studio && git pull origin main && docker compose build && docker compose up -d`
 
-Project rules that always apply: every date is Jalali and Persian; the brand logo is a red apple; follow the Emil Kowalski design rules in `.claude/skills/emil-design-eng`; no sound effects.
+Project rules that always apply: every date is Jalali and Persian; the brand logo is a red apple; follow the Emil Kowalski design rules in `.claude/skills/emil-design-eng`; no sound effects; for every UI, layout, copy or code task apply the `antislop` skills (antislop, antislop-ui, antislop-layoutmobile, antislop-copywriting, antislop-human, antislop-code — from github.com/miqdadbadjuber/anti-slop, MIT) together with the Emil Kowalski rules, and write the Persian UI texts in a plain human tone.

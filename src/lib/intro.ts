@@ -37,6 +37,9 @@ export function shouldSkipIntro(): boolean {
 /** Call the moment the intro starts — not when it ends — so leaving early still counts. */
 export function markIntroSeen() {
   playedInMemory.add(keyFor());
+  // The pre-paint gate in layout.tsx only describes the page that was loaded first.
+  // After a client-side navigation (main page → a link) it is stale and would hide this intro.
+  document.documentElement.removeAttribute("data-intro");
   try {
     localStorage.setItem(keyFor(), String(Date.now()));
   } catch {
